@@ -1,0 +1,125 @@
+/* fundo da página */
+
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  height: 100vh;
+  background: linear-gradient(135deg,#07090e,#436191);
+  overflow:hidden;
+}
+
+/* titulo do sistema */
+
+.logo{
+  color: white;
+  font-size: 48px;
+  margin-bottom: 30px;
+  letter-spacing: 3px;
+  font-weight: bold;
+}
+
+/* caixa do login */
+
+.login-box {
+  background: white;
+  padding: 40px;
+  border-radius: 12px;
+  width: 320px;
+  border: solid 1px #e2e8f0;
+  box-shadow: 0px 10px 25px rgba(0,0,0,0.2);
+  display:flex;
+  flex-direction:column;
+}
+
+/* titulo login */
+
+.login-box h2{
+  text-align:center;
+  margin-bottom:25px;
+}
+
+/* inputs */
+
+.login-box input{
+  width:100%;
+  padding:12px;
+  margin-bottom:15px;
+  border-radius:6px;
+  border:1px solid #cbd5e1;
+  outline:none;
+  transition: all 0.25s ease;
+}
+
+/* animação quando passa ou clica */
+
+.login-box input:hover{
+  border-color:#2563eb;
+}
+
+.login-box input:focus{
+  border-color:#2563eb;
+  box-shadow:0 0 5px rgba(37,99,235,0.4);
+}
+
+/* botão */
+
+.login-box button{
+  width:100%;
+  padding:12px;
+  background:#2563eb;
+  color:white;
+  border:none;
+  border-radius:6px;
+  cursor:pointer;
+  font-weight:bold;
+  transition: all 0.25s ease;
+}
+
+/* hover botão */
+
+.login-box button:hover{
+  background:#1d4ed8;
+  transform: translateY(-2px);
+  box-shadow:0 6px 15px rgba(0,0,0,0.2);
+}
+
+/* click botão */
+
+.login-box button:active{
+  transform: translateY(0px);
+  box-shadow:none;
+}
+
+.filtros-avancados{
+  display:flex;
+  gap:20px;
+  margin-bottom:15px;
+}
+
+.filtros-avancados label{
+  display:block;
+  font-size:12px;
+  margin-bottom:5px;
+}
+
+.filtros-avancados input,
+.filtros-avancados select{
+  padding:6px;
+  border-radius:6px;
+  border:1px solid #ccc;
+}
+
+.tabela-container{
+  max-height: 400px; /* controla o tamanho */
+  overflow-y: auto;
+  border-radius:12px;
+  box-shadow:0px 5px 15px rgba(0,0,0,0.1);
+}
+
+.tabela th{
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}

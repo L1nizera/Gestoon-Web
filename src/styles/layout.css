@@ -1,0 +1,37 @@
+.app-layout{
+  display:flex;
+  height:100vh;
+}
+
+/* sidebar */
+.sidebar{
+  width:220px;
+  background:#0f172a;
+  color:white;
+  flex-shrink:0;
+}
+
+/* área direita inteira */
+.main-area{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+}
+
+/* topbar */
+.topbar{
+  height:60px;
+  background:#0f172a;
+  color:white;
+  display:flex;
+  align-items:center;
+  padding:0 20px;
+}
+
+/* conteúdo */
+.main-content{
+  flex:1;
+  overflow-y:auto;
+  padding:20px;
+  background:#f1f5f9;
+}
