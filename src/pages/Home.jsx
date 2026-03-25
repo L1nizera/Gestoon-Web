@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
-import { tasks } from "../data/Tasks";
 import "../styles/home.css";
+import { tasks } from "../data/Tasks";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
@@ -15,6 +15,8 @@ function Home() {
   const [ordemTitulo, setOrdemTitulo] = useState(null); // "az" | "za"
   const [dataInicio, setDataInicio] = useState("");
   const [dataFim, setDataFim] = useState("");
+  const [tasksState, setTasksState] = useState(tasks);
+  const [editTask, setEditTask] = useState(null);
 
   // ===== Botão Limpar Filtro =====
 
@@ -27,6 +29,27 @@ function Home() {
     setMesFiltro("");
     setOrdemData(null);
     setOrdemTitulo(null);
+  }
+
+  function excluirTask(id) {
+    if (!confirm("Tem certeza que deseja excluir?")) return;
+
+    const novaLista = tasksState.filter((t) => t.id !== id);
+    setTasksState(novaLista);
+    setSelectedTask(null);
+  }
+
+  function abrirEdicao(task) {
+    setSelectedTask(null); // fecha o modal atual
+    setEditTask({ ...task });
+  }
+
+  function salvarEdicao() {
+    setTasksState((prev) =>
+      prev.map((t) => (t.id === editTask.id ? editTask : t)),
+    );
+
+    setEditTask(null);
   }
 
   // ===== Exportar PDF =====
@@ -115,95 +138,109 @@ function Home() {
   };
 
   // ===== FILTRO + BUSCA =====
-  
+
   // eslint-disable-next-line react-hooks/preserve-manual-memoization
   const lista = useMemo(() => {
-  let lista = [...tasks];
+    let lista = [...tasksState];
 
-  // filtro status
-  if (filtro !== "Todos") {
-    lista = lista.filter((t) => t.status === filtro);
-  }
-
-  // busca
-  if (busca) {
-    lista = lista.filter((t) =>
-      t.titulo.toLowerCase().includes(busca.toLowerCase())
-    );
-  }
-
-  // data
-  if (dataInicio || dataFim) {
-    lista = lista.filter((t) => {
-      const [dia, mes, ano] = t.dataCriacao.split("/");
-      const dataTask = new Date(`${ano}-${mes}-${dia}`);
-
-      const inicio = dataInicio ? new Date(dataInicio) : null;
-      const fim = dataFim ? new Date(dataFim) : null;
-
-      if (inicio && fim) return dataTask >= inicio && dataTask <= fim;
-      if (inicio && !fim) return dataTask.getTime() === inicio.getTime();
-      if (!inicio && fim) return dataTask <= fim;
-
-      return true;
-    });
-  }
-
-  // setor
-  if (setorFiltro) {
-    lista = lista.filter((t) => t.setor === setorFiltro);
-  }
-
-  // mês
-  if (mesFiltro) {
-    lista = lista.filter((t) => {
-      const [, mes] = t.dataCriacao.split("/");
-      return mes === mesFiltro;
-    });
-  }
-
-  // ordenação
-  lista.sort((a, b) => {
-    let resultado = 0;
-
-    if (ordemData) {
-      const [dA, mA, yA] = a.dataCriacao.split("/");
-      const [dB, mB, yB] = b.dataCriacao.split("/");
-
-      const dataA = new Date(`${yA}-${mA}-${dA}`);
-      const dataB = new Date(`${yB}-${mB}-${dB}`);
-
-      resultado =
-        ordemData === "recente" ? dataB - dataA : dataA - dataB;
+    // filtro status
+    if (filtro !== "Todos") {
+      lista = lista.filter((t) => t.status === filtro);
     }
 
-    if (resultado === 0 && ordemTitulo) {
-      resultado =
-        ordemTitulo === "az"
-          ? a.titulo.localeCompare(b.titulo)
-          : b.titulo.localeCompare(a.titulo);
+    // busca
+    if (busca) {
+      lista = lista.filter((t) =>
+        t.titulo.toLowerCase().includes(busca.toLowerCase()),
+      );
     }
 
-    return resultado;
-  });
+    // data
+    if (dataInicio || dataFim) {
+      lista = lista.filter((t) => {
+        const [dia, mes, ano] = t.dataCriacao.split("/");
+        const dataTask = new Date(`${ano}-${mes}-${dia}`);
 
-  return lista;
-}, [filtro, busca, dataInicio, dataFim, setorFiltro, mesFiltro, ordemData, ordemTitulo]);
+        const inicio = dataInicio ? new Date(dataInicio) : null;
+        const fim = dataFim ? new Date(dataFim) : null;
+
+        if (inicio && fim) return dataTask >= inicio && dataTask <= fim;
+        if (inicio && !fim) return dataTask.getTime() === inicio.getTime();
+        if (!inicio && fim) return dataTask <= fim;
+
+        return true;
+      });
+    }
+
+    // setor
+    if (setorFiltro) {
+      lista = lista.filter((t) => t.setor === setorFiltro);
+    }
+
+    // mês
+    if (mesFiltro) {
+      lista = lista.filter((t) => {
+        const [, mes] = t.dataCriacao.split("/");
+        return mes === mesFiltro;
+      });
+    }
+
+    // ordenação
+    lista.sort((a, b) => {
+      let resultado = 0;
+
+      if (ordemData) {
+        const [dA, mA, yA] = a.dataCriacao.split("/");
+        const [dB, mB, yB] = b.dataCriacao.split("/");
+
+        const dataA = new Date(`${yA}-${mA}-${dA}`);
+        const dataB = new Date(`${yB}-${mB}-${dB}`);
+
+        resultado = ordemData === "recente" ? dataB - dataA : dataA - dataB;
+      }
+
+      if (resultado === 0 && ordemTitulo) {
+        resultado =
+          ordemTitulo === "az"
+            ? a.titulo.localeCompare(b.titulo)
+            : b.titulo.localeCompare(a.titulo);
+      }
+
+      return resultado;
+    });
+
+    return lista;
+  }, [
+    tasksState,
+    filtro,
+    busca,
+    dataInicio,
+    dataFim,
+    setorFiltro,
+    mesFiltro,
+    ordemData,
+    ordemTitulo,
+  ]);
 
   // ===== RESUMO =====
-  const total = tasks.length;
+  const total = tasksState.length;
 
-  const pendentes = tasks.filter((t) => t.status === "Pendente").length;
-  const andamento = tasks.filter((t) => t.status === "Em andamento").length;
-  const concluidas = tasks.filter((t) => t.status === "Concluída").length;
-  const canceladas = tasks.filter((t) => t.status === "Cancelada").length;
+  const pendentes = tasksState.filter((t) => t.status === "Pendente").length;
+  const andamento = tasksState.filter(
+    (t) => t.status === "Em andamento",
+  ).length;
+  const concluidas = tasksState.filter((t) => t.status === "Concluída").length;
+  const canceladas = tasksState.filter((t) => t.status === "Cancelada").length;
 
-  const dataGrafico = useMemo(() => [
-  { name: "Pendentes", value: pendentes },
-  { name: "Em andamento", value: andamento },
-  { name: "Concluídas", value: concluidas },
-  { name: "Canceladas", value: canceladas },
-], [pendentes, andamento, concluidas, canceladas]);
+  const dataGrafico = useMemo(
+    () => [
+      { name: "Pendentes", value: pendentes },
+      { name: "Em andamento", value: andamento },
+      { name: "Concluídas", value: concluidas },
+      { name: "Canceladas", value: canceladas },
+    ],
+    [pendentes, andamento, concluidas, canceladas],
+  );
 
   return (
     <div className="dashboard">
@@ -383,7 +420,13 @@ function Home() {
 
           <tbody>
             {lista.map((task) => (
-              <tr key={task.id} onClick={() => setSelectedTask(task)}>
+              <tr
+                key={task.id}
+                onClick={(e) => {
+                  if (e.target.tagName === "BUTTON") return;
+                  setSelectedTask(task);
+                }}
+              >
                 <td>{task.titulo}</td>
 
                 <td>
@@ -411,21 +454,153 @@ function Home() {
       {/* ===== MODAL ===== */}
       {selectedTask && (
         <>
-          <div className="overlay"></div>
+          <div className="overlay" onClick={() => setSelectedTask(null)}></div>
 
-          <div className="task-modal">
-            <h2>{selectedTask.titulo}</h2>
+          <div className="task-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>{selectedTask.titulo}</h2>
 
-            <p>Status: {selectedTask.status}</p>
-            <p>Prioridade: {selectedTask.prioridade}</p>
-            <p>Setor: {selectedTask.setor}</p>
-            <p>Data: {selectedTask.dataCriacao}</p>
-            <p>Criado por: {selectedTask.criadoPor}</p>
-            <p>Horário: {selectedTask.horaCriacao}</p>
+              <span className={`badge ${statusMap[selectedTask.status]}`}>
+                {selectedTask.status}
+              </span>
+            </div>
 
-            <p className="descricao">{selectedTask.descricao}</p>
+            <div className="modal-grid">
+              <div>
+                <strong>Prioridade</strong>
+                <span
+                  className={`badge ${prioridadeMap[selectedTask.prioridade]}`}
+                >
+                  {selectedTask.prioridade}
+                </span>
+              </div>
 
-            <button onClick={() => setSelectedTask(null)}>Fechar</button>
+              <div>
+                <strong>Setor</strong>
+                <p>{selectedTask.setor}</p>
+              </div>
+
+              <div>
+                <strong>Criado por</strong>
+                <p>{selectedTask.criadoPor}</p>
+              </div>
+
+              <div>
+                <strong>Data</strong>
+                <p>{selectedTask.dataCriacao}</p>
+              </div>
+
+              <div>
+                <strong>Hora</strong>
+                <p>{selectedTask.horaCriacao}</p>
+              </div>
+            </div>
+
+            <div className="descricao-box">
+              <strong>Descrição</strong>
+              <p>{selectedTask.descricao || "Sem descrição"}</p>
+            </div>
+
+            <div className="modal-actions">
+              <button
+                className="btn-close"
+                onClick={() => setSelectedTask(null)}
+              >
+                Fechar
+              </button>
+
+              <button
+                className="btn-primary"
+                onClick={() => abrirEdicao(selectedTask)}
+              >
+                Editar
+              </button>
+
+              <button
+                className="btn-danger"
+                onClick={() => excluirTask(selectedTask.id)}
+              >
+                Excluir
+              </button>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* ===== MODAL EDITAR ===== */}
+      {editTask && (
+        <>
+          <div className="overlay" onClick={() => setEditTask(null)}></div>
+
+          <div className="task-modal" onClick={(e) => e.stopPropagation()}>
+            <h2>Editar Tarefa</h2>
+
+            <div className="form-group">
+              <label>Setor</label>
+              <select
+                value={editTask.setor}
+                onChange={(e) =>
+                  setEditTask({ ...editTask, setor: e.target.value })
+                }
+              >
+                {setores.map((s) => (
+                  <option key={s}>{s}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="form-group">
+              <label>Status</label>
+              <select
+                value={editTask.status}
+                onChange={(e) =>
+                  setEditTask({ ...editTask, status: e.target.value })
+                }
+              >
+                <option>Pendente</option>
+                <option>Em andamento</option>
+                <option>Concluída</option>
+                <option>Cancelada</option>
+              </select>
+            </div>
+
+            <div className="form-group">
+              <label>Prioridade</label>
+              <select
+                value={editTask.prioridade}
+                onChange={(e) =>
+                  setEditTask({ ...editTask, prioridade: e.target.value })
+                }
+              >
+                <option>Alta</option>
+                <option>Média</option>
+                <option>Baixa</option>
+              </select>
+            </div>
+
+            <div className="form-group">
+              <label>Descrição</label>
+              <textarea
+                rows={4}
+                value={editTask.descricao}
+                onChange={(e) =>
+                  setEditTask({ ...editTask, descricao: e.target.value })
+                }
+              />
+            </div>
+
+            <div className="modal-actions">
+              <button
+                className="btn-secondary"
+                onClick={() => setEditTask(null)}
+              >
+                Cancelar
+              </button>
+
+              <button className="btn-primary" onClick={salvarEdicao}>
+                Salvar
+              </button>
+            </div>
           </div>
         </>
       )}
