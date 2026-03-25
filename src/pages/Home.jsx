@@ -1,74 +1,135 @@
-import { useState } from "react";
-import { tasks } from "../data/Tasks";
+import { useState, useMemo } from "react";
 import "../styles/home.css";
+import { tasks } from "../data/Tasks";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
-import jsPDF from "jspdf"
-import autoTable from "jspdf-autotable"
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 function Home() {
   const [selectedTask, setSelectedTask] = useState(null);
   const [filtro, setFiltro] = useState("Todos");
   const [busca, setBusca] = useState("");
-  const [ordemData, setOrdemData] = useState(null); // "recente" | "antigo"
-  const [dataFiltro, setDataFiltro] = useState("");
+  const [ordemData, setOrdemData] = useState("recente"); // "recente" | "antigo"
   const [setorFiltro, setSetorFiltro] = useState("");
+  const [mesFiltro, setMesFiltro] = useState("");
+  const [ordemTitulo, setOrdemTitulo] = useState(null); // "az" | "za"
+  const [dataInicio, setDataInicio] = useState("");
+  const [dataFim, setDataFim] = useState("");
+  const [tasksState, setTasksState] = useState(tasks);
+  const [editTask, setEditTask] = useState(null);
+
+  // ===== Botão Limpar Filtro =====
+
+  function limparFiltros() {
+    setFiltro("Todos");
+    setBusca("");
+    setDataInicio("");
+    setDataFim("");
+    setSetorFiltro("");
+    setMesFiltro("");
+    setOrdemData(null);
+    setOrdemTitulo(null);
+  }
+
+  function excluirTask(id) {
+    if (!confirm("Tem certeza que deseja excluir?")) return;
+
+    const novaLista = tasksState.filter((t) => t.id !== id);
+    setTasksState(novaLista);
+    setSelectedTask(null);
+  }
+
+  function abrirEdicao(task) {
+    setSelectedTask(null); // fecha o modal atual
+    setEditTask({ ...task });
+  }
+
+  function salvarEdicao() {
+    setTasksState((prev) =>
+      prev.map((t) => (t.id === editTask.id ? editTask : t)),
+    );
+
+    setEditTask(null);
+  }
 
   // ===== Exportar PDF =====
   function exportarPDF() {
-  const doc = new jsPDF()
+    const doc = new jsPDF();
+    const dadosExport = lista; // usa exatamente o que está filtrado
 
-  // ===== TÍTULO =====
-  doc.setFontSize(18)
-  doc.text("Relatório de Tarefas - Gestoon", 14, 15)
+    // ===== TÍTULO =====
+    doc.setFontSize(18);
+    doc.text("Relatório de Tarefas - Gestoon", 14, 15);
 
-  // ===== DATA =====
-  const hoje = new Date().toLocaleDateString()
-  doc.setFontSize(10)
-  doc.text(`Gerado em: ${hoje}`, 14, 22)
+    // ===== DATA =====
+    const hoje = new Date().toLocaleDateString();
+    doc.setFontSize(10);
+    doc.text(`Gerado em: ${hoje}`, 14, 22);
 
-  // ===== PREPARAR DADOS =====
-  const dados = lista.map((t) => [
-    t.titulo,
-    t.status,
-    t.prioridade,
-    t.setor,
-    t.dataCriacao,
-    t.descricao || "-"
-  ])
+    // ===== PREPARAR DADOS =====
+    const dados = dadosExport.map((t) => [
+      t.titulo,
+      t.status,
+      t.prioridade,
+      t.setor,
+      t.dataCriacao,
+      t.horaCriacao,
+      t.criadoPor,
+      t.descricao || "-",
+    ]);
+    // ===== TABELA =====
+    autoTable(doc, {
+      startY: 30,
+      head: [
+        [
+          "Título",
+          "Status",
+          "Prioridade",
+          "Setor",
+          "Data",
+          "Hora",
+          "Criado por",
+          "Descrição",
+        ],
+      ],
+      body: dados,
 
-  // ===== TABELA =====
-  autoTable(doc, {
-  startY: 30,
-  head: [["Título", "Status", "Prioridade", "Setor", "Data", "Descrição"]],
-  body: dados,
+      styles: {
+        fontSize: 8,
+        lineColor: [200, 200, 200], // cor da linha
+        lineWidth: 0.1, // espessura
+      },
 
-  styles: {
-    fontSize: 8,
-    lineColor: [200, 200, 200], // cor da linha
-    lineWidth: 0.1, // espessura
-  },
+      headStyles: {
+        fillColor: [15, 23, 42],
+        textColor: 255,
+        lineWidth: 0.2,
+      },
 
-  headStyles: {
-    fillColor: [15, 23, 42],
-    textColor: 255,
-    lineWidth: 0.2,
-  },
+      theme: "grid",
+    });
 
-  theme: "grid",
-})
-
-  // ===== SALVAR =====
-  doc.save("relatorio_tarefas.pdf")
-}
+    // ===== SALVAR =====
+    doc.save("relatorio_tarefas.pdf");
+  }
 
   // ===== MAPS =====
   const statusMap = {
     Pendente: "status-pendente",
     "Em andamento": "status-andamento",
     Concluída: "status-concluida",
+    Cancelada: "status-cancelada",
   };
 
-  const setores = ["TI", "Backend", "Financeiro", "RH"];
+  const setores = [
+    "Caixa",
+    "Estoque",
+    "HortiFruti",
+    "Açougue",
+    "Padaria",
+    "Limpeza",
+    "Administração",
+  ];
 
   const prioridadeMap = {
     Alta: "prioridade-alta",
@@ -77,8 +138,10 @@ function Home() {
   };
 
   // ===== FILTRO + BUSCA =====
-  function processarTasks() {
-    let lista = [...tasks];
+
+  // eslint-disable-next-line react-hooks/preserve-manual-memoization
+  const lista = useMemo(() => {
+    let lista = [...tasksState];
 
     // filtro status
     if (filtro !== "Todos") {
@@ -92,46 +155,92 @@ function Home() {
       );
     }
 
-    // filtro por data
-    if (dataFiltro) {
-      lista = lista.filter((t) => t.dataCriacao === dataFiltro);
+    // data
+    if (dataInicio || dataFim) {
+      lista = lista.filter((t) => {
+        const [dia, mes, ano] = t.dataCriacao.split("/");
+        const dataTask = new Date(`${ano}-${mes}-${dia}`);
+
+        const inicio = dataInicio ? new Date(dataInicio) : null;
+        const fim = dataFim ? new Date(dataFim) : null;
+
+        if (inicio && fim) return dataTask >= inicio && dataTask <= fim;
+        if (inicio && !fim) return dataTask.getTime() === inicio.getTime();
+        if (!inicio && fim) return dataTask <= fim;
+
+        return true;
+      });
     }
 
-    // filtro por setor
+    // setor
     if (setorFiltro) {
       lista = lista.filter((t) => t.setor === setorFiltro);
     }
 
-    // ordenação por data
-    if (ordemData) {
-      lista.sort((a, b) => {
-        const [diaA, mesA, anoA] = a.dataCriacao.split("/");
-        const [diaB, mesB, anoB] = b.dataCriacao.split("/");
-
-        const dataA = new Date(`${anoA}-${mesA}-${diaA}`);
-        const dataB = new Date(`${anoB}-${mesB}-${diaB}`);
-
-        return ordemData === "recente" ? dataB - dataA : dataA - dataB;
+    // mês
+    if (mesFiltro) {
+      lista = lista.filter((t) => {
+        const [, mes] = t.dataCriacao.split("/");
+        return mes === mesFiltro;
       });
     }
 
-    return lista;
-  }
+    // ordenação
+    lista.sort((a, b) => {
+      let resultado = 0;
 
-  const lista = processarTasks();
+      if (ordemData) {
+        const [dA, mA, yA] = a.dataCriacao.split("/");
+        const [dB, mB, yB] = b.dataCriacao.split("/");
+
+        const dataA = new Date(`${yA}-${mA}-${dA}`);
+        const dataB = new Date(`${yB}-${mB}-${dB}`);
+
+        resultado = ordemData === "recente" ? dataB - dataA : dataA - dataB;
+      }
+
+      if (resultado === 0 && ordemTitulo) {
+        resultado =
+          ordemTitulo === "az"
+            ? a.titulo.localeCompare(b.titulo)
+            : b.titulo.localeCompare(a.titulo);
+      }
+
+      return resultado;
+    });
+
+    return lista;
+  }, [
+    tasksState,
+    filtro,
+    busca,
+    dataInicio,
+    dataFim,
+    setorFiltro,
+    mesFiltro,
+    ordemData,
+    ordemTitulo,
+  ]);
 
   // ===== RESUMO =====
-  const total = tasks.length;
+  const total = tasksState.length;
 
-  const pendentes = tasks.filter((t) => t.status === "Pendente").length;
-  const andamento = tasks.filter((t) => t.status === "Em andamento").length;
-  const concluidas = tasks.filter((t) => t.status === "Concluída").length;
+  const pendentes = tasksState.filter((t) => t.status === "Pendente").length;
+  const andamento = tasksState.filter(
+    (t) => t.status === "Em andamento",
+  ).length;
+  const concluidas = tasksState.filter((t) => t.status === "Concluída").length;
+  const canceladas = tasksState.filter((t) => t.status === "Cancelada").length;
 
-  const dataGrafico = [
-    { name: "Pendentes", value: pendentes },
-    { name: "Em andamento", value: andamento },
-    { name: "Concluídas", value: concluidas },
-  ];
+  const dataGrafico = useMemo(
+    () => [
+      { name: "Pendentes", value: pendentes },
+      { name: "Em andamento", value: andamento },
+      { name: "Concluídas", value: concluidas },
+      { name: "Canceladas", value: canceladas },
+    ],
+    [pendentes, andamento, concluidas, canceladas],
+  );
 
   return (
     <div className="dashboard">
@@ -143,6 +252,7 @@ function Home() {
         <div>Pendentes: {pendentes}</div>
         <div>Em andamento: {andamento}</div>
         <div>Concluídas: {concluidas}</div>
+        <div>Canceladas: {canceladas}</div>
       </div>
 
       {/* ===== BUSCA ===== */}
@@ -152,32 +262,64 @@ function Home() {
           className="busca"
           onChange={(e) => setBusca(e.target.value)}
         />
-
-        <button className="export-btn" onClick={exportarPDF}>Exportar PDF</button>
       </div>
 
       {/* ==== DATA ==== */}
       <div className="filtros-avancados">
         <div>
-          <label>Filtrar por data:</label>
-          <input
-            type="date"
-            onChange={(e) => {
-              const valor = e.target.value;
-              if (valor) {
-                const formatada = valor.split("-").reverse().join("/");
-                setDataFiltro(formatada);
-              } else {
-                setDataFiltro("");
-              }
-            }}
-          />
+          <div>
+            <label>Período: </label>
+
+            <div className="periodo-inputs">
+              <div>
+                <small>De: </small>
+                <input
+                  type="date"
+                  value={dataInicio}
+                  onChange={(e) => setDataInicio(e.target.value)}
+                />
+              </div>
+
+              <div>
+                <small>Até: </small>
+                <input
+                  type="date"
+                  value={dataFim}
+                  onChange={(e) => setDataFim(e.target.value)}
+                />
+              </div>
+            </div>
+          </div>
+
+          <small className="meses">Meses: </small>
+          <select
+            className="filtro-select"
+            value={mesFiltro}
+            onChange={(e) => setMesFiltro(e.target.value)}
+          >
+            <option value="">Todos os meses</option>
+            <option value="01">Janeiro</option>
+            <option value="02">Fevereiro</option>
+            <option value="03">Março</option>
+            <option value="04">Abril</option>
+            <option value="05">Maio</option>
+            <option value="06">Junho</option>
+            <option value="07">Julho</option>
+            <option value="08">Agosto</option>
+            <option value="09">Setembro</option>
+            <option value="10">Outubro</option>
+            <option value="11">Novembro</option>
+            <option value="12">Dezembro</option>
+          </select>
         </div>
 
         {/* SETOR */}
         <div>
           <label>Setor:</label>
-          <select onChange={(e) => setSetorFiltro(e.target.value)}>
+          <select
+            value={setorFiltro}
+            onChange={(e) => setSetorFiltro(e.target.value)}
+          >
             <option value="">Todos</option>
 
             {setores.map((s) => (
@@ -191,36 +333,100 @@ function Home() {
 
       {/* ===== FILTROS ===== */}
       <div className="filtros">
-        <button onClick={() => setFiltro("Todos")}>Todos</button>
-        <button onClick={() => setFiltro("Pendente")}>Pendentes</button>
-        <button onClick={() => setFiltro("Em andamento")}>Em andamento</button>
-        <button onClick={() => setFiltro("Concluída")}>Concluídas</button>
+        <button
+          className={filtro === "Todos" ? "ativo" : ""}
+          onClick={() => setFiltro("Todos")}
+        >
+          Todos
+        </button>
+
+        <button
+          className={filtro === "Pendente" ? "ativo" : ""}
+          onClick={() => setFiltro("Pendente")}
+        >
+          Pendentes
+        </button>
+
+        <button
+          className={filtro === "Em andamento" ? "ativo" : ""}
+          onClick={() => setFiltro("Em andamento")}
+        >
+          Em andamento
+        </button>
+
+        <button
+          className={filtro === "Concluída" ? "ativo" : ""}
+          onClick={() => setFiltro("Concluída")}
+        >
+          Concluídas
+        </button>
+
+        <button
+          className={filtro === "Cancelada" ? "ativo" : ""}
+          onClick={() => setFiltro("Cancelada")}
+        >
+          Canceladas
+        </button>
       </div>
+
+      <button className="limpar-btn" onClick={limparFiltros}>
+        Limpar Filtros
+      </button>
 
       {/* ===== TABELA ===== */}
       <div className="tabela-container">
         <table className="tabela">
           <thead>
             <tr>
-              <th>Título</th>
+              <th
+                className={ordemTitulo ? "coluna-ativa" : ""}
+                onClick={() =>
+                  setOrdemTitulo((prev) => {
+                    if (prev === null) return "az";
+                    if (prev === "az") return "za";
+                    return null;
+                  })
+                }
+              >
+                Título{" "}
+                {ordemTitulo === "az" ? "↑" : ordemTitulo === "za" ? "↓" : ""}
+              </th>
+
               <th>Status</th>
               <th>Prioridade</th>
               <th>Setor</th>
+              <th>Criado por</th>
+              <th>Hora</th>
+
               <th
+                className={ordemData ? "coluna-ativa" : ""}
                 onClick={() =>
-                  setOrdemData((prev) =>
-                    prev === "recente" ? "antigo" : "recente",
-                  )
+                  setOrdemData((prev) => {
+                    if (prev === null) return "recente";
+                    if (prev === "recente") return "antigo";
+                    return null;
+                  })
                 }
               >
-                Data {ordemData === "recente" ? "↓" : "↑"}
+                Data{" "}
+                {ordemData === "recente"
+                  ? "↓"
+                  : ordemData === "antigo"
+                    ? "↑"
+                    : ""}
               </th>
             </tr>
           </thead>
 
           <tbody>
             {lista.map((task) => (
-              <tr key={task.id} onClick={() => setSelectedTask(task)}>
+              <tr
+                key={task.id}
+                onClick={(e) => {
+                  if (e.target.tagName === "BUTTON") return;
+                  setSelectedTask(task);
+                }}
+              >
                 <td>{task.titulo}</td>
 
                 <td>
@@ -236,6 +442,8 @@ function Home() {
                 </td>
 
                 <td>{task.setor}</td>
+                <td>{task.criadoPor}</td>
+                <td>{task.horaCriacao}</td>
                 <td>{task.dataCriacao}</td>
               </tr>
             ))}
@@ -246,41 +454,188 @@ function Home() {
       {/* ===== MODAL ===== */}
       {selectedTask && (
         <>
-          <div className="overlay"></div>
+          <div className="overlay" onClick={() => setSelectedTask(null)}></div>
 
-          <div className="task-modal">
-            <h2>{selectedTask.titulo}</h2>
+          <div className="task-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>{selectedTask.titulo}</h2>
 
-            <p>Status: {selectedTask.status}</p>
-            <p>Prioridade: {selectedTask.prioridade}</p>
-            <p>Setor: {selectedTask.setor}</p>
-            <p>Data: {selectedTask.dataCriacao}</p>
+              <span className={`badge ${statusMap[selectedTask.status]}`}>
+                {selectedTask.status}
+              </span>
+            </div>
 
-            <p className="descricao">{selectedTask.descricao}</p>
+            <div className="modal-grid">
+              <div>
+                <strong>Prioridade</strong>
+                <span
+                  className={`badge ${prioridadeMap[selectedTask.prioridade]}`}
+                >
+                  {selectedTask.prioridade}
+                </span>
+              </div>
 
-            <button onClick={() => setSelectedTask(null)}>Fechar</button>
+              <div>
+                <strong>Setor</strong>
+                <p>{selectedTask.setor}</p>
+              </div>
+
+              <div>
+                <strong>Criado por</strong>
+                <p>{selectedTask.criadoPor}</p>
+              </div>
+
+              <div>
+                <strong>Data</strong>
+                <p>{selectedTask.dataCriacao}</p>
+              </div>
+
+              <div>
+                <strong>Hora</strong>
+                <p>{selectedTask.horaCriacao}</p>
+              </div>
+            </div>
+
+            <div className="descricao-box">
+              <strong>Descrição</strong>
+              <p>{selectedTask.descricao || "Sem descrição"}</p>
+            </div>
+
+            <div className="modal-actions">
+              <button
+                className="btn-close"
+                onClick={() => setSelectedTask(null)}
+              >
+                Fechar
+              </button>
+
+              <button
+                className="btn-primary"
+                onClick={() => abrirEdicao(selectedTask)}
+              >
+                Editar
+              </button>
+
+              <button
+                className="btn-danger"
+                onClick={() => excluirTask(selectedTask.id)}
+              >
+                Excluir
+              </button>
+            </div>
           </div>
         </>
       )}
+
+      {/* ===== MODAL EDITAR ===== */}
+      {editTask && (
+        <>
+          <div className="overlay" onClick={() => setEditTask(null)}></div>
+
+          <div className="task-modal" onClick={(e) => e.stopPropagation()}>
+            <h2>Editar Tarefa</h2>
+
+            <div className="form-group">
+              <label>Setor</label>
+              <select
+                value={editTask.setor}
+                onChange={(e) =>
+                  setEditTask({ ...editTask, setor: e.target.value })
+                }
+              >
+                {setores.map((s) => (
+                  <option key={s}>{s}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="form-group">
+              <label>Status</label>
+              <select
+                value={editTask.status}
+                onChange={(e) =>
+                  setEditTask({ ...editTask, status: e.target.value })
+                }
+              >
+                <option>Pendente</option>
+                <option>Em andamento</option>
+                <option>Concluída</option>
+                <option>Cancelada</option>
+              </select>
+            </div>
+
+            <div className="form-group">
+              <label>Prioridade</label>
+              <select
+                value={editTask.prioridade}
+                onChange={(e) =>
+                  setEditTask({ ...editTask, prioridade: e.target.value })
+                }
+              >
+                <option>Alta</option>
+                <option>Média</option>
+                <option>Baixa</option>
+              </select>
+            </div>
+
+            <div className="form-group">
+              <label>Descrição</label>
+              <textarea
+                rows={4}
+                value={editTask.descricao}
+                onChange={(e) =>
+                  setEditTask({ ...editTask, descricao: e.target.value })
+                }
+              />
+            </div>
+
+            <div className="modal-actions">
+              <button
+                className="btn-secondary"
+                onClick={() => setEditTask(null)}
+              >
+                Cancelar
+              </button>
+
+              <button className="btn-primary" onClick={salvarEdicao}>
+                Salvar
+              </button>
+            </div>
+          </div>
+        </>
+      )}
+
+      <div className="footer-actions">
+        <button className="export-btn" onClick={exportarPDF}>
+          Exportar PDF
+        </button>
+      </div>
 
       {/* ==== Gráfico ==== */}
       <div className="grafico">
         <h3>Status das tarefas</h3>
 
-        <ResponsiveContainer width="100%" height={250}>
+        <ResponsiveContainer width="100%" height={400}>
           <PieChart>
             <Pie
               data={dataGrafico}
               dataKey="value"
               nameKey="name"
               outerRadius={120}
-              innerRadius={50} // deixa estilo "donut"
-              paddingAngle={3}
+              innerRadius={50}
+              activeShape={null}
+              isAnimationActive={false}
+              stroke="none"
+              label={({ name, percent }) =>
+                `${name}: ${(percent * 100).toFixed(0)}%`
+              }
+              labelLine={false}
+              fontSize={20}
             >
               {dataGrafico.map((entry, index) => (
                 <Cell
                   key={index}
-                  fill={["#ef4444", "#f59e0b", "#22c55e"][index]}
+                  fill={["#ef4444", "#f59e0b", "#22c55e", "#6b7280"][index]}
                 />
               ))}
             </Pie>
@@ -296,7 +651,7 @@ function Home() {
               <span
                 className="cor"
                 style={{
-                  background: ["#ef4444", "#f59e0b", "#22c55e"][i],
+                  background: ["#ef4444", "#f59e0b", "#22c55e", "#6b7280"][i],
                 }}
               ></span>
               {item.name} ({item.value})
