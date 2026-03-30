@@ -467,12 +467,14 @@ function Home() {
 
             <div className="modal-grid">
               <div>
-                <strong>Prioridade</strong>
-                <span
-                  className={`badge ${prioridadeMap[selectedTask.prioridade]}`}
-                >
-                  {selectedTask.prioridade}
-                </span>
+                <strong>Prioridade: </strong>
+                <p>
+                  <span
+                    className={`badge ${prioridadeMap[selectedTask.prioridade]}`}
+                  >
+                    {selectedTask.prioridade}
+                  </span>
+                </p>
               </div>
 
               <div>
@@ -535,58 +537,61 @@ function Home() {
           <div className="task-modal" onClick={(e) => e.stopPropagation()}>
             <h2>Editar Tarefa</h2>
 
-            <div className="form-group">
-              <label>Setor</label>
-              <select
-                value={editTask.setor}
-                onChange={(e) =>
-                  setEditTask({ ...editTask, setor: e.target.value })
-                }
-              >
-                {setores.map((s) => (
-                  <option key={s}>{s}</option>
-                ))}
-              </select>
-            </div>
+            <div className="form-grid">
+              <div className="form-group">
+                <label>Setor</label>
+                <select
+                  value={editTask.setor}
+                  onChange={(e) =>
+                    setEditTask({ ...editTask, setor: e.target.value })
+                  }
+                >
+                  {setores.map((s) => (
+                    <option key={s}>{s}</option>
+                  ))}
+                </select>
+              </div>
 
-            <div className="form-group">
-              <label>Status</label>
-              <select
-                value={editTask.status}
-                onChange={(e) =>
-                  setEditTask({ ...editTask, status: e.target.value })
-                }
-              >
-                <option>Pendente</option>
-                <option>Em andamento</option>
-                <option>Concluída</option>
-                <option>Cancelada</option>
-              </select>
-            </div>
+              <div className="form-group">
+                <label>Status</label>
+                <select
+                  value={editTask.status}
+                  onChange={(e) =>
+                    setEditTask({ ...editTask, status: e.target.value })
+                  }
+                >
+                  <option>Pendente</option>
+                  <option>Em andamento</option>
+                  <option>Concluída</option>
+                  <option>Cancelada</option>
+                </select>
+              </div>
 
-            <div className="form-group">
-              <label>Prioridade</label>
-              <select
-                value={editTask.prioridade}
-                onChange={(e) =>
-                  setEditTask({ ...editTask, prioridade: e.target.value })
-                }
-              >
-                <option>Alta</option>
-                <option>Média</option>
-                <option>Baixa</option>
-              </select>
-            </div>
+              <div className="form-group">
+                <label>Prioridade</label>
+                <select
+                  value={editTask.prioridade}
+                  onChange={(e) =>
+                    setEditTask({ ...editTask, prioridade: e.target.value })
+                  }
+                >
+                  <option>Alta</option>
+                  <option>Média</option>
+                  <option>Baixa</option>
+                </select>
+              </div>
 
-            <div className="form-group">
-              <label>Descrição</label>
-              <textarea
-                rows={4}
-                value={editTask.descricao}
-                onChange={(e) =>
-                  setEditTask({ ...editTask, descricao: e.target.value })
-                }
-              />
+              {/* 👇 ocupa linha inteira */}
+              <div className="form-group full">
+                <label>Descrição</label>
+                <textarea
+                  rows={4}
+                  value={editTask.descricao}
+                  onChange={(e) =>
+                    setEditTask({ ...editTask, descricao: e.target.value })
+                  }
+                />
+              </div>
             </div>
 
             <div className="modal-actions">
