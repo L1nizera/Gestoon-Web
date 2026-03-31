@@ -85,15 +85,8 @@ select {
   gap: 5px;
 }
 
-
-.filtros-avancados label {
-  font-size: 13px;
-  font-weight: 500;
-  color: #334155;
-}
-
 .filtros-avancados small {
-  font-size: 11px;
+  font-size: 14px;
   color: #64748b;
 }
 
@@ -198,9 +191,9 @@ select {
   top: 50%;
   left: 50%;
   width: 90%;
-  max-width: 500px;
+  max-width: 600px;
   background: white;
-  padding: 25px;
+  padding: 30px;
   border-radius: 14px;
   box-shadow: 0px 20px 50px rgba(0, 0, 0, 0.25);
   z-index: 1000;
@@ -221,7 +214,7 @@ select {
 .task-modal form {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px;
+  gap: 16px;
 }
 
 /* descrição */
@@ -403,8 +396,10 @@ select {
   outline: none;
 }
 
-.recharts-wrapper:focus,
-.recharts-surface:focus {
+.recharts-layer:focus,
+.recharts-sector:focus,
+.recharts-text:focus,
+.recharts-wrapper *:focus {
   outline: none;
 }
 /* legenda */
@@ -503,6 +498,7 @@ select {
   border-radius: 6px;
   border: 1px solid #cbd5e1;
   font-size: 13px;
+  transition: all 0.2s ease;
 }
 
 .task-modal textarea {
@@ -510,6 +506,27 @@ select {
   resize: none;
 }
 
+
+
+.task-modal h2 {
+   margin-bottom: 15px;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.task-modal input:focus,
+.task-modal textarea:focus,
+.task-modal select:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+}
+
+/* hover leve */
+.task-modal input:hover,
+.task-modal textarea:hover,
+.task-modal select:hover {
+  border-color: #94a3b8;
+}
 
 
 /* botões */
@@ -534,19 +551,21 @@ th:focus {
 /* botão salvar */
 .modal-actions {
   display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  margin-top: 15px;
+  justify-content: space-between;
+  margin-top: 20px;
 }
+
+
 
 .btn-primary {
   background: #2563eb;
   color: white;
   border: none;
-  padding: 8px 14px;
+  padding: 10px 18px;
   border-radius: 6px;
   cursor: pointer;
   transition: 0.2s;
+  font-weight: 600;
 }
 
 .btn-primary:hover {
@@ -555,16 +574,18 @@ th:focus {
 }
 
 .btn-secondary {
-  background: #64748b;
+  background: #64748B;
   color: white;
   border: none;
   padding: 8px 14px;
   border-radius: 6px;
   cursor: pointer;
+  font-weight: 600;
 }
 
 .btn-secondary:hover {
   background: #475569;
+  transform: scale(1.05);
 }
 
 .btn-danger {
@@ -574,6 +595,7 @@ th:focus {
   padding: 8px 14px;
   border-radius: 6px;
   cursor: pointer;
+  font-weight: 600;
 }
 
 .btn-danger:hover {
@@ -588,10 +610,12 @@ th:focus {
   padding: 8px 14px;
   border-radius: 6px;
   cursor: pointer;
+  font-weight: 600;
 }
 
 .btn-close:hover {
   background: #475569;
+  transform: scale(1.05);
 }
 
 
@@ -644,6 +668,7 @@ th:focus {
   flex-direction: column;
   margin-bottom: 12px;
 }
+
 
 .form-group.full {
   grid-column: span 2;

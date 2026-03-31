@@ -315,7 +315,7 @@ function Home() {
 
         {/* SETOR */}
         <div>
-          <label>Setor:</label>
+          <small>Setor:</small>
           <select
             value={setorFiltro}
             onChange={(e) => setSetorFiltro(e.target.value)}
@@ -538,6 +538,19 @@ function Home() {
             <h2>Editar Tarefa</h2>
 
             <div className="form-grid">
+              {/* TÍTULO - NOVO */}
+              <div className="form-group full">
+                <label>Título</label>
+                <input
+                  type="text"
+                  value={editTask.titulo}
+                  onChange={(e) =>
+                    setEditTask({ ...editTask, titulo: e.target.value })
+                  }
+                  placeholder="Digite o título da tarefa..."
+                />
+              </div>
+
               <div className="form-group">
                 <label>Setor</label>
                 <select
@@ -581,7 +594,13 @@ function Home() {
                 </select>
               </div>
 
-              {/* 👇 ocupa linha inteira */}
+              {/* CRIADO POR - NOVO */}
+              <div className="form-group">
+                <label>Criado por</label>
+                <input type="text" value={editTask.criadoPor} disabled />
+              </div>
+
+              {/* DESCRIÇÃO */}
               <div className="form-group full">
                 <label>Descrição</label>
                 <textarea
@@ -602,7 +621,11 @@ function Home() {
                 Cancelar
               </button>
 
-              <button className="btn-primary" onClick={salvarEdicao}>
+              <button
+                className="btn-primary"
+                onClick={salvarEdicao}
+                disabled={!editTask.titulo}
+              >
                 Salvar
               </button>
             </div>
