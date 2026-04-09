@@ -54,65 +54,7 @@ function Sidebar() {
           </Link>
         </li>
 
-        <li>
-          <span
-            onClick={toggleMenu}
-            style={{
-              ...linkStyle,
-              cursor: "pointer"
-            }}
-            onMouseEnter={(e) => e.target.style.background = "#475569"}
-            onMouseLeave={(e) => e.target.style.background = "#334155"}
-          >
-            {open ? "Cadastrar🔼" : "Cadastrar🔽"}
-          </span>
-
-          <ul
-            style={{
-              marginTop: "5px",
-              listStyle: "none",
-              overflow: "hidden",
-              maxHeight: open ? "200px" : "0px",
-              opacity: open ? 1 : 0,
-              transition: "all 0.3s ease",
-              paddingLeft: "10px"
-            }}
-          >
-            <li>
-              <Link 
-                to="/cadastrar/funcionario" 
-                style={subLinkStyle}
-                onClick={() => setOpen(false)}
-                onMouseEnter={(e) => e.target.style.background = "#64748b"}
-                onMouseLeave={(e) => e.target.style.background = "#475569"}
-              >
-                Funcionários
-              </Link>
-            </li>
-            <li>
-              <Link 
-                to="/cadastrar/tarefa" 
-                style={subLinkStyle}
-                onClick={() => setOpen(false)}
-                onMouseEnter={(e) => e.target.style.background = "#64748b"}
-                onMouseLeave={(e) => e.target.style.background = "#475569"}
-              >
-                Tarefas
-              </Link>
-            </li>
-            <li>
-              <Link 
-                to="/cadastrar/usuario" 
-                style={subLinkStyle}
-                onClick={() => setOpen(false)}
-                onMouseEnter={(e) => e.target.style.background = "#64748b"}
-                onMouseLeave={(e) => e.target.style.background = "#475569"}
-              >
-                Usuários
-              </Link>
-            </li>
-          </ul>
-        </li>
+        
 
         <li>
           <Link 

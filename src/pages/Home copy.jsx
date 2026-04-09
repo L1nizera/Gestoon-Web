@@ -17,7 +17,6 @@ function Home() {
   const [dataFim, setDataFim] = useState("");
   const [tasksState, setTasksState] = useState(tasks);
   const [editTask, setEditTask] = useState(null);
-  const [menuAtivo, setMenuAtivo] = useState("tarefas");
 
   // ===== Botão Limpar Filtro =====
 
@@ -245,28 +244,7 @@ function Home() {
 
   return (
     <div className="dashboard">
-      {/* ===== MENU TOPO ===== */}
-      <div className="menu-topo">
-        <div>
-
-          <button
-            className={menuAtivo === "tarefas" ? "ativo" : ""}
-            onClick={() => setMenuAtivo("tarefas")}
-          >
-            Tarefas
-          </button>
-
-          <button
-            className={menuAtivo === "funcionarios" ? "ativo" : ""}
-            onClick={() => setMenuAtivo("funcionarios")}
-          >
-            Funcionários
-          </button>
-        </div>
-      </div>
-
       <h1>Dashboard</h1>
-
 
       {/* ===== RESUMO ===== */}
       <div className="resumo">
