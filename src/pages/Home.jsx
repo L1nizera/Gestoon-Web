@@ -19,6 +19,17 @@ function Home() {
   const [editTask, setEditTask] = useState(null);
   const [menuAtivo, setMenuAtivo] = useState("tarefas");
 
+  // ===== MODAL CRIAR =====
+  const [createTaskOpen, setCreateTaskOpen] = useState(false);
+
+  const [novaTask, setNovaTask] = useState({
+    titulo: "",
+    setor: "Caixa",
+    prioridade: "Média",
+    status: "Pendente",
+    descricao: "",
+  });
+
   // ===== Botão Limpar Filtro =====
 
   function limparFiltros() {
@@ -53,6 +64,38 @@ function Home() {
     setEditTask(null);
   }
 
+  function criarTask() {
+    if (!novaTask.titulo.trim()) return;
+
+    const agora = new Date();
+
+    const dataCriacao = agora.toLocaleDateString("pt-BR");
+    const horaCriacao = agora.toLocaleTimeString("pt-BR", {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+
+    const taskCompleta = {
+      ...novaTask,
+      id: Date.now(),
+      criadoPor: "Admin", // temporário
+      dataCriacao,
+      horaCriacao,
+    };
+
+    setTasksState((prev) => [...prev, taskCompleta]);
+
+    // resetar
+    setNovaTask({
+      titulo: "",
+      setor: "Caixa",
+      prioridade: "Média",
+      status: "Pendente",
+      descricao: "",
+    });
+
+    setCreateTaskOpen(false);
+  }
   // ===== Exportar PDF =====
   function exportarPDF() {
     const doc = new jsPDF();
@@ -376,7 +419,9 @@ function Home() {
         Limpar Filtros
       </button>
 
-      <button className="criar-btn">Criar +</button>
+      <button className="criar-btn" onClick={() => setCreateTaskOpen(true)}>
+        Criar +
+      </button>
 
       {/* ===== TABELA ===== */}
       <div className="tabela-container">
@@ -633,6 +678,142 @@ function Home() {
               >
                 Salvar
               </button>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* ===== MODAL CRIAR ===== */}
+      {createTaskOpen && (
+        <>
+          <div className="overlay" onClick={() => setCreateTaskOpen(false)}></div>
+
+          <div className="task-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>Criar Tarefa</h2>
+            </div>
+
+            <div className="form-grid">
+              {/* TÍTULO */}
+              <div className="form-group full">
+                <label>Título</label>
+                <input
+                  type="text"
+                  value={novaTask.titulo}
+                  onChange={(e) =>
+                    setNovaTask({ ...novaTask, titulo: e.target.value })
+                  }
+                  placeholder="Digite o título..."
+                />
+              </div>
+
+              {/* SETOR */}
+              <div className="form-group">
+                <label>Setor</label>
+                <select
+                  value={novaTask.setor}
+                  onChange={(e) =>
+                    setNovaTask({ ...novaTask, setor: e.target.value })
+                  }
+                >
+                  {setores.map((s) => (
+                    <option key={s}>{s}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* STATUS */}
+              <div className="form-group">
+                <label>Status</label>
+                <select
+                  value={novaTask.status}
+                  onChange={(e) =>
+                    setNovaTask({ ...novaTask, status: e.target.value })
+                  }
+                >
+                  <option>Pendente</option>
+                  <option>Em andamento</option>
+                  <option>Concluída</option>
+                  <option>Cancelada</option>
+                </select>
+              </div>
+
+              {/* PRIORIDADE */}
+              <div className="form-group">
+                <label>Prioridade</label>
+                <select
+                  value={novaTask.prioridade}
+                  onChange={(e) =>
+                    setNovaTask({ ...novaTask, prioridade: e.target.value })
+                  }
+                >
+                  <option>Alta</option>
+                  <option>Média</option>
+                  <option>Baixa</option>
+                </select>
+              </div>
+
+              {/* DESCRIÇÃO */}
+              <div className="form-group full">
+                <label>Descrição</label>
+                <textarea
+                  rows={4}
+                  value={novaTask.descricao}
+                  onChange={(e) =>
+                    setNovaTask({ ...novaTask, descricao: e.target.value })
+                  }
+                />
+              </div>
+            </div>
+
+            <div className="modal-actions">
+              {/* ESQUERDA */}
+
+              <div style={{ justifySelf: "start" }}>
+                <button className="btn-danger" onClick={() => {
+                  setCreateTaskOpen(false);
+                  setNovaTask({
+                    titulo: "",
+                    setor: "Caixa",
+                    prioridade: "Média",
+                    status: "Pendente",
+                    descricao: "",
+                  });
+                }}>
+                  Fechar
+                </button>
+              </div>
+
+              {/* CENTRO */}
+
+              <div style={{ justifySelf: "center" }}>
+                <button
+                  className="btn-secondary"
+                  onClick={() =>
+                    setNovaTask({
+                      titulo: "",
+                      setor: "Caixa",
+                      prioridade: "Média",
+                      status: "Pendente",
+                      descricao: "",
+                    })
+                  }
+                >
+                  Limpar
+                </button>
+              </div>
+
+              {/* DIREITA */}
+              <div style={{ justifySelf: "end" }}>
+
+                <button
+                  className="btn-primary"
+                  onClick={criarTask}
+                  disabled={!novaTask.titulo}
+                >
+                  Criar
+                </button>
+              </div>
             </div>
           </div>
         </>
