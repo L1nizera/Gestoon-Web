@@ -248,7 +248,6 @@ function Home() {
       {/* ===== MENU TOPO ===== */}
       <div className="menu-topo">
         <div>
-
           <button
             className={menuAtivo === "tarefas" ? "ativo" : ""}
             onClick={() => setMenuAtivo("tarefas")}
@@ -266,7 +265,6 @@ function Home() {
       </div>
 
       <h1>Dashboard</h1>
-
 
       {/* ===== RESUMO ===== */}
       <div className="resumo">
@@ -394,6 +392,8 @@ function Home() {
       <button className="limpar-btn" onClick={limparFiltros}>
         Limpar Filtros
       </button>
+
+      <button className="criar-btn">Criar +</button>
 
       {/* ===== TABELA ===== */}
       <div className="tabela-container">

@@ -244,6 +244,7 @@ select {
   font-weight: 500;
   transition: 0.2s;
   margin-bottom: 15px;
+  width: 150px;
 }
 
 .limpar-btn:active {
@@ -253,6 +254,30 @@ select {
 
 .limpar-btn:hover {
   background: #dc2626;
+}
+
+.criar-btn {
+  background: #1e293b;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: large;
+  transition: 0.2s;
+  margin-bottom: 15px;
+  margin-left: 82%;
+  width: 120px;
+}
+
+.criar-btn:active {
+  background: #629b06;
+  transform: scale(1.1);
+}
+
+.criar-btn:hover {
+  background: #629b06;
 }
 
 /* ===== RESUMO ===== */
