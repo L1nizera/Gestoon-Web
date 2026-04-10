@@ -290,7 +290,7 @@ function Home() {
     <div className="dashboard">
       {/* ===== MENU TOPO ===== */}
 
-      <h1>Dashboard</h1>
+      <h1>Tarefas</h1>
 
       {/* ===== RESUMO ===== */}
       <div className="resumo">

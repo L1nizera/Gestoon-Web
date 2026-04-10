@@ -719,3 +719,15 @@ th:focus {
 .filtros-avancados {
   border: 1px solid #e2e8f0;
 }
+
+.input-erro {
+  border: 1px solid #ef4444;
+  outline: none;
+}
+
+.erro-texto {
+  color: #ef4444;
+  font-size: 12px;
+  margin-top: 4px;
+  display: block;
+}
