@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import { useState } from "react";
 
 function Sidebar() {
@@ -11,23 +11,18 @@ function Sidebar() {
   const linkStyle = {
     display: "block",
     color: "white",
-    background: "#334155", // tom mais claro que o fundo
+    background: "#334155",
     padding: "8px 10px",
     borderRadius: "5px",
     marginBottom: "8px",
     textDecoration: "none",
-    transition: "background 0.3s",
+    transition: "all 0.3s",
   };
 
-  const subLinkStyle = {
-    display: "block",
-    color: "white",
-    background: "#475569",
-    padding: "6px 10px",
-    borderRadius: "5px",
-    marginBottom: "6px",
-    textDecoration: "none",
-    transition: "background 0.3s",
+  const activeStyle = {
+    background: "#1c3968",
+    fontWeight: "bold",
+    borderLeft: "4px solid #38bdf8",
   };
 
   return (
@@ -43,36 +38,75 @@ function Sidebar() {
 
       <ul style={{ listStyle: "none", padding: 0 }}>
         <li>
-          <Link
+          <NavLink
             to="/home"
-            style={linkStyle}
+            style={({ isActive }) => ({
+              ...linkStyle,
+              ...(isActive ? activeStyle : {}),
+            })}
             onMouseEnter={(e) => (e.target.style.background = "#475569")}
-            onMouseLeave={(e) => (e.target.style.background = "#334155")}
+            onMouseLeave={(e) => {
+              if (!e.target.classList.contains("active")) {
+                e.target.style.background = "#334155";
+              }
+            }}
           >
             Home
-          </Link>
+          </NavLink>
         </li>
 
         <li>
-          <Link
-            to="/perfil"
-            style={linkStyle}
+          <NavLink
+            to="/funcionarios"
+            style={({ isActive }) => ({
+              ...linkStyle,
+              ...(isActive ? activeStyle : {}),
+            })}
             onMouseEnter={(e) => (e.target.style.background = "#475569")}
-            onMouseLeave={(e) => (e.target.style.background = "#334155")}
+            onMouseLeave={(e) => {
+              if (!e.target.classList.contains("active")) {
+                e.target.style.background = "#334155";
+              }
+            }}
+          >
+            Funcionários
+          </NavLink>
+        </li>
+
+        <li>
+          <NavLink
+            to="/perfil"
+            style={({ isActive }) => ({
+              ...linkStyle,
+              ...(isActive ? activeStyle : {}),
+            })}
+            onMouseEnter={(e) => (e.target.style.background = "#475569")}
+            onMouseLeave={(e) => {
+              if (!e.target.classList.contains("active")) {
+                e.target.style.background = "#334155";
+              }
+            }}
           >
             Meu Perfil
-          </Link>
+          </NavLink>
         </li>
 
         <li>
-          <Link
-            to="/relatorio"
-            style={linkStyle}
+          <NavLink
+            to="/relatorios"
+            style={({ isActive }) => ({
+              ...linkStyle,
+              ...(isActive ? activeStyle : {}),
+            })}
             onMouseEnter={(e) => (e.target.style.background = "#475569")}
-            onMouseLeave={(e) => (e.target.style.background = "#334155")}
+            onMouseLeave={(e) => {
+              if (!e.target.classList.contains("active")) {
+                e.target.style.background = "#334155";
+              }
+            }}
           >
             Relatórios
-          </Link>
+          </NavLink>
         </li>
       </ul>
     </div>
