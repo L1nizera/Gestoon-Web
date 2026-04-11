@@ -276,8 +276,8 @@ function Funcionarios() {
                 </div>
             </div>
 
-            <button className="criar-btn" onClick={() => setCreateModal(true)}>
-                Criar +
+            <button className="cadastrar-btn" onClick={() => setCreateModal(true)}>
+                Cadastrar +
             </button>
 
             {/* TABELA */}
