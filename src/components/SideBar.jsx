@@ -123,6 +123,16 @@ function Sidebar() {
             Relatórios
           </NavLink>
         </li>
+        <li>
+          <NavLink
+            to="/"
+            style={btsair}
+            onMouseEnter={(e) => (e.target.style.background = "#475569")}
+            onMouseLeave={(e) => (e.target.style.background = "#334155")}
+          >
+            Sair
+          </NavLink>
+        </li>
       </ul>
     </div>
   );
