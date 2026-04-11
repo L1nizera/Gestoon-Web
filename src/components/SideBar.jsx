@@ -31,7 +31,6 @@ function Sidebar() {
     background: "#334155", // tom mais claro que o fundo
     padding: "8px 10px",
     borderRadius: "5px",
-    marginTop: 730,
     marginBottom: "8px",
     textDecoration: "none",
     transition: "background 0.3s",
@@ -107,6 +106,7 @@ function Sidebar() {
         </li>
 
         <li>
+
           <NavLink
             to="/relatorios"
             style={({ isActive }) => ({
@@ -123,8 +123,8 @@ function Sidebar() {
             Relatórios
           </NavLink>
         </li>
-        <li>
-          <NavLink
+      </ul>
+      <NavLink
             to="/"
             style={btsair}
             onMouseEnter={(e) => (e.target.style.background = "#475569")}
@@ -132,8 +132,6 @@ function Sidebar() {
           >
             Sair
           </NavLink>
-        </li>
-      </ul>
     </div>
   );
 }
