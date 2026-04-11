@@ -1,0 +1,89 @@
+.container {
+  background: #f5f6fa;
+  min-height: 100vh;
+  padding: 50px;
+}
+
+.card {
+  max-width: 1000px;
+  margin: auto;
+  background: #fff;
+  padding: 40px;
+  border-radius: 16px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+}
+
+.title {
+  margin-bottom: 30px;
+}
+
+/* layout */
+.content {
+  display: flex;
+  gap: 60px;
+  align-items: flex-start;
+}
+
+/* FOTO */
+.fotoSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.foto {
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.fotoPlaceholder {
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  background: #ddd;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* INFO */
+.infoSection {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.infoGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.infoGroup span {
+  font-size: 14px;
+  color: #777;
+}
+
+.infoGroup p {
+  background: #f9f9f9;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #eee;
+  margin: 0;
+}
+.btnFoto {
+  margin-top: 10px;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 8px;
+  background: #1e293b;
+  color: white;
+  cursor: pointer;
+}
+
+.btnFoto:hover {
+  background: #334155;
+}

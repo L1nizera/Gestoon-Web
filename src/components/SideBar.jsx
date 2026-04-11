@@ -25,6 +25,18 @@ function Sidebar() {
     borderLeft: "4px solid #38bdf8",
   };
 
+  const btsair = {
+    display: "block",
+    color: "white",
+    background: "#334155", // tom mais claro que o fundo
+    padding: "8px 10px",
+    borderRadius: "5px",
+    marginTop: 730,
+    marginBottom: "8px",
+    textDecoration: "none",
+    transition: "background 0.3s",
+  };
+
   return (
     <div
       style={{
@@ -32,11 +44,14 @@ function Sidebar() {
         background: "#1e293b",
         color: "white",
         padding: "20px",
+        display: "flex",
+        flexDirection: "column",
+        height: "100vh"
       }}
     >
       <h2>Menu</h2>
 
-      <ul style={{ listStyle: "none", padding: 0 }}>
+      <ul style={{ listStyle: "none", padding: 0, flex: 1 }}>
         <li>
           <NavLink
             to="/home"
@@ -106,6 +121,16 @@ function Sidebar() {
             }}
           >
             Relatórios
+          </NavLink>
+        </li>
+        <li>
+          <NavLink
+            to="/"
+            style={btsair}
+            onMouseEnter={(e) => (e.target.style.background = "#475569")}
+            onMouseLeave={(e) => (e.target.style.background = "#334155")}
+          >
+            Sair
           </NavLink>
         </li>
       </ul>
