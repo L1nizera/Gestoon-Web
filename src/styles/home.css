@@ -603,6 +603,7 @@ th:focus {
   grid-template-columns: 1fr 1fr 1fr;
   align-items: center;
   margin-top: 20px;
+  gap: 20px;
 }
 
 
@@ -616,6 +617,7 @@ th:focus {
   cursor: pointer;
   transition: 0.2s;
   font-weight: 500;
+
 }
 
 .btn-primary:hover {
@@ -660,12 +662,12 @@ th:focus {
   padding: 8px 14px;
   border-radius: 6px;
   cursor: pointer;
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .btn-close:hover {
   background: #475569;
-  transform: scale(1.05);
+  transform: scale(1.03);
 }
 
 
