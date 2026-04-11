@@ -18,9 +18,7 @@ function App() {
 
         <Route element={<DashboardLayout />}>
           <Route path="/home" element={<Home />} />
-          <Route path="/funcionarios" element={<Funcionarios />} />
           <Route path="/perfil" element={<Perfil />} />
-          <Route path="/relatorios" element={<Relatorios />} />       
         </Route>
 
       </Routes>
