@@ -1,10 +1,10 @@
 .relatoriosPage {
   display: flex;
   flex-direction: column;
-  gap: 24px;
-  padding: 20px;
+  gap: 2.4rem; /* 24px */
+  padding: 2rem; /* 20px */
   background: #f8fafc;
-  border-radius: 12px;
+  border-radius: 1.2rem; /* 12px */
   min-height: 100%;
 }
 
@@ -12,13 +12,13 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  gap: 20px;
+  gap: 2rem; /* 20px */
   flex-wrap: wrap;
 }
 
 .relatoriosLabel {
   display: inline-block;
-  margin-bottom: 8px;
+  margin-bottom: 0.8rem; /* 8px */
   font-size: 0.9rem;
   color: #64748b;
   text-transform: uppercase;
@@ -26,7 +26,7 @@
 }
 
 .relatoriosHeader h1 {
-  margin-bottom: 8px;
+  margin-bottom: 0.8rem; /* 8px */
   font-size: clamp(1.8rem, 2vw, 2.4rem);
   color: #0f172a;
 }
@@ -34,14 +34,14 @@
 .relatoriosSubtitle {
   color: #475569;
   line-height: 1.6;
-  max-width: 640px;
+  max-width: 64rem; /* 640px */
 }
 
 .relatoriosExportButton,
 .btnSecondary {
   border: none;
-  border-radius: 10px;
-  padding: 12px 18px;
+  border-radius: 1rem; /* 10px */
+  padding: 1.2rem 1.8rem; /* 12px 18px */
   font-weight: 600;
   cursor: pointer;
   transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
@@ -50,18 +50,18 @@
 .relatoriosExportButton {
   background: #0284c7;
   color: white;
-  min-width: 180px;
+  min-width: 18rem; /* 180px */
 }
 
 .relatoriosExportButton:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 12px 22px rgba(2, 132, 199, 0.18);
+  transform: translateY(-0.1rem); /* -1px */
+  box-shadow: 0 1.2rem 2.2rem rgba(2, 132, 199, 0.18); /* 12px 22px */
 }
 
 .btnSecondary {
   background: white;
   color: #334155;
-  border: 1px solid #cbd5e1;
+  border: 0.1rem solid #cbd5e1; /* 1px */
 }
 
 .btnSecondary:hover {
@@ -70,19 +70,19 @@
 
 .relatoriosFiltros {
   display: grid;
-  grid-template-columns: repeat(3, minmax(220px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(3, minmax(22rem, 1fr)); /* 220px */
+  gap: 1.6rem; /* 16px */
   align-items: end;
 }
 
 .filtroCard {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding: 18px;
+  gap: 0.8rem; /* 8px */
+  padding: 1.8rem; /* 18px */
   background: white;
-  border: 1px solid #e2e8f0;
-  border-radius: 14px;
+  border: 0.1rem solid #e2e8f0; /* 1px */
+  border-radius: 1.4rem; /* 14px */
 }
 
 .filtroCard label {
@@ -93,9 +93,9 @@
 
 .filtroCard input {
   width: 100%;
-  padding: 10px 12px;
-  border: 1px solid #cbd5e1;
-  border-radius: 10px;
+  padding: 1rem 1.2rem; /* 10px 12px */
+  border: 0.1rem solid #cbd5e1; /* 1px */
+  border-radius: 1rem; /* 10px */
   background: #f8fafc;
   color: #0f172a;
 }
@@ -110,11 +110,11 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 16px;
-  padding: 18px;
+  gap: 1.6rem; /* 16px */
+  padding: 1.8rem; /* 18px */
   background: white;
-  border: 1px solid #e2e8f0;
-  border-radius: 14px;
+  border: 0.1rem solid #e2e8f0; /* 1px */
+  border-radius: 1.4rem; /* 14px */
 }
 
 .filtroCount {
@@ -125,22 +125,22 @@
 .relatoriosTableWrapper {
   overflow-x: auto;
   background: white;
-  border: 1px solid #e2e8f0;
-  border-radius: 14px;
-  padding: 16px;
+  border: 0.1rem solid #e2e8f0; /* 1px */
+  border-radius: 1.4rem; /* 14px */
+  padding: 1.6rem; /* 16px */
 }
 
 .relatoriosTable {
   width: 100%;
   border-collapse: collapse;
-  min-width: 640px;
+  min-width: 64rem; /* 640px */
 }
 
 .relatoriosTable th,
 .relatoriosTable td {
-  padding: 14px 16px;
+  padding: 1.4rem 1.6rem; /* 14px 16px */
   text-align: left;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 0.1rem solid #e2e8f0; /* 1px */
 }
 
 .relatoriosTable th {
@@ -155,17 +155,17 @@
 
 .semResultados {
   text-align: center;
-  padding: 28px 0;
+  padding: 2.8rem 0; /* 28px */
   color: #64748b;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 900px) { /* 900px */
   .relatoriosFiltros {
-    grid-template-columns: repeat(2, minmax(220px, 1fr));
+    grid-template-columns: repeat(2, minmax(22rem, 1fr));
   }
 }
 
-@media (max-width: 700px) {
+@media (max-width: 700px) { /* 700px */
   .relatoriosHeader {
     flex-direction: column;
     align-items: stretch;

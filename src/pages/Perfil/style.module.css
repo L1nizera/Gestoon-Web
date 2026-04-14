@@ -1,26 +1,26 @@
 .container {
   background: #f5f6fa;
   min-height: 100vh;
-  padding: 50px;
+  padding: 5rem; /* 50px */
 }
 
 .card {
-  max-width: 1000px;
+  max-width: 100rem; /* 1000px */
   margin: auto;
   background: #fff;
-  padding: 40px;
-  border-radius: 16px;
-  box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+  padding: 4rem; /* 40px */
+  border-radius: 1.6rem; /* 16px */
+  box-shadow: 0 0.8rem 2.5rem rgba(0,0,0,0.08); /* 8px 25px */
 }
 
 .title {
-  margin-bottom: 30px;
+  margin-bottom: 3rem; /* 30px */
 }
 
 /* layout */
 .content {
   display: flex;
-  gap: 60px;
+  gap: 6rem; /* 60px */
   align-items: flex-start;
 }
 
@@ -32,15 +32,15 @@
 }
 
 .foto {
-  width: 180px;
-  height: 180px;
+  width: 18rem; /* 180px */
+  height: 18rem; /* 180px */
   border-radius: 50%;
   object-fit: cover;
 }
 
 .fotoPlaceholder {
-  width: 180px;
-  height: 180px;
+  width: 18rem; /* 180px */
+  height: 18rem; /* 180px */
   border-radius: 50%;
   background: #ddd;
   display: flex;
@@ -53,32 +53,33 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 2rem; /* 20px */
 }
 
 .infoGroup {
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 0.5rem; /* 5px */
 }
 
 .infoGroup span {
-  font-size: 14px;
+  font-size: 1.4rem; /* 14px */
   color: #777;
 }
 
 .infoGroup p {
   background: #f9f9f9;
-  padding: 12px;
-  border-radius: 8px;
-  border: 1px solid #eee;
+  padding: 1.2rem; /* 12px */
+  border-radius: 0.8rem; /* 8px */
+  border: 0.1rem solid #eee; /* 1px */
   margin: 0;
 }
+
 .btnFoto {
-  margin-top: 10px;
-  padding: 10px 15px;
+  margin-top: 1rem; /* 10px */
+  padding: 1rem 1.5rem; /* 10px 15px */
   border: none;
-  border-radius: 8px;
+  border-radius: 0.8rem; /* 8px */
   background: #1e293b;
   color: white;
   cursor: pointer;
