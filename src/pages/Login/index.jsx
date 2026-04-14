@@ -1,4 +1,4 @@
-import "../styles/login.css"
+import styles from "./style.module.css";
 import { useNavigate } from "react-router-dom"
 import { useState } from "react"
 
@@ -26,11 +26,11 @@ function Login() {
 
   return (
 
-    <div className="login-container">
+    <div className={styles.loginContainer}>
 
-      <h1 className="logo">Gestoon</h1>
+      <h1 className={styles.logo}>Gestoon</h1>
 
-      <form className="login-box" onSubmit={handleLogin}>
+      <form className={styles.loginBox} onSubmit={handleLogin}>
 
         <h2>Login</h2>
 
@@ -47,7 +47,7 @@ function Login() {
           onChange={(e) => setSenha(e.target.value)}
         />
 
-        <button type="submit">
+        <button type="submit" className={styles.button}>
           Entrar
         </button>
 

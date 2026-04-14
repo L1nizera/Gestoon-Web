@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import "../styles/home.css";
+import styles from "./style.module.css";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
@@ -242,20 +242,20 @@ function Funcionarios() {
     }
 
     return (
-        <div className="dashboard">
+        <div className={styles.dashboard}>
             <h1>Funcionários</h1>
 
             {/* BUSCA */}
-            <div className="top-actions">
+            <div className={styles.topActions}>
                 <input
-                    className="busca"
+                    className={styles.busca}
                     placeholder="Buscar funcionário..."
                     onChange={(e) => setBusca(e.target.value)}
                 />
             </div>
 
             {/* FILTROS */}
-            <div className="filtros-avancados">
+            <div className={styles.filtrosAvancados}>
                 <div>
                     <small>Setor:</small>
                     <select onChange={(e) => setSetorFiltro(e.target.value)}>
@@ -276,13 +276,13 @@ function Funcionarios() {
                 </div>
             </div>
 
-            <button className="cadastrar-btn" onClick={() => setCreateModal(true)}>
+            <button className={styles.cadastrarBtn} onClick={() => setCreateModal(true)}>
                 Cadastrar +
             </button>
 
             {/* TABELA */}
-            <div className="tabela-container">
-                <table className="tabela">
+            <div className={styles.tabelaContainer}>
+                <table className={styles.tabela}>
                     <thead>
                         <tr>
                             <th
@@ -328,8 +328,7 @@ function Funcionarios() {
                                 <td>{f.cargo}</td>
                                 <td>
                                     <span
-                                        className={`badge ${f.ativo ? "status-concluida" : "status-cancelada"
-                                            }`}
+                                        className={`${styles.badge} ${styles[f.ativo ? "statusConcluida" : "statusCancelada"]}`}
                                     >
                                         {f.ativo ? "Ativo" : "Inativo"}
                                     </span>
@@ -344,24 +343,24 @@ function Funcionarios() {
             {/* MODAL */}
             {selected && (
                 <>
-                    <div className="overlay" onClick={() => setSelected(null)} />
+                    <div className={styles.overlay} onClick={() => setSelected(null)} />
 
-                    <div className="task-modal">
+                    <div className={styles.taskModal}>
                         <h2>{selected.nome}</h2>
                         <p><strong>Email:</strong> {selected.email}</p>
                         <p><strong>Setor:</strong> {selected.setor}</p>
                         <p><strong>Cargo:</strong> {selected.cargo}</p>
 
-                        <div className="modal-actions">
+                        <div className={styles.modalActions}>
                             <button
-                                className="btn-close"
+                                className={styles.btnClose}
                                 onClick={() => setSelected(null)}
                             >
                                 Fechar
                             </button>
 
                             <button
-                                className="btn-primary"
+                                className={styles.btnPrimary}
                                 onClick={() => {
                                     setSelected(null);
                                     setEdit({ ...selected });
@@ -371,7 +370,7 @@ function Funcionarios() {
                             </button>
 
                             <button
-                                className="btn-danger"
+                                className={styles.btnDanger}
                                 onClick={() => excluir(selected.id)}
                             >
                                 Excluir
@@ -384,13 +383,13 @@ function Funcionarios() {
             {/* MODAL CRIAR */}
             {createModal && (
                 <>
-                    <div className="overlay" onClick={() => setCreateModal(false)} />
+                    <div className={styles.overlay} onClick={() => setCreateModal(false)} />
 
-                    <div className="task-modal">
+                    <div className={styles.taskModal}>
                         <h2>Novo Funcionário</h2>
 
-                        <div className="form-grid">
-                            <div className="form-group">
+                        <div className={styles.formGrid}>
+                            <div className={styles.formGroup}>
                                 <label>Nome</label>
                                 <input
                                     type="text"
@@ -401,7 +400,7 @@ function Funcionarios() {
                                 />
                             </div>
 
-                            <div className="form-group">
+                            <div className={styles.formGroup}>
                                 <label>Email</label>
                                 <input
                                     type="email"
@@ -412,7 +411,7 @@ function Funcionarios() {
                                 />
                             </div>
 
-                            <div className="form-group">
+                            <div className={styles.formGroup}>
                                 <label>Setor</label>
                                 <select
                                     value={novoFuncionario.setor}
@@ -427,7 +426,7 @@ function Funcionarios() {
                                 </select>
                             </div>
 
-                            <div className="form-group">
+                            <div className={styles.formGroup}>
                                 <label>Cargo</label>
                                 <input
                                     type="text"
@@ -438,7 +437,7 @@ function Funcionarios() {
                                 />
                             </div>
 
-                            <div className="form-group">
+                            <div className={styles.formGroup}>
                                 <label>Status</label>
                                 <select
                                     value={novoFuncionario.ativo}
@@ -455,16 +454,16 @@ function Funcionarios() {
                             </div>
                         </div>
 
-                        <div className="modal-actions">
+                        <div className={styles.modalActions}>
                             <button
-                                className="btn-secondary"
+                                className={styles.btnSecondary}
                                 onClick={() => setCreateModal(false)}
                             >
                                 Cancelar
                             </button>
 
                             <button
-                                className="btn-primary"
+                                className={styles.btnPrimary}
                                 onClick={criarFuncionario}
                                 disabled={!novoFuncionario.nome || !novoFuncionario.email}
                             >
@@ -477,14 +476,14 @@ function Funcionarios() {
 
             {edit && (
                 <>
-                    <div className="overlay" onClick={() => setEdit(null)} />
+                    <div className={styles.overlay} onClick={() => setEdit(null)} />
 
-                    <div className="task-modal" onClick={(e) => e.stopPropagation()}>
+                    <div className={styles.taskModal} onClick={(e) => e.stopPropagation()}>
                         <h2>Editar Funcionário</h2>
 
-                        <div className="form-grid">
+                        <div className={styles.formGrid}>
                             {/* NOME */}
-                            <div className="form-group">
+                            <div className={styles.formGroup}>
                                 <label>Nome</label>
                                 <input
                                     type="text"
@@ -496,7 +495,7 @@ function Funcionarios() {
                             </div>
 
                             {/* EMAIL */}
-                            <div className="form-group">
+                            <div className={styles.formGroup}>
                                 <label>Email</label>
                                 <input
                                     type="email"
@@ -508,7 +507,7 @@ function Funcionarios() {
                             </div>
 
                             {/* SETOR */}
-                            <div className="form-group">
+                            <div className={styles.formGroup}>
                                 <label>Setor</label>
                                 <select
                                     value={edit.setor}
@@ -523,7 +522,7 @@ function Funcionarios() {
                             </div>
 
                             {/* CARGO */}
-                            <div className="form-group">
+                            <div className={styles.formGroup}>
                                 <label>Cargo</label>
                                 <input
                                     type="text"
@@ -535,7 +534,7 @@ function Funcionarios() {
                             </div>
 
                             {/* STATUS */}
-                            <div className="form-group">
+                            <div className={styles.formGroup}>
                                 <label>Status</label>
                                 <select
                                     value={edit.ativo}
@@ -552,22 +551,22 @@ function Funcionarios() {
                             </div>
 
                             {/* DATA (bloqueado) */}
-                            <div className="form-group">
+                            <div className={styles.formGroup}>
                                 <label>Data de criação</label>
                                 <input type="text" value={edit.dataCriacao} disabled />
                             </div>
                         </div>
 
-                        <div className="modal-actions">
+                        <div className={styles.modalActions}>
                             <button
-                                className="btn-secondary"
+                                className={styles.btnSecondary}
                                 onClick={() => setEdit(null)}
                             >
                                 Cancelar
                             </button>
 
                             <button
-                                className="btn-primary"
+                                className={styles.btnPrimary}
                                 onClick={salvarEdicao}
                             >
                                 Salvar
@@ -577,8 +576,8 @@ function Funcionarios() {
                 </>
             )}
 
-            <div className="footer-actions">
-                <button className="export-btn" onClick={exportarPDF}>
+            <div className={styles.footerActions}>
+                <button className={styles.exportBtn} onClick={exportarPDF}>
                     Exportar PDF
                 </button>
             </div>

@@ -8,7 +8,7 @@ body {
   overflow-x: hidden;
 }
 
-.top-actions {
+.topActions {
   margin-bottom: 10px;
 }
 
@@ -38,7 +38,7 @@ body {
   gap: 10px;
 }
 
-.filtros-avancados {
+.filtrosAvancados {
   display: flex;
   gap: 20px;
   align-items: flex-end;
@@ -49,12 +49,12 @@ body {
   transition: all 0.25s ease;
 }
 
-.filtros-avancados:hover {
+.filtrosAvancados:hover {
   box-shadow: 0 8px 20px rgba(0,0,0,0.08);
 }
 
-.filtros-avancados input,
-.filtros-avancados select {
+.filtrosAvancados input,
+.filtrosAvancados select {
   width: 100%;
   padding: 6px 8px;
   border-radius: 6px;
@@ -69,7 +69,7 @@ select {
 }
 
 @media (max-width: 768px) {
-  .filtros-avancados {
+  .filtrosAvancados {
     flex-direction: column;
   }
 
@@ -79,13 +79,13 @@ select {
 }
 
 /* cada bloco (período, mês, setor) */
-.filtros-avancados > div {
+.filtrosAvancados > div {
   display: flex;
   flex-direction: column;
   gap: 5px;
 }
 
-.filtros-avancados small {
+.filtrosAvancados small {
   font-size: 14px;
   color: #64748b;
 }
@@ -112,17 +112,17 @@ select {
   box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.3);
 }
 
-.periodo-inputs {
+.periodoInputs {
   display: flex;
   gap: 8px;
 }
 
-.periodo-inputs div {
+.periodoInputs div {
   display: flex;
   flex-direction: column;
 }
 
-.periodo-inputs input {
+.periodoInputs input {
   width: 130px;
 }
 /* ===== BADGES ===== */
@@ -136,38 +136,38 @@ select {
 
 /* STATUS */
 
-.status-pendente {
+.statusPendente {
   background: #fee2e2;
   color: #b91c1c;
 }
 
-.status-andamento {
+.statusAndamento {
   background: #fef9c3;
   color: #a16207;
 }
 
-.status-concluida {
+.statusConcluida {
   background: #dcfce7;
   color: #166534;
 }
 
-.status-cancelada {
+.statusCancelada {
   background: #e5e7eb;
   color: #374151;
 }
 /* PRIORIDADE */
 
-.prioridade-alta {
+.prioridadeAlta {
   background: #fecaca;
   color: #991b1b;
 }
 
-.prioridade-media {
+.prioridadeMedia {
   background: #fde68a;
   color: #92400e;
 }
 
-.prioridade-baixa {
+.prioridadeBaixa {
   background: #bbf7d0;
   color: #166534;
 }
@@ -186,7 +186,7 @@ select {
 
 /* ===== MODAL ===== */
 
-.task-modal {
+.taskModal {
   position: fixed;
   top: 50%;
   left: 50%;
@@ -211,7 +211,7 @@ select {
   }
 }
 
-.task-modal form {
+.taskModal form {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 16px;
@@ -228,13 +228,13 @@ select {
 
 /* botões */
 
-.footer-actions {
+.footerActions {
   display: flex;
   justify-content: flex-end;
   margin-top: 15px;
 }
 
-.limpar-btn {
+.limparBtn {
   background: #1e293b;
   color: white;
   border: none;
@@ -247,16 +247,16 @@ select {
   width: 150px;
 }
 
-.limpar-btn:active {
+.limparBtn:active {
   background: #dc2626;
   transform: scale(1.1);
 }
 
-.limpar-btn:hover {
+.limparBtn:hover {
   background: #dc2626;
 }
 
-.criar-btn {
+.criarBtn {
   background: #1e293b;
   color: white;
   border: none;
@@ -271,12 +271,12 @@ select {
   width: 120px;
 }
 
-.criar-btn:active {
+.criarBtn:active {
   background: #629b06;
   transform: scale(1.1);
 }
 
-.criar-btn:hover {
+.criarBtn:hover {
   background: #629b06;
 }
 
@@ -420,7 +420,7 @@ select {
   white-space: normal;
 }
 
-.tabela-container {
+.tabelaContainer {
   overflow-x: auto;
 }
 
@@ -488,7 +488,7 @@ select {
 
 /* ===== BUSCA ===== */
 
-.export-btn {
+.exportBtn {
   padding: 5px 5px;
   background: #2563eb;
   color: white;
@@ -499,7 +499,7 @@ select {
   transition: 0.2s;
 }
 
-.export-btn:hover {
+.exportBtn:hover {
   background: #1d4ed8;
 }
 
@@ -509,7 +509,7 @@ select {
 
 /* ===== COLUNA ATIVA ===== */
 
-.coluna-ativa {
+.colunaAtiva {
   background: #2563eb !important;
   color: white;
   animation: pulse;
@@ -538,9 +538,9 @@ select {
   }
 }
 
-.task-modal input,
-.task-modal textarea,
-.task-modal select {
+.taskModal input,
+.taskModal textarea,
+.taskModal select {
   width: 100%;
   padding: 8px;
   margin-top: 8px;
@@ -550,30 +550,30 @@ select {
   transition: all 0.2s ease;
 }
 
-.task-modal textarea {
+.taskModal textarea {
   min-height: 80px;
   resize: none;
 }
 
 
 
-.task-modal h2 {
+.taskModal h2 {
    margin-bottom: 15px;
   font-size: 20px;
   font-weight: 600;
 }
 
-.task-modal input:focus,
-.task-modal textarea:focus,
-.task-modal select:focus {
+.taskModal input:focus,
+.taskModal textarea:focus,
+.taskModal select:focus {
   border-color: #2563eb;
   box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
 }
 
 /* hover leve */
-.task-modal input:hover,
-.task-modal textarea:hover,
-.task-modal select:hover {
+.taskModal input:hover,
+.taskModal textarea:hover,
+.taskModal select:hover {
   border-color: #94a3b8;
 }
 
@@ -598,7 +598,7 @@ th:focus {
 }
 
 /* botão salvar */
-.modal-actions {
+.modalActions {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   align-items: center;
@@ -608,7 +608,7 @@ th:focus {
 
 
 
-.btn-primary {
+.btnPrimary {
   background: #2563eb;
   color: white;
   border: none;
@@ -620,12 +620,12 @@ th:focus {
 
 }
 
-.btn-primary:hover {
+.btnPrimary:hover {
   background: #1d4ed8;
   transform: scale(1.03);
 }
 
-.btn-secondary {
+.btnSecondary {
   background: #64748B;
   color: white;
   border: none;
@@ -635,12 +635,12 @@ th:focus {
   font-weight: 500;
 }
 
-.btn-secondary:hover {
+.btnSecondary:hover {
   background: #475569;
   transform: scale(1.03);
 }
 
-.btn-danger {
+.btnDanger {
   background: #dc2626;
   color: white;
   border: none;
@@ -650,12 +650,12 @@ th:focus {
   font-weight: 500;
 }
 
-.btn-danger:hover {
+.btnDanger:hover {
   background: #b91c1c;
   transform: scale(1.03);
 }
 
-.btn-close {
+.btnClose {
   background: #64748b;
   color: white;
   border: none;
@@ -665,13 +665,13 @@ th:focus {
   font-weight: 500;
 }
 
-.btn-close:hover {
+.btnClose:hover {
   background: #475569;
   transform: scale(1.03);
 }
 
 
-.modal-header {
+.modalHeader {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
@@ -679,60 +679,60 @@ th:focus {
   gap: 10px;
 }
 
-.modal-header h2 {
+.modalHeader h2 {
   font-size: 18px;
   line-height: 1.3;
   word-break: break-word;
   max-width: 80%;
 }
 
-.modal-grid {
+.modalGrid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px;
   margin-bottom: 15px;
 }
 
-.modal-grid div {
+.modalGrid div {
   display: flex;
   flex-direction: column;
 }
 
-.modal-grid strong {
+.modalGrid strong {
   font-size: 12px;
   color: #64748b;
 }
 
-.modal-grid p {
+.modalGrid p {
   margin: 2px 0 0;
   font-size: 14px;
 }
 
-.descricao-box {
+.descricaoBox {
   background: #f1f5f9;
   padding: 12px;
   border-radius: 8px;
   margin-bottom: 15px;
 }
 
-.form-group {
+.formGroup {
   display: flex;
   flex-direction: column;
   margin-bottom: 12px;
 }
 
 
-.form-group.full {
+.formGroup.full {
   grid-column: span 2;
 }
 
-.form-group label {
+.formGroup label {
   font-size: 12px;
   margin-bottom: 4px;
   color: #475569;
 }
 
-.filtros-avancados,
+.filtrosAvancados,
 .grafico,
 .tabela,
 .resumo div {
@@ -742,7 +742,7 @@ th:focus {
 .card,
 .tabela,
 .grafico,
-.filtros-avancados {
+.filtrosAvancados {
   border: 1px solid #e2e8f0;
 }
 
@@ -757,3 +757,4 @@ th:focus {
   margin-top: 4px;
   display: block;
 }
+

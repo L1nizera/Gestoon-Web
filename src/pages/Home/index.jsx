@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
-import "../styles/home.css";
-import { tasks } from "../data/Tasks";
+import styles from "./style.module.css";
+import { tasks } from "../../data/Tasks";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
@@ -159,10 +159,10 @@ function Home() {
 
   // ===== MAPS =====
   const statusMap = {
-    Pendente: "status-pendente",
-    "Em andamento": "status-andamento",
-    Concluída: "status-concluida",
-    Cancelada: "status-cancelada",
+    Pendente: "statusPendente",
+    "Em andamento": "statusAndamento",
+    Concluída: "statusConcluida",
+    Cancelada: "statusCancelada",
   };
 
   const setores = [
@@ -176,9 +176,9 @@ function Home() {
   ];
 
   const prioridadeMap = {
-    Alta: "prioridade-alta",
-    Média: "prioridade-media",
-    Baixa: "prioridade-baixa",
+    Alta: "prioridadeAlta",
+    Média: "prioridadeMedia",
+    Baixa: "prioridadeBaixa",
   };
 
   // ===== FILTRO + BUSCA =====
@@ -287,13 +287,13 @@ function Home() {
   );
 
   return (
-    <div className="dashboard">
+    <div className={styles.dashboard}>
       {/* ===== MENU TOPO ===== */}
 
       <h1>Tarefas</h1>
 
       {/* ===== RESUMO ===== */}
-      <div className="resumo">
+      <div className={styles.resumo}>
         <div>Total: {total}</div>
         <div>Pendentes: {pendentes}</div>
         <div>Em andamento: {andamento}</div>
@@ -302,21 +302,21 @@ function Home() {
       </div>
 
       {/* ===== BUSCA ===== */}
-      <div className="top-actions">
+      <div className={styles.topActions}>
         <input
           placeholder="Buscar tarefa..."
-          className="busca"
+          className={styles.busca}
           onChange={(e) => setBusca(e.target.value)}
         />
       </div>
 
       {/* ==== DATA ==== */}
-      <div className="filtros-avancados">
+      <div className={styles.filtrosAvancados}>
         <div>
           <div>
             <label>Período: </label>
 
-            <div className="periodo-inputs">
+            <div className={styles.periodoInputs}>
               <div>
                 <small>De: </small>
                 <input
@@ -337,9 +337,9 @@ function Home() {
             </div>
           </div>
 
-          <small className="meses">Meses: </small>
+          <small className={styles.meses}>Meses: </small>
           <select
-            className="filtro-select"
+            className={styles.filtroSelect}
             value={mesFiltro}
             onChange={(e) => setMesFiltro(e.target.value)}
           >
@@ -378,30 +378,30 @@ function Home() {
       </div>
 
       {/* ===== FILTROS ===== */}
-      <div className="filtros">
+      <div className={styles.filtros}>
         <button
-          className={filtro === "Todos" ? "ativo" : ""}
+          className={filtro === "Todos" ? styles.ativo : ""}
           onClick={() => setFiltro("Todos")}
         >
           Todos
         </button>
 
         <button
-          className={filtro === "Pendente" ? "ativo" : ""}
+          className={filtro === "Pendente" ? styles.ativo : ""}
           onClick={() => setFiltro("Pendente")}
         >
           Pendentes
         </button>
 
         <button
-          className={filtro === "Em andamento" ? "ativo" : ""}
+          className={filtro === "Em andamento" ? styles.ativo : ""}
           onClick={() => setFiltro("Em andamento")}
         >
           Em andamento
         </button>
 
         <button
-          className={filtro === "Concluída" ? "ativo" : ""}
+          className={filtro === "Concluída" ? styles.ativo : ""}
           onClick={() => setFiltro("Concluída")}
         >
           Concluídas
@@ -415,21 +415,21 @@ function Home() {
         </button>
       </div>
 
-      <button className="limpar-btn" onClick={limparFiltros}>
+      <button className={styles.limparBtn} onClick={limparFiltros}>
         Limpar Filtros
       </button>
 
-      <button className="criar-btn" onClick={() => setCreateTaskOpen(true)}>
+      <button className={styles.criarBtn} onClick={() => setCreateTaskOpen(true)}>
         Criar +
       </button>
 
       {/* ===== TABELA ===== */}
-      <div className="tabela-container">
-        <table className="tabela">
+      <div className={styles.tabelaContainer}>
+        <table className={styles.tabela}>
           <thead>
             <tr>
               <th
-                className={ordemTitulo ? "coluna-ativa" : ""}
+                className={ordemTitulo ? styles.colunaAtiva : ""}
                 onClick={() =>
                   setOrdemTitulo((prev) => {
                     if (prev === null) return "az";
@@ -449,7 +449,7 @@ function Home() {
               <th>Hora</th>
 
               <th
-                className={ordemData ? "coluna-ativa" : ""}
+                className={ordemData ? styles.colunaAtiva : ""}
                 onClick={() =>
                   setOrdemData((prev) => {
                     if (prev === null) return "recente";
@@ -480,13 +480,13 @@ function Home() {
                 <td>{task.titulo}</td>
 
                 <td>
-                  <span className={`badge ${statusMap[task.status]}`}>
+                  <span className={`${styles.badge} ${styles[statusMap[task.status]]}`}>
                     {task.status}
                   </span>
                 </td>
 
                 <td>
-                  <span className={`badge ${prioridadeMap[task.prioridade]}`}>
+                  <span className={`${styles.badge} ${styles[prioridadeMap[task.prioridade]]}`}>
                     {task.prioridade}
                   </span>
                 </td>
@@ -504,23 +504,23 @@ function Home() {
       {/* ===== MODAL ===== */}
       {selectedTask && (
         <>
-          <div className="overlay" onClick={() => setSelectedTask(null)}></div>
+          <div className={styles.overlay} onClick={() => setSelectedTask(null)}></div>
 
-          <div className="task-modal" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
+          <div className={styles.taskModal} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.modalHeader}>
               <h2>{selectedTask.titulo}</h2>
 
-              <span className={`badge ${statusMap[selectedTask.status]}`}>
+              <span className={`${styles.badge} ${styles[statusMap[selectedTask.status]]}`}>
                 {selectedTask.status}
               </span>
             </div>
 
-            <div className="modal-grid">
+            <div className={styles.modalGrid}>
               <div>
                 <strong>Prioridade: </strong>
                 <p>
                   <span
-                    className={`badge ${prioridadeMap[selectedTask.prioridade]}`}
+                    className={`${styles.badge} ${styles[prioridadeMap[selectedTask.prioridade]]}`}
                   >
                     {selectedTask.prioridade}
                   </span>
@@ -548,28 +548,28 @@ function Home() {
               </div>
             </div>
 
-            <div className="descricao-box">
+            <div className={styles.descricaoBox}>
               <strong>Descrição</strong>
               <p>{selectedTask.descricao || "Sem descrição"}</p>
             </div>
 
-            <div className="modal-actions">
+            <div className={styles.modalActions}>
               <button
-                className="btn-close"
+                className={styles.btnClose}
                 onClick={() => setSelectedTask(null)}
               >
                 Fechar
               </button>
 
               <button
-                className="btn-primary"
+                className={styles.btnPrimary}
                 onClick={() => abrirEdicao(selectedTask)}
               >
                 Editar
               </button>
 
               <button
-                className="btn-danger"
+                className={styles.btnDanger}
                 onClick={() => excluirTask(selectedTask.id)}
               >
                 Excluir
@@ -582,14 +582,14 @@ function Home() {
       {/* ===== MODAL EDITAR ===== */}
       {editTask && (
         <>
-          <div className="overlay" onClick={() => setEditTask(null)}></div>
+          <div className={styles.overlay} onClick={() => setEditTask(null)}></div>
 
-          <div className="task-modal" onClick={(e) => e.stopPropagation()}>
+          <div className={styles.taskModal} onClick={(e) => e.stopPropagation()}>
             <h2>Editar Tarefa</h2>
 
-            <div className="form-grid">
+            <div className={styles.formGrid}>
               {/* TÍTULO - NOVO */}
-              <div className="form-group full">
+              <div className={`${styles.formGroup} ${styles.full}`}>
                 <label>Título</label>
                 <input
                   type="text"
@@ -601,7 +601,7 @@ function Home() {
                 />
               </div>
 
-              <div className="form-group">
+              <div className={styles.formGroup}>
                 <label>Setor</label>
                 <select
                   value={editTask.setor}
@@ -615,7 +615,7 @@ function Home() {
                 </select>
               </div>
 
-              <div className="form-group">
+              <div className={styles.formGroup}>
                 <label>Status</label>
                 <select
                   value={editTask.status}
@@ -630,7 +630,7 @@ function Home() {
                 </select>
               </div>
 
-              <div className="form-group">
+              <div className={styles.formGroup}>
                 <label>Prioridade</label>
                 <select
                   value={editTask.prioridade}
@@ -645,13 +645,13 @@ function Home() {
               </div>
 
               {/* CRIADO POR - NOVO */}
-              <div className="form-group">
+              <div className={styles.formGroup}>
                 <label>Criado por</label>
                 <input type="text" value={editTask.criadoPor} disabled />
               </div>
 
               {/* DESCRIÇÃO */}
-              <div className="form-group full">
+              <div className={`${styles.formGroup} ${styles.full}`}>
                 <label>Descrição</label>
                 <textarea
                   rows={4}
@@ -663,16 +663,16 @@ function Home() {
               </div>
             </div>
 
-            <div className="modal-actions">
+            <div className={styles.modalActions}>
               <button
-                className="btn-secondary"
+                className={styles.btnSecondary}
                 onClick={() => setEditTask(null)}
               >
                 Cancelar
               </button>
 
               <button
-                className="btn-primary"
+                className={styles.btnPrimary}
                 onClick={salvarEdicao}
                 disabled={!editTask.titulo}
               >
@@ -686,16 +686,16 @@ function Home() {
       {/* ===== MODAL CRIAR ===== */}
       {createTaskOpen && (
         <>
-          <div className="overlay" onClick={() => setCreateTaskOpen(false)}></div>
+          <div className={styles.overlay} onClick={() => setCreateTaskOpen(false)}></div>
 
-          <div className="task-modal" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
+          <div className={styles.taskModal} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.modalHeader}>
               <h2>Criar Tarefa</h2>
             </div>
 
-            <div className="form-grid">
+            <div className={styles.formGrid}>
               {/* TÍTULO */}
-              <div className="form-group full">
+              <div className={`${styles.formGroup} ${styles.full}`}>
                 <label>Título</label>
                 <input
                   type="text"
@@ -708,7 +708,7 @@ function Home() {
               </div>
 
               {/* SETOR */}
-              <div className="form-group">
+              <div className={styles.formGroup}>
                 <label>Setor</label>
                 <select
                   value={novaTask.setor}
@@ -723,7 +723,7 @@ function Home() {
               </div>
 
               {/* STATUS */}
-              <div className="form-group">
+              <div className={styles.formGroup}>
                 <label>Status</label>
                 <select
                   value={novaTask.status}
@@ -739,7 +739,7 @@ function Home() {
               </div>
 
               {/* PRIORIDADE */}
-              <div className="form-group">
+              <div className={styles.formGroup}>
                 <label>Prioridade</label>
                 <select
                   value={novaTask.prioridade}
@@ -754,7 +754,7 @@ function Home() {
               </div>
 
               {/* DESCRIÇÃO */}
-              <div className="form-group full">
+              <div className={`${styles.formGroup} ${styles.full}`}>
                 <label>Descrição</label>
                 <textarea
                   rows={4}
@@ -766,11 +766,11 @@ function Home() {
               </div>
             </div>
 
-            <div className="modal-actions">
+            <div className={styles.modalActions}>
               {/* ESQUERDA */}
 
               <div style={{ justifySelf: "start" }}>
-                <button className="btn-danger" onClick={() => {
+                <button className={styles.btnDanger} onClick={() => {
                   setCreateTaskOpen(false);
                   setNovaTask({
                     titulo: "",
@@ -788,7 +788,7 @@ function Home() {
 
               <div style={{ justifySelf: "center" }}>
                 <button
-                  className="btn-secondary"
+                  className={styles.btnSecondary}
                   onClick={() =>
                     setNovaTask({
                       titulo: "",
@@ -807,7 +807,7 @@ function Home() {
               <div style={{ justifySelf: "end" }}>
 
                 <button
-                  className="btn-primary"
+                  className={styles.btnPrimary}
                   onClick={criarTask}
                   disabled={!novaTask.titulo}
                 >
@@ -819,14 +819,14 @@ function Home() {
         </>
       )}
 
-      <div className="footer-actions">
-        <button className="export-btn" onClick={exportarPDF}>
+      <div className={styles.footerActions}>
+        <button className={styles.exportBtn} onClick={exportarPDF}>
           Exportar PDF
         </button>
       </div>
 
       {/* ==== Gráfico ==== */}
-      <div className="grafico">
+      <div className={styles.grafico}>
         <h3>Status das tarefas</h3>
 
         <ResponsiveContainer width="100%" height={400}>

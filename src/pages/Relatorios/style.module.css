@@ -1,4 +1,4 @@
-.relatorios-page {
+.relatoriosPage {
   display: flex;
   flex-direction: column;
   gap: 24px;
@@ -8,7 +8,7 @@
   min-height: 100%;
 }
 
-.relatorios-header {
+.relatoriosHeader {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
@@ -16,7 +16,7 @@
   flex-wrap: wrap;
 }
 
-.relatorios-label {
+.relatoriosLabel {
   display: inline-block;
   margin-bottom: 8px;
   font-size: 0.9rem;
@@ -25,20 +25,20 @@
   letter-spacing: 0.08em;
 }
 
-.relatorios-header h1 {
+.relatoriosHeader h1 {
   margin-bottom: 8px;
   font-size: clamp(1.8rem, 2vw, 2.4rem);
   color: #0f172a;
 }
 
-.relatorios-subtitle {
+.relatoriosSubtitle {
   color: #475569;
   line-height: 1.6;
   max-width: 640px;
 }
 
-.relatorios-export-button,
-.btn-secondary {
+.relatoriosExportButton,
+.btnSecondary {
   border: none;
   border-radius: 10px;
   padding: 12px 18px;
@@ -47,35 +47,35 @@
   transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
 }
 
-.relatorios-export-button {
+.relatoriosExportButton {
   background: #0284c7;
   color: white;
   min-width: 180px;
 }
 
-.relatorios-export-button:hover {
+.relatoriosExportButton:hover {
   transform: translateY(-1px);
   box-shadow: 0 12px 22px rgba(2, 132, 199, 0.18);
 }
 
-.btn-secondary {
+.btnSecondary {
   background: white;
   color: #334155;
   border: 1px solid #cbd5e1;
 }
 
-.btn-secondary:hover {
+.btnSecondary:hover {
   background: #f1f5f9;
 }
 
-.relatorios-filtros {
+.relatoriosFiltros {
   display: grid;
   grid-template-columns: repeat(3, minmax(220px, 1fr));
   gap: 16px;
   align-items: end;
 }
 
-.filtro-card {
+.filtroCard {
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -85,13 +85,13 @@
   border-radius: 14px;
 }
 
-.filtro-card label {
+.filtroCard label {
   color: #334155;
   font-size: 0.95rem;
   font-weight: 600;
 }
 
-.filtro-card input {
+.filtroCard input {
   width: 100%;
   padding: 10px 12px;
   border: 1px solid #cbd5e1;
@@ -100,13 +100,13 @@
   color: #0f172a;
 }
 
-.filtro-card input:focus {
+.filtroCard input:focus {
   outline: none;
   border-color: #0284c7;
   background: white;
 }
 
-.filtro-actions {
+.filtroActions {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -117,12 +117,12 @@
   border-radius: 14px;
 }
 
-.filtro-count {
+.filtroCount {
   color: #64748b;
   font-size: 0.95rem;
 }
 
-.relatorios-table-wrapper {
+.relatoriosTableWrapper {
   overflow-x: auto;
   background: white;
   border: 1px solid #e2e8f0;
@@ -130,53 +130,52 @@
   padding: 16px;
 }
 
-.relatorios-table {
+.relatoriosTable {
   width: 100%;
   border-collapse: collapse;
   min-width: 640px;
 }
 
-.relatorios-table th,
-.relatorios-table td {
+.relatoriosTable th,
+.relatoriosTable td {
   padding: 14px 16px;
   text-align: left;
   border-bottom: 1px solid #e2e8f0;
 }
 
-.relatorios-table th {
+.relatoriosTable th {
   background: #f8fafc;
   color: #0f172a;
   font-weight: 700;
 }
 
-.relatorios-table tbody tr:hover {
+.relatoriosTable tbody tr:hover {
   background: #f1f5f9;
 }
 
-.semv-resultados,
-.sem-resultados {
+.semResultados {
   text-align: center;
   padding: 28px 0;
   color: #64748b;
 }
 
 @media (max-width: 900px) {
-  .relatorios-filtros {
+  .relatoriosFiltros {
     grid-template-columns: repeat(2, minmax(220px, 1fr));
   }
 }
 
 @media (max-width: 700px) {
-  .relatorios-header {
+  .relatoriosHeader {
     flex-direction: column;
     align-items: stretch;
   }
 
-  .relatorios-filtros {
+  .relatoriosFiltros {
     grid-template-columns: 1fr;
   }
 
-  .filtro-actions {
+  .filtroActions {
     flex-direction: column;
     align-items: stretch;
   }

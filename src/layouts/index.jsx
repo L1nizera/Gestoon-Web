@@ -1,18 +1,18 @@
 import { Outlet } from "react-router-dom"
 import SideBar from "../components/SideBar"
 import TopBar from "../components/TopBar"
-import "../styles/layout.css"
+import styles from "./style.module.css" 
 
 function DashboardLayout() {
   return (
-    <div className="app-layout">
+    <div className={styles.appLayout}>
 
       <SideBar />
 
-      <div className="main-area">
+      <div className={styles.mainArea}>
         <TopBar />
         
-        <main className="main-content">
+        <main className={styles.mainContent}>
           <Outlet />
         </main>
       </div>

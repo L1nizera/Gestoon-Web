@@ -1,7 +1,7 @@
 
 import { useMemo, useState } from "react";
-import { tasks } from "../data/Tasks";
-import "../styles/relatorios.css";
+import { tasks } from "../../data/Tasks";
+import styles from "./style.module.css";
 
 const funcionariosMock = [
   { id: 1, nome: "João Silva", cargo: "Supervisor", dataCriacao: "10/03/2026" },
@@ -71,23 +71,23 @@ function Relatorios() {
   }
 
   return (
-    <div className="relatorios-page">
-      <div className="relatorios-header">
+    <div className={styles.relatoriosPage}>
+      <div className={styles.relatoriosHeader}>
         <div>
-          <p className="relatorios-label">Relatórios</p>
+          <p className={styles.relatoriosLabel}>Relatórios</p>
           <h1>Relatório de Funcionários</h1>
-          <p className="relatorios-subtitle">
+          <p className={styles.relatoriosSubtitle}>
             Acompanhe o cadastro dos colaboradores, incluindo tarefas concluídas e não concluídas.
           </p>
         </div>
 
-        <button className="relatorios-export-button" type="button" onClick={handleExport}>
+        <button className={styles.relatoriosExportButton} type="button" onClick={handleExport}>
           Exportar relatório
         </button>
       </div>
 
-      <section className="relatorios-filtros">
-        <div className="filtro-card">
+      <section className={styles.relatoriosFiltros}>
+        <div className={styles.filtroCard}>
           <label htmlFor="nomeFiltro">Nome</label>
           <input
             id="nomeFiltro"
@@ -98,7 +98,7 @@ function Relatorios() {
           />
         </div>
 
-        <div className="filtro-card">
+        <div className={styles.filtroCard}>
           <label htmlFor="cargoFiltro">Cargo</label>
           <input
             id="cargoFiltro"
@@ -109,7 +109,7 @@ function Relatorios() {
           />
         </div>
 
-        <div className="filtro-card">
+        <div className={styles.filtroCard}>
           <label htmlFor="dataFiltro">Data de cadastro</label>
           <input
             id="dataFiltro"
@@ -119,16 +119,16 @@ function Relatorios() {
           />
         </div>
 
-        <div className="filtro-actions">
-          <button type="button" className="btn-secondary" onClick={limparFiltros}>
+        <div className={styles.filtroActions}>
+          <button type="button" className={styles.btnSecondary} onClick={limparFiltros}>
             Limpar filtros
           </button>
-          <span className="filtro-count">{listaFiltrada.length} funcionário(s) encontrados</span>
+          <span className={styles.filtroCount}>{listaFiltrada.length} funcionário(s) encontrados</span>
         </div>
       </section>
 
-      <section className="relatorios-table-wrapper">
-        <table className="relatorios-table">
+      <section className={styles.relatoriosTableWrapper}>
+        <table className={styles.relatoriosTable}>
           <thead>
             <tr>
               <th>Nome</th>
@@ -151,7 +151,7 @@ function Relatorios() {
               ))
             ) : (
               <tr>
-                <td colSpan="5" className="sem-resultados">
+                <td colSpan="5" className={styles.semResultados}>
                   Nenhum funcionário encontrado com os filtros aplicados.
                 </td>
               </tr>
