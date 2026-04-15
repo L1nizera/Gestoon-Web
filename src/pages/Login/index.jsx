@@ -1,47 +1,52 @@
 import styles from "./style.module.css";
-import { useNavigate } from "react-router-dom"
-import { useState } from "react"
+import { Navigate, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { useAuth } from "../../context/AuthContext";
 
 function Login() {
+  const navigate = useNavigate();
+  const { user, login } = useAuth();
 
-  const navigate = useNavigate()
+  const [email, setEmail] = useState("");
+  const [senha, setSenha] = useState("");
 
-  const [email, setEmail] = useState("")
-  const [senha, setSenha] = useState("")
+  if (user) {
+    return <Navigate to={user.tipo === "admin" ? "/home" : "/tarefas"} replace />;
+  }
 
-  function handleLogin(e){
-    e.preventDefault()
+  function handleLogin(e) {
+    e.preventDefault();
 
-    // 🔹 Simulação de usuários
-    if(email === "admin" && senha === "admin"){
-      navigate("/home")
-    } 
-    else if(email === "user" && senha === "user"){
-      navigate("/perfil")
-    } 
-    else {
-      alert("Usuário ou senha inválidos")
+    if (email === "admin" && senha === "admin") {
+      login({ nome: "Administrador", tipo: "admin" });
+      navigate("/home");
+      return;
     }
+
+    if (email === "user" && senha === "user") {
+      login({ nome: "Funcionário", tipo: "funcionario" });
+      navigate("/tarefas");
+      return;
+    }
+
+    alert("Usuário ou senha inválidos");
   }
 
   return (
-
     <div className={styles.loginContainer}>
-
       <h1 className={styles.logo}>Gestoon</h1>
 
       <form className={styles.loginBox} onSubmit={handleLogin}>
-
         <h2>Login</h2>
 
-        <input 
+        <input
           placeholder="Email / Usuário"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
 
-        <input 
-          type="password" 
+        <input
+          type="password"
           placeholder="Senha"
           value={senha}
           onChange={(e) => setSenha(e.target.value)}
@@ -50,12 +55,9 @@ function Login() {
         <button type="submit" className={styles.button}>
           Entrar
         </button>
-
       </form>
-
     </div>
-
-  )
+  );
 }
 
 export default Login;

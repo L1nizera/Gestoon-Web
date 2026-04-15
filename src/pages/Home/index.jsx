@@ -414,14 +414,18 @@ function Home() {
           Canceladas
         </button>
       </div>
+      
+      <div className={styles.alinhaBtn}>
 
-      <button className={styles.limparBtn} onClick={limparFiltros}>
-        Limpar Filtros
-      </button>
+        <button className={styles.limparBtn} onClick={limparFiltros}>
+          Limpar Filtros
+        </button>
 
-      <button className={styles.criarBtn} onClick={() => setCreateTaskOpen(true)}>
-        Criar +
-      </button>
+        <button className={styles.criarBtn} onClick={() => setCreateTaskOpen(true)}>
+          Criar +
+        </button>
+
+      </div>
 
       {/* ===== TABELA ===== */}
       <div className={styles.tabelaContainer}>
@@ -442,14 +446,14 @@ function Home() {
                 {ordemTitulo === "az" ? "↑" : ordemTitulo === "za" ? "↓" : ""}
               </th>
 
-              <th>Status</th>
-              <th>Prioridade</th>
-              <th>Setor</th>
-              <th>Criado por</th>
-              <th>Hora</th>
+              <th className={styles.textCenter}>Status</th>
+              <th className={styles.textCenter}>Prioridade</th>
+              <th className={styles.textCenter}>Setor</th>
+              <th className={styles.textCenter}>Criado por</th>
+              <th className={styles.textCenter}>Hora</th>
 
               <th
-                className={ordemData ? styles.colunaAtiva : ""}
+                className={`${ordemData ? styles.colunaAtiva : ""} ${styles.textCenter}`}
                 onClick={() =>
                   setOrdemData((prev) => {
                     if (prev === null) return "recente";
@@ -479,22 +483,22 @@ function Home() {
               >
                 <td>{task.titulo}</td>
 
-                <td>
+                <td className={styles.textCenter}>
                   <span className={`${styles.badge} ${styles[statusMap[task.status]]}`}>
                     {task.status}
                   </span>
                 </td>
 
-                <td>
+                <td className={styles.textCenter}>
                   <span className={`${styles.badge} ${styles[prioridadeMap[task.prioridade]]}`}>
                     {task.prioridade}
                   </span>
                 </td>
 
-                <td>{task.setor}</td>
-                <td>{task.criadoPor}</td>
-                <td>{task.horaCriacao}</td>
-                <td>{task.dataCriacao}</td>
+                <td className={styles.textCenter}>{task.setor}</td>
+                <td className={styles.textCenter}>{task.criadoPor}</td>
+                <td className={styles.textCenter}>{task.horaCriacao}</td>
+                <td className={styles.textCenter}>{task.dataCriacao}</td>
               </tr>
             ))}
           </tbody>

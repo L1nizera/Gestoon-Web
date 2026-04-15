@@ -1,33 +1,93 @@
 
-import { BrowserRouter, Routes, Route } from "react-router-dom"
-import Login from "./pages/Login/index"
-import Home from "./pages/Home"
-import DashboardLayout from "./layouts/index"
-import Funcionarios from "./pages/Funcionarios/index"
-import Perfil from "./pages/perfil/index"
-import Relatorios from "./pages/Relatorios"
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import Login from "./pages/Login/index";
+import Home from "./pages/Home";
+import DashboardLayout from "./layouts/index";
+import Funcionarios from "./pages/Funcionarios/index";
+import Perfil from "./pages/Perfil/index";
+import Relatorios from "./pages/Relatorios";
+import Tarefas from "./pages/Tarefas";
+import ProtectedRoute from "./components/ProtectedRoute";
+import { AuthProvider, useAuth } from "./context/AuthContext";
+
+function AppRoutes() {
+  const { user } = useAuth();
+
+  return (
+    <Routes>
+      <Route
+        path="/"
+        element={
+          user ? (
+            <Navigate to={user.tipo === "admin" ? "/home" : "/tarefas"} replace />
+          ) : (
+            <Login />
+          )
+        }
+      />
+
+      <Route
+        element={
+          <ProtectedRoute allowedFor={["admin", "funcionario"]}>
+            <DashboardLayout />
+          </ProtectedRoute>
+        }
+      >
+        <Route
+          path="/home"
+          element={
+            <ProtectedRoute allowedFor={["admin"]}>
+              <Home />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/funcionarios"
+          element={
+            <ProtectedRoute allowedFor={["admin"]}>
+              <Funcionarios />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/perfil"
+          element={
+            <ProtectedRoute allowedFor={["admin", "funcionario"]}>
+              <Perfil />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/relatorios"
+          element={
+            <ProtectedRoute allowedFor={["admin"]}>
+              <Relatorios />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/tarefas"
+          element={
+            <ProtectedRoute allowedFor={["admin", "funcionario"]}>
+              <Tarefas />
+            </ProtectedRoute>
+          }
+        />
+      </Route>
+
+      <Route path="*" element={<Navigate to={user ? "/tarefas" : "/"} replace />} />
+    </Routes>
+  );
+}
 
 function App() {
   return (
-
-    <BrowserRouter>
-
-      <Routes>
-
-        <Route path="/" element={<Login />} />
-
-        <Route element={<DashboardLayout />}>
-          <Route path="/home" element={<Home />} />
-          <Route path="/funcionarios" element={<Funcionarios />} />
-          <Route path="/perfil" element={<Perfil />} />
-          <Route path="/relatorios" element={<Relatorios />} />
-        </Route>
-
-      </Routes>
-
-    </BrowserRouter>
-
-  )
+    <AuthProvider>
+      <BrowserRouter>
+        <AppRoutes />
+      </BrowserRouter>
+    </AuthProvider>
+  );
 }
 
-export default App
+export default App;

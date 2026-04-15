@@ -154,6 +154,31 @@ select {
 
 /* botões */
 
+.cadastrarBtn {
+  background: #1e293b;
+  color: white;
+  border: none;
+  padding: 0.8rem 1.4rem;
+  border-radius: 0.6rem;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: large;
+  transition: 0.2s;
+  margin-bottom: 1.5rem;
+  margin-left: 145rem;
+  margin-top: 3rem;
+  width: 13rem;
+}
+
+.cadastrarBtn:active {
+  background: #629b06;
+  transform: scale(1.1);
+}
+
+.cadastrarBtn:hover {
+  background: #629b06;
+}
+
 .footerActions {
   display: flex;
   justify-content: flex-end;
@@ -232,6 +257,17 @@ select {
   word-break: break-word;
   white-space: nowrap;
   font-size: 1.4rem;
+}
+
+.textCenter {
+  text-align: center;
+}
+
+.flexCenter {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
 }
 
 .tabela tr:nth-child(even) {

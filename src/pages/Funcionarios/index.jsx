@@ -294,11 +294,12 @@ function Funcionarios() {
                             >
                                 Nome {ordemNome === "az" ? "↑" : ordemNome === "za" ? "↓" : ""}
                             </th>
-                            <th>Email</th>
-                            <th>Setor</th>
-                            <th>Cargo</th>
-                            <th>Status</th>
+                            <th className={styles.textCenter}>Email</th>
+                            <th className={styles.textCenter}>Setor</th>
+                            <th className={styles.textCenter}>Cargo</th>
+                            <th className={styles.textCenter}>Status</th>
                             <th
+                                className={styles.textCenter}
                                 onClick={() =>
                                     setOrdemData((prev) =>
                                         prev === "recente"
@@ -323,17 +324,17 @@ function Funcionarios() {
                         {lista.map((f) => (
                             <tr key={f.id} onClick={() => setSelected(f)}>
                                 <td>{f.nome}</td>
-                                <td>{f.email}</td>
-                                <td>{f.setor}</td>
-                                <td>{f.cargo}</td>
-                                <td>
+                                <td className={styles.textCenter}>{f.email}</td>
+                                <td className={styles.textCenter}>{f.setor}</td>
+                                <td className={styles.textCenter}>{f.cargo}</td>
+                                <td className={styles.textCenter}>
                                     <span
                                         className={`${styles.badge} ${styles[f.ativo ? "statusConcluida" : "statusCancelada"]}`}
                                     >
                                         {f.ativo ? "Ativo" : "Inativo"}
                                     </span>
                                 </td>
-                                <td>{f.dataCriacao}</td>
+                                <td className={styles.textCenter}>{f.dataCriacao}</td>
                             </tr>
                         ))}
                     </tbody>
