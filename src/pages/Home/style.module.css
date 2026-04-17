@@ -191,50 +191,7 @@ select {
   background: #bbf7d0;
   color: #166534;
 }
-<<<<<<< Updated upstream
 /* Grid */
-=======
-
-/* ===== OVERLAY ===== */
-
-.overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 999;
-}
-
-/* ===== MODAL ===== */
-
-.taskModal {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  width: 90%;
-  max-width: 60rem;
-  background: white;
-  padding: 3rem;
-  border-radius: 1.4rem;
-  box-shadow: 0 2rem 5rem rgba(0, 0, 0, 0.25);
-  z-index: 1000;
-  animation: modalIn 0.2s ease forwards;
-}
-
-@keyframes modalIn {
-  from {
-    opacity: 0;
-    transform: translate(-50%, -60%) scale(0.95);
-  }
-
-  to {
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(1);
-  }
-}
->>>>>>> Stashed changes
 
 .formGrid {
   display: grid;
@@ -571,49 +528,6 @@ select {
   }
 }
 
-<<<<<<< Updated upstream
-=======
-.taskModal input,
-.taskModal textarea,
-.taskModal select {
-  width: 100%;
-  padding: 0.8rem;
-  margin-top: 0.8rem;
-  border-radius: 0.6rem;
-  border: 0.1rem solid #cbd5e1;
-  font-size: 1.3rem;
-  transition: all 0.2s ease;
-}
-
-.taskModal textarea {
-  min-height: 8rem;
-  resize: none;
-}
-
-
-
-.taskModal h2 {
-  margin-bottom: 1.5rem;
-  font-size: 2rem;
-  font-weight: 600;
-}
-
-.taskModal input:focus,
-.taskModal textarea:focus,
-.taskModal select:focus {
-  border-color: #2563eb;
-  box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.2);
-}
-
-/* hover leve */
-.taskModal input:hover,
-.taskModal textarea:hover,
-.taskModal select:hover {
-  border-color: #94a3b8;
-}
-
-
->>>>>>> Stashed changes
 /* botões */
 button {
   transition: all 0.2s ease;
@@ -778,61 +692,4 @@ th:focus {
 .grafico,
 .filtrosAvancados {
   border: 0.1rem solid #e2e8f0;
-<<<<<<< Updated upstream
-=======
-}
-
-/* CONTROLE */
-/* DESKTOP PRIMEIRO */
-.desktopOnly {
-  display: block;
-}
-
-.mobileOnly {
-  display: none;
-}
-
-/* MOBILE SOBRESCREVE */
-@media (max-width: 768px) {
-  .desktopOnly {
-    display: none !important;
-  }
-
-  .mobileOnly {
-    display: flex !important;
-    flex-direction: column;
-    gap: 12px;
-  }
-}
-
-/* CARD */
-.card {
-  background: #fafafa;
-  border-radius: 12px;
-  padding: 14px;
-  cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
-  transition: 0.2s;
-}
-
-.cardHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 8px;
-  width: 10rem;
-}
-
-.cardBody p {
-  margin: 4px 0;
-  font-size: 13px;
-}
-
-.cardFooter {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 8px;
-  font-size: 12px;
-  opacity: 0.7;
->>>>>>> Stashed changes
 }
