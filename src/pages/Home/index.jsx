@@ -4,6 +4,8 @@ import { tasks } from "../../data/Tasks";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import Modal from "../../components/UI/Modal";
+
 
 function Home() {
   const [selectedTask, setSelectedTask] = useState(null);
@@ -408,156 +410,116 @@ function Home() {
         </button>
 
         <button
-          className={filtro === "Cancelada" ? "ativo" : ""}
+          className={filtro === "Cancelada" ? styles.ativo : ""}
           onClick={() => setFiltro("Cancelada")}
         >
           Canceladas
         </button>
       </div>
-      
-      <div className={styles.alinhaBtn}>
 
+
+      <div className={styles.acoes}>
         <button className={styles.limparBtn} onClick={limparFiltros}>
           Limpar Filtros
         </button>
 
-        <button className={styles.criarBtn} onClick={() => setCreateTaskOpen(true)}>
-          Criar +
+        <button
+          className={styles.criarBtn}
+          onClick={() => setCreateTaskOpen(true)}
+        >
+          Criar Tarefa
         </button>
-
       </div>
 
       {/* ===== TABELA ===== */}
-      <div className={styles.tabelaContainer}>
-        <table className={styles.tabela}>
-          <thead>
-            <tr>
-              <th
-                className={ordemTitulo ? styles.colunaAtiva : ""}
-                onClick={() =>
-                  setOrdemTitulo((prev) => {
-                    if (prev === null) return "az";
-                    if (prev === "az") return "za";
-                    return null;
-                  })
-                }
-              >
-                Título{" "}
-                {ordemTitulo === "az" ? "↑" : ordemTitulo === "za" ? "↓" : ""}
-              </th>
+      <div className={styles.tabelascroll}>
+        <div className={styles.tabelaContainer}>
+          <table className={styles.tabela}>
+            <thead>
+              <tr>
+                <th
+                  className={ordemTitulo ? styles.colunaAtiva : ""}
+                  onClick={() =>
+                    setOrdemTitulo((prev) => {
+                      if (prev === null) return "az";
+                      if (prev === "az") return "za";
+                      return null;
+                    })
+                  }
+                >
+                  Título{" "}
+                  {ordemTitulo === "az" ? "↑" : ordemTitulo === "za" ? "↓" : ""}
+                </th>
 
-              <th className={styles.textCenter}>Status</th>
-              <th className={styles.textCenter}>Prioridade</th>
-              <th className={styles.textCenter}>Setor</th>
-              <th className={styles.textCenter}>Criado por</th>
-              <th className={styles.textCenter}>Hora</th>
+                <th>Status</th>
+                <th>Prioridade</th>
+                <th>Setor</th>
+                <th>Criado por</th>
+                <th>Hora</th>
 
-              <th
-                className={`${ordemData ? styles.colunaAtiva : ""} ${styles.textCenter}`}
-                onClick={() =>
-                  setOrdemData((prev) => {
-                    if (prev === null) return "recente";
-                    if (prev === "recente") return "antigo";
-                    return null;
-                  })
-                }
-              >
-                Data{" "}
-                {ordemData === "recente"
-                  ? "↓"
-                  : ordemData === "antigo"
-                    ? "↑"
-                    : ""}
-              </th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {lista.map((task) => (
-              <tr
-                key={task.id}
-                onClick={(e) => {
-                  if (e.target.tagName === "BUTTON") return;
-                  setSelectedTask(task);
-                }}
-              >
-                <td>{task.titulo}</td>
-
-                <td className={styles.textCenter}>
-                  <span className={`${styles.badge} ${styles[statusMap[task.status]]}`}>
-                    {task.status}
-                  </span>
-                </td>
-
-                <td className={styles.textCenter}>
-                  <span className={`${styles.badge} ${styles[prioridadeMap[task.prioridade]]}`}>
-                    {task.prioridade}
-                  </span>
-                </td>
-
-                <td className={styles.textCenter}>{task.setor}</td>
-                <td className={styles.textCenter}>{task.criadoPor}</td>
-                <td className={styles.textCenter}>{task.horaCriacao}</td>
-                <td className={styles.textCenter}>{task.dataCriacao}</td>
+                <th
+                  className={ordemData ? styles.colunaAtiva : ""}
+                  onClick={() =>
+                    setOrdemData((prev) => {
+                      if (prev === null) return "recente";
+                      if (prev === "recente") return "antigo";
+                      return null;
+                    })
+                  }
+                >
+                  Data{" "}
+                  {ordemData === "recente"
+                    ? "↓"
+                    : ordemData === "antigo"
+                      ? "↑"
+                      : ""}
+                </th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+
+            <tbody>
+              {lista.map((task) => (
+                <tr
+                  key={task.id}
+                  onClick={(e) => {
+                    if (e.target.tagName === "BUTTON") return;
+                    setSelectedTask(task);
+                  }}
+                >
+                  <td>{task.titulo}</td>
+
+                  <td>
+                    <span className={`${styles.badge} ${styles[statusMap[task.status]]}`}>
+                      {task.status}
+                    </span>
+                  </td>
+
+                  <td>
+                    <span className={`${styles.badge} ${styles[prioridadeMap[task.prioridade]]}`}>
+                      {task.prioridade}
+                    </span>
+                  </td>
+
+                  <td>{task.setor}</td>
+                  <td>{task.criadoPor}</td>
+                  <td>{task.horaCriacao}</td>
+                  <td>{task.dataCriacao}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {/* ===== MODAL ===== */}
       {selectedTask && (
-        <>
-          <div className={styles.overlay} onClick={() => setSelectedTask(null)}></div>
+        <Modal
+          title={selectedTask.titulo}
+          variant="between"
 
-          <div className={styles.taskModal} onClick={(e) => e.stopPropagation()}>
-            <div className={styles.modalHeader}>
-              <h2>{selectedTask.titulo}</h2>
-
-              <span className={`${styles.badge} ${styles[statusMap[selectedTask.status]]}`}>
-                {selectedTask.status}
-              </span>
-            </div>
-
-            <div className={styles.modalGrid}>
-              <div>
-                <strong>Prioridade: </strong>
-                <p>
-                  <span
-                    className={`${styles.badge} ${styles[prioridadeMap[selectedTask.prioridade]]}`}
-                  >
-                    {selectedTask.prioridade}
-                  </span>
-                </p>
-              </div>
-
-              <div>
-                <strong>Setor</strong>
-                <p>{selectedTask.setor}</p>
-              </div>
-
-              <div>
-                <strong>Criado por</strong>
-                <p>{selectedTask.criadoPor}</p>
-              </div>
-
-              <div>
-                <strong>Data</strong>
-                <p>{selectedTask.dataCriacao}</p>
-              </div>
-
-              <div>
-                <strong>Hora</strong>
-                <p>{selectedTask.horaCriacao}</p>
-              </div>
-            </div>
-
-            <div className={styles.descricaoBox}>
-              <strong>Descrição</strong>
-              <p>{selectedTask.descricao || "Sem descrição"}</p>
-            </div>
-
-            <div className={styles.modalActions}>
+          onClose={() => setSelectedTask(null)}
+          actions={
+            <>
               <button
                 className={styles.btnClose}
                 onClick={() => setSelectedTask(null)}
@@ -578,96 +540,53 @@ function Home() {
               >
                 Excluir
               </button>
+            </>
+          }
+        >
+          <div className={styles.modalGrid}>
+            <div>
+              <strong>Prioridade:</strong>
+              <span className={`${styles.badge} ${styles[prioridadeMap[selectedTask.prioridade]]}`}>
+                {selectedTask.prioridade}
+              </span>
+            </div>
+
+            <div>
+              <strong>Setor</strong>
+              <p>{selectedTask.setor}</p>
+            </div>
+
+            <div>
+              <strong>Criado por</strong>
+              <p>{selectedTask.criadoPor}</p>
+            </div>
+
+            <div>
+              <strong>Data</strong>
+              <p>{selectedTask.dataCriacao}</p>
+            </div>
+
+            <div>
+              <strong>Hora</strong>
+              <p>{selectedTask.horaCriacao}</p>
             </div>
           </div>
-        </>
+
+          <div className={styles.descricaoBox}>
+            <strong>Descrição</strong>
+            <p>{selectedTask.descricao || "Sem descrição"}</p>
+          </div>
+        </Modal>
       )}
 
       {/* ===== MODAL EDITAR ===== */}
       {editTask && (
-        <>
-          <div className={styles.overlay} onClick={() => setEditTask(null)}></div>
-
-          <div className={styles.taskModal} onClick={(e) => e.stopPropagation()}>
-            <h2>Editar Tarefa</h2>
-
-            <div className={styles.formGrid}>
-              {/* TÍTULO - NOVO */}
-              <div className={`${styles.formGroup} ${styles.full}`}>
-                <label>Título</label>
-                <input
-                  type="text"
-                  value={editTask.titulo}
-                  onChange={(e) =>
-                    setEditTask({ ...editTask, titulo: e.target.value })
-                  }
-                  placeholder="Digite o título da tarefa..."
-                />
-              </div>
-
-              <div className={styles.formGroup}>
-                <label>Setor</label>
-                <select
-                  value={editTask.setor}
-                  onChange={(e) =>
-                    setEditTask({ ...editTask, setor: e.target.value })
-                  }
-                >
-                  {setores.map((s) => (
-                    <option key={s}>{s}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div className={styles.formGroup}>
-                <label>Status</label>
-                <select
-                  value={editTask.status}
-                  onChange={(e) =>
-                    setEditTask({ ...editTask, status: e.target.value })
-                  }
-                >
-                  <option>Pendente</option>
-                  <option>Em andamento</option>
-                  <option>Concluída</option>
-                  <option>Cancelada</option>
-                </select>
-              </div>
-
-              <div className={styles.formGroup}>
-                <label>Prioridade</label>
-                <select
-                  value={editTask.prioridade}
-                  onChange={(e) =>
-                    setEditTask({ ...editTask, prioridade: e.target.value })
-                  }
-                >
-                  <option>Alta</option>
-                  <option>Média</option>
-                  <option>Baixa</option>
-                </select>
-              </div>
-
-              {/* CRIADO POR - NOVO */}
-              <div className={styles.formGroup}>
-                <label>Criado por</label>
-                <input type="text" value={editTask.criadoPor} disabled />
-              </div>
-
-              {/* DESCRIÇÃO */}
-              <div className={`${styles.formGroup} ${styles.full}`}>
-                <label>Descrição</label>
-                <textarea
-                  rows={4}
-                  value={editTask.descricao}
-                  onChange={(e) =>
-                    setEditTask({ ...editTask, descricao: e.target.value })
-                  }
-                />
-              </div>
-            </div>
-
-            <div className={styles.modalActions}>
+        <Modal
+          title="Editar Tarefa"
+          onClose={() => setEditTask(null)}
+          variant="between"
+          actions={
+            <>
               <button
                 className={styles.btnSecondary}
                 onClick={() => setEditTask(null)}
@@ -682,145 +601,200 @@ function Home() {
               >
                 Salvar
               </button>
+            </>
+          }
+        >
+          <div className={styles.formGrid}>
+            <div className={`${styles.formGroup} ${styles.full}`}>
+              <label>Título</label>
+              <input
+                type="text"
+                value={editTask.titulo}
+                onChange={(e) =>
+                  setEditTask({ ...editTask, titulo: e.target.value })
+                }
+              />
+            </div>
+
+            <div className={styles.formGroup}>
+              <label>Setor</label>
+              <select
+                value={editTask.setor}
+                onChange={(e) =>
+                  setEditTask({ ...editTask, setor: e.target.value })
+                }
+              >
+                {setores.map((s) => (
+                  <option key={s}>{s}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className={styles.formGroup}>
+              <label>Status</label>
+              <select
+                value={editTask.status}
+                onChange={(e) =>
+                  setEditTask({ ...editTask, status: e.target.value })
+                }
+              >
+                <option>Pendente</option>
+                <option>Em andamento</option>
+                <option>Concluída</option>
+                <option>Cancelada</option>
+              </select>
+            </div>
+
+            <div className={styles.formGroup}>
+              <label>Prioridade</label>
+              <select
+                value={editTask.prioridade}
+                onChange={(e) =>
+                  setEditTask({ ...editTask, prioridade: e.target.value })
+                }
+              >
+                <option>Alta</option>
+                <option>Média</option>
+                <option>Baixa</option>
+              </select>
+            </div>
+
+            <div className={styles.formGroup}>
+              <label>Criado por</label>
+              <input type="text" value={editTask.criadoPor} disabled />
+            </div>
+
+            <div className={`${styles.formGroup} ${styles.full}`}>
+              <label>Descrição</label>
+              <textarea
+                rows={4}
+                value={editTask.descricao}
+                onChange={(e) =>
+                  setEditTask({ ...editTask, descricao: e.target.value })
+                }
+              />
             </div>
           </div>
-        </>
+        </Modal>
       )}
 
       {/* ===== MODAL CRIAR ===== */}
       {createTaskOpen && (
-        <>
-          <div className={styles.overlay} onClick={() => setCreateTaskOpen(false)}></div>
+        <Modal
+          title="Criar Tarefa"
+          onClose={() => setCreateTaskOpen(false)}
+          variant="between"
+          actions={
+            <>
+              <button className={styles.btnDanger} onClick={() => {
+                setCreateTaskOpen(false);
+                setNovaTask({
+                  titulo: "",
+                  setor: "Caixa",
+                  prioridade: "Média",
+                  status: "Pendente",
+                  descricao: "",
+                });
+              }}>Fechar
+              </button>
 
-          <div className={styles.taskModal} onClick={(e) => e.stopPropagation()}>
-            <div className={styles.modalHeader}>
-              <h2>Criar Tarefa</h2>
+
+              <button className={styles.btnSecondary} onClick={() =>
+                setNovaTask({
+                  titulo: "",
+                  setor: "Caixa",
+                  prioridade: "Média",
+                  status: "Pendente",
+                  descricao: "",
+                })
+              }
+              >Limpar
+              </button>
+
+
+              <button className={styles.btnPrimary}
+                onClick={criarTask}
+                disabled={!novaTask.titulo}
+              >
+                Criar
+              </button>
+            </>
+          }
+        >
+
+          <div className={styles.formGrid}>
+            {/* TÍTULO */}
+            <div className={`${styles.formGroup} ${styles.full}`}>
+              <label>Título</label>
+              <input
+                type="text"
+                value={novaTask.titulo}
+                onChange={(e) =>
+                  setNovaTask({ ...novaTask, titulo: e.target.value })
+                }
+                placeholder="Digite o título..."
+              />
             </div>
 
-            <div className={styles.formGrid}>
-              {/* TÍTULO */}
-              <div className={`${styles.formGroup} ${styles.full}`}>
-                <label>Título</label>
-                <input
-                  type="text"
-                  value={novaTask.titulo}
-                  onChange={(e) =>
-                    setNovaTask({ ...novaTask, titulo: e.target.value })
-                  }
-                  placeholder="Digite o título..."
-                />
-              </div>
-
-              {/* SETOR */}
-              <div className={styles.formGroup}>
-                <label>Setor</label>
-                <select
-                  value={novaTask.setor}
-                  onChange={(e) =>
-                    setNovaTask({ ...novaTask, setor: e.target.value })
-                  }
-                >
-                  {setores.map((s) => (
-                    <option key={s}>{s}</option>
-                  ))}
-                </select>
-              </div>
-
-              {/* STATUS */}
-              <div className={styles.formGroup}>
-                <label>Status</label>
-                <select
-                  value={novaTask.status}
-                  onChange={(e) =>
-                    setNovaTask({ ...novaTask, status: e.target.value })
-                  }
-                >
-                  <option>Pendente</option>
-                  <option>Em andamento</option>
-                  <option>Concluída</option>
-                  <option>Cancelada</option>
-                </select>
-              </div>
-
-              {/* PRIORIDADE */}
-              <div className={styles.formGroup}>
-                <label>Prioridade</label>
-                <select
-                  value={novaTask.prioridade}
-                  onChange={(e) =>
-                    setNovaTask({ ...novaTask, prioridade: e.target.value })
-                  }
-                >
-                  <option>Alta</option>
-                  <option>Média</option>
-                  <option>Baixa</option>
-                </select>
-              </div>
-
-              {/* DESCRIÇÃO */}
-              <div className={`${styles.formGroup} ${styles.full}`}>
-                <label>Descrição</label>
-                <textarea
-                  rows={4}
-                  value={novaTask.descricao}
-                  onChange={(e) =>
-                    setNovaTask({ ...novaTask, descricao: e.target.value })
-                  }
-                />
-              </div>
+            {/* SETOR */}
+            <div className={styles.formGroup}>
+              <label>Setor</label>
+              <select
+                value={novaTask.setor}
+                onChange={(e) =>
+                  setNovaTask({ ...novaTask, setor: e.target.value })
+                }
+              >
+                {setores.map((s) => (
+                  <option key={s}>{s}</option>
+                ))}
+              </select>
             </div>
 
-            <div className={styles.modalActions}>
-              {/* ESQUERDA */}
+            {/* STATUS */}
+            <div className={styles.formGroup}>
+              <label>Status</label>
+              <select
+                value={novaTask.status}
+                onChange={(e) =>
+                  setNovaTask({ ...novaTask, status: e.target.value })
+                }
+              >
+                <option>Pendente</option>
+                <option>Em andamento</option>
+                <option>Concluída</option>
+                <option>Cancelada</option>
+              </select>
+            </div>
 
-              <div style={{ justifySelf: "start" }}>
-                <button className={styles.btnDanger} onClick={() => {
-                  setCreateTaskOpen(false);
-                  setNovaTask({
-                    titulo: "",
-                    setor: "Caixa",
-                    prioridade: "Média",
-                    status: "Pendente",
-                    descricao: "",
-                  });
-                }}>
-                  Fechar
-                </button>
-              </div>
+            {/* PRIORIDADE */}
+            <div className={styles.formGroup}>
+              <label>Prioridade</label>
+              <select
+                value={novaTask.prioridade}
+                onChange={(e) =>
+                  setNovaTask({ ...novaTask, prioridade: e.target.value })
+                }
+              >
+                <option>Alta</option>
+                <option>Média</option>
+                <option>Baixa</option>
+              </select>
+            </div>
 
-              {/* CENTRO */}
-
-              <div style={{ justifySelf: "center" }}>
-                <button
-                  className={styles.btnSecondary}
-                  onClick={() =>
-                    setNovaTask({
-                      titulo: "",
-                      setor: "Caixa",
-                      prioridade: "Média",
-                      status: "Pendente",
-                      descricao: "",
-                    })
-                  }
-                >
-                  Limpar
-                </button>
-              </div>
-
-              {/* DIREITA */}
-              <div style={{ justifySelf: "end" }}>
-
-                <button
-                  className={styles.btnPrimary}
-                  onClick={criarTask}
-                  disabled={!novaTask.titulo}
-                >
-                  Criar
-                </button>
-              </div>
+            {/* DESCRIÇÃO */}
+            <div className={`${styles.formGroup} ${styles.full}`}>
+              <label>Descrição</label>
+              <textarea
+                rows={4}
+                value={novaTask.descricao}
+                onChange={(e) =>
+                  setNovaTask({ ...novaTask, descricao: e.target.value })
+                }
+              />
             </div>
           </div>
-        </>
+        </Modal>
       )}
 
       <div className={styles.footerActions}>
