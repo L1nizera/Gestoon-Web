@@ -1,11 +1,13 @@
 #root {
+  display: flex;
+  flex-direction: column;
   background-color: #fafafa;
   color: #212121;
-  flex-direction: column;
   align-items: center;
   min-width: 32rem;
   min-height: 100vh;
   width: 100%;
+  font-family: 'Source Sans 3', sans-serif
 }
 
 html {
@@ -26,41 +28,41 @@ html {
 } 
 
 h1 {
-  font-size: 3.8rem;
-  font-weight: bold;
+  font-size: 2.4rem;
+  font-weight: 600;
   line-height: 1.1;
   margin: 1.5rem 0;
 }
 
 h2 {
-  font-size: 3.3rem;
-  font-weight: bold;
+  font-size: 2rem;
+  font-weight: 600;
   line-height: 1.1;
   margin: 0.8rem 0;
 }
 
 h3 {
-  font-size: 2.9rem;
-  font-weight: bold;
+  font-size: 1.6rem;
+  font-weight: 600;
   line-height: 1.1;
   margin: 0.4rem 0;
 }
 
 label {
-  font-size: 2.8rem;
+  font-size: 1.3rem;
 }
 
 p {
-  font-size: 2.6rem;
+  font-size: 1.4rem;
 }
 
 small {
-  font-size: 2.3rem;
+  font-size: 1.2rem;
 }
 
 a {
   text-decoration: none;
-  font-size: 2.2rem; 
+  font-size: 1.3rem; 
   color: cornflowerblue;
   margin-bottom: 0.5rem;
 }
@@ -68,8 +70,9 @@ a {
 
 /* Estilo para Inputs, Selects e Textareas */
 input, select, textarea {
+  font-size: 1.4rem;
   width: 100%;
-  padding: 1rem;
+  padding: 0.8rem 1rem;
   margin: 0.8rem 0;
   border: 0.1rem solid #ccc;
   border-radius: 0.4rem;
@@ -78,6 +81,7 @@ input, select, textarea {
 
 /* Tabelas Responsivas */
 table {
+  font-size: 1.3rem;
   width: 100%;
   border-collapse: collapse;
   margin: 0;
@@ -90,17 +94,26 @@ th, td {
 }
 
 th {
-  background-color: #f4f4f4;
+  font-weight: 600;
+  color: #6b7280;
+}
+
+td{
+  font-variant-numeric: tabular-nums
+}
+
+body {
+  -webkit-font-smoothing: antialiased;
 }
 
 
-@media screen and (max-width: 960px) {
+@media screen and (max-width: 96rem) {
   html {
     font-size: 50%;
   }
 }
 
-@media screen and (max-width: 600px) {
+@media screen and (max-width: 60rem) {
   html {
     font-size: 37.2%;
   }
