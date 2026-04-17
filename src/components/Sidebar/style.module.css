@@ -1,0 +1,63 @@
+.sidebar {
+  width: 220px;
+  background: #1e293b;
+  color: white;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.header {
+  margin-bottom: 1.5rem;
+}
+
+.header p {
+  margin: 0;
+  color: #cbd5e1;
+  font-size: 1.25rem;
+}
+
+.menu {
+  list-style: none;
+  padding: 0;
+  flex: 1;
+}
+
+/* LINKS */
+.link {
+  display: block;
+  color: white;
+  background: #334155;
+  padding: 8px 10px;
+  border-radius: 5px;
+  margin-bottom: 8px;
+  text-decoration: none;
+  transition: 0.3s;
+}
+
+.link:hover {
+  background: #475569;
+}
+
+/* ATIVO */
+.active {
+  background: #1c3968;
+  font-weight: bold;
+  border-left: 4px solid #38bdf8;
+}
+
+/* BOTÃO SAIR */
+.logoutBtn {
+  background: #334155;
+  color: white;
+  padding: 8px 10px;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.logoutBtn:hover {
+  background: #475569;
+}

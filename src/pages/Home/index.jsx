@@ -4,7 +4,7 @@ import { tasks } from "../../data/Tasks";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import Modal from "../../components/UI/Modal";
+import Modal from "../../components/Modal/Modal";
 
 
 function Home() {
