@@ -280,8 +280,8 @@ function Funcionarios() {
                 Cadastrar +
             </button>
 
-            {/* TABELA */}
-            <div className={styles.tabelaContainer}>
+            {/* ===== DESKTOP (TABELA) ===== */}
+            <div className={`${styles.tabelaContainer} ${styles.desktopOnly}`}>
                 <table className={styles.tabela}>
                     <thead>
                         <tr>
@@ -329,7 +329,8 @@ function Funcionarios() {
                                 <td className={styles.textCenter}>{f.cargo}</td>
                                 <td className={styles.textCenter}>
                                     <span
-                                        className={`${styles.badge} ${styles[f.ativo ? "statusConcluida" : "statusCancelada"]}`}
+                                        className={`${styles.badge} ${styles[f.ativo ? "statusConcluida" : "statusCancelada"]
+                                            }`}
                                     >
                                         {f.ativo ? "Ativo" : "Inativo"}
                                     </span>
@@ -339,6 +340,34 @@ function Funcionarios() {
                         ))}
                     </tbody>
                 </table>
+            </div>
+
+            {/* ===== MOBILE (CARDS) ===== */}
+            <div className={styles.mobileOnly}>
+                {lista.map((f) => (
+                    <div
+                        key={f.id}
+                        className={styles.card}
+                        onClick={() => setSelected(f)}
+                    >
+                        <div className={styles.cardHeader}>
+                            <strong>{f.nome}</strong>
+                            <span
+                                className={`${styles.badge} ${styles[f.ativo ? "statusConcluida" : "statusCancelada"]
+                                    }`}
+                            >
+                                {f.ativo ? "Ativo" : "Inativo"}
+                            </span>
+                        </div>
+
+                        <div className={styles.cardBody}>
+                            <p><strong>Email:</strong> {f.email}</p>
+                            <p><strong>Setor:</strong> {f.setor}</p>
+                            <p><strong>Cargo:</strong> {f.cargo}</p>
+                            <p><strong>Data:</strong> {f.dataCriacao}</p>
+                        </div>
+                    </div>
+                ))}
             </div>
 
             {/* MODAL */}

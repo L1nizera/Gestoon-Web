@@ -1,5 +1,4 @@
 /* Garantir que nada ultrapasse a tela */
-
 * {
   box-sizing: border-box;
 }
@@ -10,6 +9,8 @@ body {
 
 .topActions {
   margin-bottom: 1rem;
+  display: flex;
+  justify-content: flex-end; /* 🔥 corrigido */
 }
 
 /* ===== DASHBOARD ===== */
@@ -17,6 +18,12 @@ body {
 .dashboard {
   padding: 3rem;
   animation: fadeSlideIn 0.4s ease;
+}
+
+@media (max-width: 768px) {
+  .dashboard {
+    padding: 1.5rem; /* 🔥 corrigido */
+  }
 }
 
 @keyframes fadeSlideIn {
@@ -53,7 +60,7 @@ body {
   padding: 0.6rem 0.8rem;
   border-radius: 0.6rem;
   border: 0.1rem solid #cbd5e1;
-  font-size: 1.3rem;
+  font-size: 16px; /* 🔥 evita zoom no mobile */
 }
 
 select {
@@ -62,7 +69,7 @@ select {
   background-color: white;
 }
 
-@media (max-width: 76.8rem) {
+@media (max-width: 768px) {
   .filtrosAvancados {
     flex-direction: column;
   }
@@ -72,7 +79,7 @@ select {
   }
 }
 
-/* cada bloco (período, mês, setor) */
+/* cada bloco */
 .filtrosAvancados > div {
   display: flex;
   flex-direction: column;
@@ -83,6 +90,7 @@ select {
   font-size: 1.4rem;
   color: #64748b;
 }
+
 /* ===== BADGES ===== */
 
 .badge {
@@ -91,8 +99,6 @@ select {
   font-size: 1.2rem;
   font-weight: 600;
 }
-
-/* STATUS */
 
 .statusConcluida {
   background: #dcfce7;
@@ -150,9 +156,13 @@ select {
   margin-bottom: 1.5rem;
 }
 
-/* descrição */
+@media (max-width: 768px) {
+  .formGrid {
+    grid-template-columns: 1fr;
+  }
+}
 
-/* botões */
+/* ===== BOTÃO CADASTRAR ===== */
 
 .cadastrarBtn {
   background: #1e293b;
@@ -165,9 +175,9 @@ select {
   font-size: large;
   transition: 0.2s;
   margin-bottom: 1.5rem;
-  margin-left: 145rem;
   margin-top: 3rem;
-  width: 13rem;
+  width: 20rem;
+  margin-left: 0;
 }
 
 .cadastrarBtn:active {
@@ -188,7 +198,8 @@ select {
 /* ===== BUSCA ===== */
 
 .busca {
-  width: 30rem;
+  width: 100%;
+  max-width: 30rem; /* 🔥 corrigido */
   padding: 1rem 1.2rem;
   border-radius: 0.8rem;
   border: 0.1rem solid #cbd5e1;
@@ -214,7 +225,11 @@ select {
   border-spacing: 0;
   background: white;
   animation: fadeSlideIn 0.3s ease;
-  table-layout: fixed; /* força colunas respeitarem largura */
+  table-layout: fixed;
+}
+
+.tabelaContainer {
+  overflow-x: auto;
 }
 
 .tabela tbody tr {
@@ -238,134 +253,41 @@ select {
   padding: 1.2rem;
   white-space: nowrap;
   cursor: pointer;
-  user-select: none;
-  position: relative;
-  transition: all 0.2s ease;
   font-size: 1.8rem;
-}
-
-.tabela th:hover {
-  background: #334155;
-}
-
-.tabela th:active {
-  background: #2563eb;
 }
 
 .tabela td {
   padding: 1rem;
-  word-break: break-word;
   white-space: nowrap;
   font-size: 1.4rem;
 }
 
-.textCenter {
-  text-align: center;
-}
-
-.flexCenter {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.6rem;
+.tabela td:last-child {
+  white-space: normal;
 }
 
 .tabela tr:nth-child(even) {
   background: #f8fafc;
 }
 
-.tabela th,
-.tabela td {
-  border-right: 0.15rem solid #000000;
-  border-bottom: 0.15rem solid #000000;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  vertical-align: middle;
+/* ===== MODAL ACTIONS ===== */
+
+.modalActions {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  align-items: center;
+  margin-top: 2rem;
+  gap: 2rem;
 }
 
-/* remove a borda da última coluna */
-.tabela th:last-child,
-.tabela td:last-child {
-  border-right: none;
-}
-.tabela td:last-child {
-  white-space: normal;
+@media (max-width: 768px) {
+  .modalActions {
+    grid-template-columns: 1fr; /* 🔥 corrigido */
+  }
 }
 
-.tabelaContainer {
-  overflow-x: auto;
-}
+/* ===== BOTÕES ===== */
 
-/* ===== BUSCA ===== */
-
-.exportBtn {
-  padding: 0.5rem 0.5rem;
-  background: #2563eb;
-  color: white;
-  border: none;
-  border-radius: 0.6rem;
-  cursor: pointer;
-  font-weight: 500;
-  transition: 0.2s;
-}
-
-.exportBtn:hover {
-  background: #1d4ed8;
-}
-
-/* ===== ANIMAÇÕES GERAIS ===== */
-
-.tabela tr {
-  cursor: pointer;
-  transition: background 0.2s ease, box-shadow 0.2s ease;
-}
-
-.tabela tr:hover {
-  background: #e2e8f0;
-  box-shadow: inset 0.4rem 0 0 #2563eb, inset -0.4rem 0 0 #2563eb;
-}
-
-.taskModal input,
-.taskModal textarea,
-.taskModal select {
-  width: 100%;
-  padding: 0.8rem;
-  margin-top: 0.8rem;
-  border-radius: 0.6rem;
-  border: 0.1rem solid #cbd5e1;
-  font-size: 1.3rem;
-  transition: all 0.2s ease;
-}
-
-.taskModal textarea {
-  min-height: 8rem;
-  resize: none;
-}
-
-
-
-.taskModal h2 {
-   margin-bottom: 1.5rem;
-  font-size: 2rem;
-  font-weight: 600;
-}
-
-.taskModal input:focus,
-.taskModal textarea:focus,
-.taskModal select:focus {
-  border-color: #2563eb;
-  box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.2);
-}
-
-/* hover leve */
-.taskModal input:hover,
-.taskModal textarea:hover,
-.taskModal select:hover {
-  border-color: #94a3b8;
-}
-
-
-/* botões */
 button {
   transition: all 0.2s ease;
 }
@@ -379,84 +301,35 @@ button:active {
   transform: scale(0.97);
 }
 
-button:focus,
-th:focus {
-  outline: none;
-}
-
-/* botão salvar */
-.modalActions {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  align-items: center;
-  margin-top: 2rem;
-  gap: 2rem;
-}
-
-
-
 .btnPrimary {
   background: #2563eb;
   color: white;
-  border: none;
   padding: 1rem 1.8rem;
   border-radius: 0.6rem;
-  cursor: pointer;
-  transition: 0.2s;
-  font-weight: 500;
-
-}
-
-.btnPrimary:hover {
-  background: #1d4ed8;
-  transform: scale(1.03);
 }
 
 .btnSecondary {
   background: #64748B;
   color: white;
-  border: none;
   padding: 0.8rem 1.4rem;
   border-radius: 0.6rem;
-  cursor: pointer;
-  font-weight: 500;
-}
-
-.btnSecondary:hover {
-  background: #475569;
-  transform: scale(1.03);
 }
 
 .btnDanger {
   background: #dc2626;
   color: white;
-  border: none;
   padding: 0.8rem 1.4rem;
   border-radius: 0.6rem;
-  cursor: pointer;
-  font-weight: 500;
-}
-
-.btnDanger:hover {
-  background: #b91c1c;
-  transform: scale(1.03);
 }
 
 .btnClose {
   background: #64748b;
   color: white;
-  border: none;
   padding: 0.8rem 1.4rem;
   border-radius: 0.6rem;
-  cursor: pointer;
-  font-weight: 500;
 }
 
-.btnClose:hover {
-  background: #475569;
-  transform: scale(1.03);
-}
-
+/* ===== FORM ===== */
 
 .formGroup {
   display: flex;
@@ -470,13 +343,52 @@ th:focus {
   color: #475569;
 }
 
-.filtrosAvancados,
-.tabela {
-  box-shadow: 0 0.4rem 1.2rem rgba(0,0,0,0.05);
+/* CONTROLE RESPONSIVO */
+.desktopOnly {
+  display: block;
 }
 
-.tabela,
-.filtrosAvancados {
-  border: 0.1rem solid #e2e8f0;
+.mobileOnly {
+  display: none;
 }
 
+/* MOBILE */
+@media (max-width: 768px) {
+  .desktopOnly {
+    display: none;
+  }
+
+  .mobileOnly {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+}
+
+/* CARD */
+.card {
+  background: #fafafa;
+  border-radius: 12px;
+  padding: 14px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+  transition: 0.2s;
+}
+
+.card:hover {
+  transform: scale(1.01);
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  font-size: 15px;
+}
+
+.cardBody p {
+  margin: 4px 0;
+  font-size: 13px;
+  opacity: 0.9;
+}

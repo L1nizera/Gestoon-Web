@@ -416,6 +416,11 @@ function Home() {
           Canceladas
         </button>
       </div>
+<<<<<<< Updated upstream
+=======
+
+      <div className={styles.alinhaBtn}>
+>>>>>>> Stashed changes
 
 
       <div className={styles.acoes}>
@@ -432,6 +437,7 @@ function Home() {
       </div>
 
       {/* ===== TABELA ===== */}
+<<<<<<< Updated upstream
       <div className={styles.tabelascroll}>
         <div className={styles.tabelaContainer}>
           <table className={styles.tabela}>
@@ -450,6 +456,25 @@ function Home() {
                   Título{" "}
                   {ordemTitulo === "az" ? "↑" : ordemTitulo === "za" ? "↓" : ""}
                 </th>
+=======
+      {/* ===== DESKTOP (TABELA) ===== */}
+      <div className={`${styles.tabelaContainer} ${styles.desktopOnly}`}>
+        <table className={styles.tabela}>
+          <thead>
+            <tr>
+              <th
+                className={ordemTitulo ? styles.colunaAtiva : ""}
+                onClick={() =>
+                  setOrdemTitulo((prev) => {
+                    if (prev === null) return "az";
+                    if (prev === "az") return "za";
+                    return null;
+                  })
+                }
+              >
+                Título {ordemTitulo === "az" ? "↑" : ordemTitulo === "za" ? "↓" : ""}
+              </th>
+>>>>>>> Stashed changes
 
                 <th>Status</th>
                 <th>Prioridade</th>
@@ -509,6 +534,44 @@ function Home() {
             </tbody>
           </table>
         </div>
+      </div>
+
+      {/* ===== MOBILE (CARDS) ===== */}
+      <div className={styles.mobileOnly}>
+        {lista.map((task) => (
+          <div
+            key={task.id}
+            className={styles.card}
+            onClick={() => setSelectedTask(task)}
+          >
+            {/* HEADER */}
+            <div className={styles.cardHeader}>
+              <strong>{task.titulo}</strong>
+
+              <span className={`${styles.badge} ${styles[statusMap[task.status]]}`}>
+                {task.status}
+              </span>
+            </div>
+
+            {/* BODY */}
+            <div className={styles.cardBody}>
+              <p>
+                <strong>Prioridade:</strong>{" "}
+                <span className={`${styles.badge} ${styles[prioridadeMap[task.prioridade]]}`}>
+                  {task.prioridade}
+                </span>
+              </p>
+
+              <p><strong>Setor:</strong> {task.setor}</p>
+              <p><strong>Criado por:</strong> {task.criadoPor}</p>
+
+              <div className={styles.cardFooter}>
+                <span>{task.horaCriacao}</span>
+                <span>{task.dataCriacao}</span>
+              </div>
+            </div>
+          </div>
+        ))}
       </div>
 
       {/* ===== MODAL ===== */}
