@@ -24,6 +24,7 @@ body {
     opacity: 0;
     transform: translateY(1rem);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -36,6 +37,7 @@ body {
   margin-bottom: 2rem;
   display: flex;
   gap: 1rem;
+  
 }
 
 .filtrosAvancados {
@@ -47,10 +49,11 @@ body {
   padding: 1.5rem;
   border-radius: 1rem;
   transition: all 0.25s ease;
+  margin-bottom: 1rem;
 }
 
 .filtrosAvancados:hover {
-  box-shadow: 0 0.8rem 2rem rgba(0,0,0,0.08);
+  box-shadow: 0 0.8rem 2rem rgba(0, 0, 0, 0.08);
 }
 
 .filtrosAvancados input,
@@ -79,7 +82,7 @@ select {
 }
 
 /* cada bloco (período, mês, setor) */
-.filtrosAvancados > div {
+.filtrosAvancados>div {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
@@ -100,6 +103,7 @@ select {
   font-weight: 500;
   transition: 0.2s;
 }
+
 
 .filtros button:hover {
   background: #334155;
@@ -125,6 +129,7 @@ select {
 .periodoInputs input {
   width: 13rem;
 }
+
 /* ===== BADGES ===== */
 
 .badge {
@@ -132,6 +137,8 @@ select {
   border-radius: 99.9rem;
   font-size: 1.2rem;
   font-weight: 600;
+  display: inline-block;
+  width: fit-content;
 }
 
 /* STATUS */
@@ -155,6 +162,7 @@ select {
   background: #e5e7eb;
   color: #374151;
 }
+
 /* PRIORIDADE */
 
 .prioridadeAlta {
@@ -171,53 +179,13 @@ select {
   background: #bbf7d0;
   color: #166534;
 }
-
-/* ===== OVERLAY ===== */
-
-.overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 999;
-}
-
-/* ===== MODAL ===== */
-
-.taskModal {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  width: 90%;
-  max-width: 60rem;
-  background: white;
-  padding: 3rem;
-  border-radius: 1.4rem;
-  box-shadow: 0 2rem 5rem rgba(0, 0, 0, 0.25);
-  z-index: 1000;
-  animation: modalIn 0.2s ease forwards;
-}
-
-@keyframes modalIn {
-  from {
-    opacity: 0;
-    transform: translate(-50%, -60%) scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(1);
-  }
-}
+/* Grid */
 
 .formGrid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1.6rem;
 }
-
-/* descrição */
 
 /* botões */
 
@@ -234,6 +202,7 @@ select {
   padding: 0.8rem 1.4rem;
   border-radius: 0.6rem;
   cursor: pointer;
+  font-weight: 500;
   transition: 0.2s;
   margin-bottom: 1.5rem;
   width: 15rem;
@@ -255,10 +224,17 @@ select {
   padding: 0.8rem 1.4rem;
   border-radius: 0.6rem;
   cursor: pointer;
+  font-weight: 500;
   font-size: large;
   transition: 0.2s;
   margin-bottom: 1.5rem;
-  width: 12rem;
+  width: 13rem;
+}
+
+.acoes {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
 }
 
 .criarBtn:active {
@@ -268,11 +244,6 @@ select {
 
 .criarBtn:hover {
   background: #629b06;
-}
-
-.alinhaBtn {
-  display: flex;
-  justify-content: space-between;
 }
 
 /* ===== RESUMO ===== */
@@ -295,7 +266,7 @@ select {
 
 .resumo div:hover {
   transform: translateY(-0.2rem) scale(1.02);
-  box-shadow: 0 1rem 2.5rem rgba(0,0,0,0.2);
+  box-shadow: 0 1rem 2.5rem rgba(0, 0, 0, 0.2);
 }
 
 /* ===== BUSCA ===== */
@@ -327,7 +298,8 @@ select {
   border-spacing: 0;
   background: white;
   animation: fadeSlideIn 0.3s ease;
-  table-layout: fixed; /* força colunas respeitarem largura */
+  table-layout: fixed;
+  /* força colunas respeitarem largura */
 }
 
 .tabela tbody tr {
@@ -339,6 +311,7 @@ select {
     opacity: 0;
     transform: translateY(0.5rem);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -369,18 +342,8 @@ select {
   padding: 1rem;
   word-break: break-word;
   white-space: nowrap;
+  text-overflow: ellipsis;
   font-size: 1.4rem;
-}
-
-.textCenter {
-  text-align: center;
-}
-
-.flexCenter {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.6rem;
 }
 
 .tabela tr:nth-child(even) {
@@ -401,12 +364,38 @@ select {
 .tabela td:last-child {
   border-right: none;
 }
+
 .tabela td:last-child {
   white-space: normal;
 }
 
 .tabelaContainer {
-  overflow-x: auto;
+  max-height: 40rem;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: white;
+}
+
+.tabelascroll {
+  border-radius: 1.2rem;
+  overflow: hidden;
+  border: 0.1rem solid #e2e8f0;
+}
+
+.tabela thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+.tabelaContainer::-webkit-scrollbar {
+  height: 0.8rem;
+  width: 0.8rem;
+}
+
+.tabelaContainer::-webkit-scrollbar-thumb {
+  background: #94a3b8;
+  border-radius: 1rem;
 }
 
 /* ==== Gráfico ==== */
@@ -424,6 +413,37 @@ select {
 
 .grafico:hover {
   transform: scale(1.01);
+}
+
+.recharts-sector:focus {
+  outline: none;
+}
+
+:global(.recharts-layer:focus),
+:global(.recharts-sector:focus),
+:global(.recharts-text:focus),
+:global(.recharts-wrapper *:focus) {
+  outline: none;
+}
+
+/* ===== Legenda Gráfico ==== */
+
+:global(.legenda) {
+  margin-top: 1rem;
+  transition: all 0.2 ease;
+}
+
+:global(.legenda div) {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  font-size: 1.4rem;
+}
+
+:global(.cor) {
+  width: 1rem;
+  height: 1rem;
+  border-radius: 50%;
 }
 
 /* ===== BUSCA ===== */
@@ -472,51 +492,12 @@ select {
     opacity: 0;
     transform: translate(-50%, -60%);
   }
+
   to {
     opacity: 1;
     transform: translate(-50%, -50%);
   }
 }
-
-.taskModal input,
-.taskModal textarea,
-.taskModal select {
-  width: 100%;
-  padding: 0.8rem;
-  margin-top: 0.8rem;
-  border-radius: 0.6rem;
-  border: 0.1rem solid #cbd5e1;
-  font-size: 1.3rem;
-  transition: all 0.2s ease;
-}
-
-.taskModal textarea {
-  min-height: 8rem;
-  resize: none;
-}
-
-
-
-.taskModal h2 {
-   margin-bottom: 1.5rem;
-  font-size: 2rem;
-  font-weight: 600;
-}
-
-.taskModal input:focus,
-.taskModal textarea:focus,
-.taskModal select:focus {
-  border-color: #2563eb;
-  box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.2);
-}
-
-/* hover leve */
-.taskModal input:hover,
-.taskModal textarea:hover,
-.taskModal select:hover {
-  border-color: #94a3b8;
-}
-
 
 /* botões */
 button {
@@ -525,7 +506,7 @@ button {
 
 button:hover {
   transform: translateY(-0.2rem);
-  box-shadow: 0 0.5rem 1.2rem rgba(0,0,0,0.15);
+  box-shadow: 0 0.5rem 1.2rem rgba(0, 0, 0, 0.15);
 }
 
 button:active {
@@ -537,22 +518,11 @@ th:focus {
   outline: none;
 }
 
-/* botão salvar */
-.modalActions {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  align-items: center;
-  margin-top: 2rem;
-  gap: 2rem;
-}
-
-
 
 .btnPrimary {
   background: #2563eb;
   color: white;
   border: none;
-  padding: 1rem 1.8rem;
   border-radius: 0.6rem;
   cursor: pointer;
   transition: 0.2s;
@@ -569,7 +539,6 @@ th:focus {
   background: #64748B;
   color: white;
   border: none;
-  padding: 0.8rem 1.4rem;
   border-radius: 0.6rem;
   cursor: pointer;
   font-weight: 500;
@@ -584,7 +553,6 @@ th:focus {
   background: #dc2626;
   color: white;
   border: none;
-  padding: 0.8rem 1.4rem;
   border-radius: 0.6rem;
   cursor: pointer;
   font-weight: 500;
@@ -599,7 +567,6 @@ th:focus {
   background: #64748b;
   color: white;
   border: none;
-  padding: 0.8rem 1.4rem;
   border-radius: 0.6rem;
   cursor: pointer;
   font-weight: 500;
@@ -608,6 +575,19 @@ th:focus {
 .btnClose:hover {
   background: #475569;
   transform: scale(1.03);
+}
+
+.btnPrimary,
+.btnSecondary,
+.btnDanger,
+.btnClose {
+  padding: 10px 16px;
+  font-size: 14px;
+  min-height: 30px;
+  min-width: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 
@@ -629,7 +609,7 @@ th:focus {
 .modalGrid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1.2rem;
+  gap: 1.5rem;
   margin-bottom: 1.5rem;
 }
 
@@ -676,7 +656,7 @@ th:focus {
 .grafico,
 .tabela,
 .resumo div {
-  box-shadow: 0 0.4rem 1.2rem rgba(0,0,0,0.05);
+  box-shadow: 0 0.4rem 1.2rem rgba(0, 0, 0, 0.05);
 }
 
 .tabela,
@@ -684,4 +664,3 @@ th:focus {
 .filtrosAvancados {
   border: 0.1rem solid #e2e8f0;
 }
-
