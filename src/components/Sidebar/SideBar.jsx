@@ -10,6 +10,7 @@ function Sidebar() {
     { to: "/home", label: "Home", allowed: ["admin"] },
     { to: "/funcionarios", label: "Funcionários", allowed: ["admin"] },
     { to: "/tarefas", label: "Tarefas", allowed: ["funcionario"] },
+    { to: "/historico", label: "Histórico", allowed: ["funcionario"] },
     { to: "/perfil", label: "Meu Perfil", allowed: ["admin", "funcionario"] },
     { to: "/relatorios", label: "Relatórios", allowed: ["admin"] },
   ];

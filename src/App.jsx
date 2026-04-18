@@ -7,6 +7,7 @@ import Funcionarios from "./pages/Funcionarios/index";
 import Perfil from "./pages/Perfil/index";
 import Relatorios from "./pages/Relatorios";
 import Tarefas from "./pages/Tarefas";
+import Historico from "./pages/Historico";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 
@@ -70,6 +71,14 @@ function AppRoutes() {
           element={
             <ProtectedRoute allowedFor={["admin", "funcionario"]}>
               <Tarefas />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/historico"
+          element={
+            <ProtectedRoute allowedFor={["funcionario"]}>
+              <Historico />
             </ProtectedRoute>
           }
         />

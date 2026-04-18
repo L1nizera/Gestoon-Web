@@ -6,11 +6,7 @@
   min-width: 32rem;
   min-height: 100vh;
   width: 100%;
-<<<<<<< Updated upstream
   font-family: 'Source Sans 3', sans-serif
-=======
-  overflow-x: hidden;
->>>>>>> Stashed changes
 }
 
 html {
@@ -68,25 +64,15 @@ small {
 
 a {
   text-decoration: none;
-<<<<<<< Updated upstream
   font-size: 1.3rem; 
-=======
-  font-size: 2.2rem;
->>>>>>> Stashed changes
   color: cornflowerblue;
   margin-bottom: 0.5rem;
 }
 
 
 /* Estilo para Inputs, Selects e Textareas */
-<<<<<<< Updated upstream
 input, select, textarea {
   font-size: 1.4rem;
-=======
-input,
-select,
-textarea {
->>>>>>> Stashed changes
   width: 100%;
   padding: 0.8rem 1rem;
   margin: 0.8rem 0;
