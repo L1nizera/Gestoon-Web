@@ -416,11 +416,8 @@ function Home() {
           Canceladas
         </button>
       </div>
-<<<<<<< Updated upstream
-=======
 
       <div className={styles.alinhaBtn}>
->>>>>>> Stashed changes
 
 
       <div className={styles.acoes}>
@@ -437,26 +434,6 @@ function Home() {
       </div>
 
       {/* ===== TABELA ===== */}
-<<<<<<< Updated upstream
-      <div className={styles.tabelascroll}>
-        <div className={styles.tabelaContainer}>
-          <table className={styles.tabela}>
-            <thead>
-              <tr>
-                <th
-                  className={ordemTitulo ? styles.colunaAtiva : ""}
-                  onClick={() =>
-                    setOrdemTitulo((prev) => {
-                      if (prev === null) return "az";
-                      if (prev === "az") return "za";
-                      return null;
-                    })
-                  }
-                >
-                  Título{" "}
-                  {ordemTitulo === "az" ? "↑" : ordemTitulo === "za" ? "↓" : ""}
-                </th>
-=======
       {/* ===== DESKTOP (TABELA) ===== */}
       <div className={`${styles.tabelaContainer} ${styles.desktopOnly}`}>
         <table className={styles.tabela}>
@@ -474,7 +451,6 @@ function Home() {
               >
                 Título {ordemTitulo === "az" ? "↑" : ordemTitulo === "za" ? "↓" : ""}
               </th>
->>>>>>> Stashed changes
 
                 <th>Status</th>
                 <th>Prioridade</th>
