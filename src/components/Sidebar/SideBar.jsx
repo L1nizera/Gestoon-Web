@@ -2,7 +2,7 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import styles from "./style.module.css";
 
-function Sidebar() {
+function Sidebar({ isOpen = false, onClose }) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
@@ -22,9 +22,19 @@ function Sidebar() {
   );
 
   return (
-    <div className={styles.sidebar}>
+    <div className={`${styles.sidebar} ${isOpen ? styles.open : styles.closed}`}>
       <div className={styles.header}>
-        <h2>Menu</h2>
+        <div className={styles.headerTop}>
+          <h2>Menu</h2>
+          <button
+            type="button"
+            className={styles.closeButton}
+            onClick={onClose}
+            aria-label="Fechar menu"
+          >
+            ×
+          </button>
+        </div>
         <p>
           {user.nome} • {user.tipo === "admin" ? "Admin" : "Funcionário"}
         </p>

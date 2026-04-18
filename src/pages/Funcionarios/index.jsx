@@ -275,10 +275,12 @@ function Funcionarios() {
                     </select>
                 </div>
             </div>
+            <div className={styles.alinharBtn}>
 
             <button className={styles.cadastrarBtn} onClick={() => setCreateModal(true)}>
                 Cadastrar +
             </button>
+            </div>
 
             {/* ===== DESKTOP (TABELA) ===== */}
             <div className={`${styles.tabelaContainer} ${styles.desktopOnly}`}>

@@ -20,9 +20,10 @@ body {
 
 @media (max-width: 768px) {
   .dashboard {
-    padding: 1.5rem;
+    padding: 1rem;
   }
 }
+
 
 @keyframes fadeSlideIn {
   from {
@@ -42,8 +43,24 @@ body {
   margin-bottom: 2rem;
   display: flex;
   gap: 1rem;
-  
+  flex-wrap: wrap;
 }
+
+@media (max-width: 768px) {
+  .filtros {
+    gap: 2.5rem;
+    box-shadow: #72717144 0px 10px 20px;
+    padding: 1.5rem;
+
+    border-radius: 2rem;
+  }
+
+  .filtros button {
+    flex: 1 1 auto;
+    min-width: 11rem;
+  }
+}
+
 
 .filtrosAvancados {
   display: flex;
@@ -77,15 +94,18 @@ select {
   background-color: white;
 }
 
-@media (max-width: 76.8rem) {
+@media (max-width: 768px) {
   .filtrosAvancados {
     flex-direction: column;
+    gap: 1rem;
+    padding: 1rem;
   }
 
   .busca {
     width: 100%;
   }
 }
+
 
 /* cada bloco (período, mês, setor) */
 .filtrosAvancados>div {
@@ -191,6 +211,7 @@ select {
   background: #bbf7d0;
   color: #166534;
 }
+
 /* Grid */
 
 .formGrid {
@@ -199,6 +220,13 @@ select {
   gap: 1.6rem;
 }
 
+@media (max-width: 768px) {
+  .formGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+
 /* botões */
 
 .footerActions {
@@ -206,6 +234,13 @@ select {
   justify-content: flex-end;
   margin-top: 1.5rem;
 }
+
+@media (max-width: 768px) {
+  .footerActions {
+    justify-content: center;
+  }
+}
+
 
 .limparBtn {
   background: #1e293b;
@@ -216,8 +251,8 @@ select {
   cursor: pointer;
   font-weight: 500;
   transition: 0.2s;
-  margin-bottom: 1.5rem;
-  width: 15rem;
+  width: 13rem;
+  max-width: 100%;
 }
 
 .limparBtn:active {
@@ -237,17 +272,36 @@ select {
   border-radius: 0.6rem;
   cursor: pointer;
   font-weight: 500;
-  font-size: large;
   transition: 0.2s;
-  margin-bottom: 1.5rem;
   width: 13rem;
+  max-width: 100%;
 }
+
 
 .acoes {
   display: flex;
   justify-content: space-between;
   margin-top: 10px;
+  gap: 1rem;
 }
+
+@media (max-width: 768px) {
+  .acoes {
+    flex-direction: row;
+    display: flex;
+    align-items: center;
+    padding: 1.5rem;
+    height: fit-content;
+    box-shadow: #72717144 0px 10px 20px;
+    border-radius: 2rem;
+  }
+
+  .limparBtn,
+  .criarBtn {
+    width: 30%;
+  }
+}
+
 
 .criarBtn:active {
   background: #629b06;
@@ -401,9 +455,23 @@ select {
 .tabelaContainer {
   max-height: 40rem;
   overflow-y: auto;
-  overflow-x: hidden;
+  overflow-x: auto;
   background: white;
+  margin-top: 1.5rem;
 }
+
+@media (max-width: 768px) {
+  .tabelaContainer {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .tabela {
+    min-width: 600px;
+    /* garante que a tabela tenha largura mínima */
+  }
+}
+
 
 .tabelascroll {
   border-radius: 1.2rem;
@@ -439,6 +507,17 @@ select {
   animation: fadeSlideIn 0.5s ease;
   transition: all 0.3s ease;
 }
+
+@media (max-width: 768px) {
+  .grafico {
+    padding: 1rem;
+  }
+
+  .grafico h3 {
+    font-size: 1.4rem;
+  }
+}
+
 
 .grafico:hover {
   transform: scale(1.01);
@@ -635,12 +714,32 @@ th:focus {
   max-width: 80%;
 }
 
+@media (max-width: 768px) {
+  .modalHeader {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .modalHeader h2 {
+    max-width: 100%;
+    font-size: 1.5rem;
+  }
+}
+
+
 .modalGrid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1.5rem;
   margin-bottom: 1.5rem;
 }
+
+@media (max-width: 768px) {
+  .modalGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
 
 .modalGrid div {
   display: flex;
@@ -732,8 +831,14 @@ th:focus {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 8px;
-  width: 10rem;
 }
+
+@media (max-width: 768px) {
+  .cardHeader strong {
+    font-size: 1rem;
+  }
+}
+
 
 .cardBody p {
   margin: 4px 0;

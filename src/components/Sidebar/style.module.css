@@ -1,21 +1,40 @@
 .sidebar {
-  width: 220px;
+  width: min(220px, 100%);
+  max-width: 260px;
   background: #1e293b;
   color: white;
   padding: 20px;
   display: flex;
   flex-direction: column;
   height: 100vh;
+  box-sizing: border-box;
 }
 
 .header {
   margin-bottom: 1.5rem;
 }
 
+.headerTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.closeButton {
+  display: none;
+  border: none;
+  background: transparent;
+  color: white;
+  font-size: 1.75rem;
+  cursor: pointer;
+  line-height: 1;
+}
+
 .header p {
   margin: 0;
   color: #cbd5e1;
-  font-size: 1.25rem;
+  font-size: 1.1rem;
 }
 
 .menu {
@@ -34,6 +53,7 @@
   margin-bottom: 8px;
   text-decoration: none;
   transition: 0.3s;
+  font-size: 1.25rem;
 }
 
 .link:hover {
@@ -60,4 +80,54 @@
 
 .logoutBtn:hover {
   background: #475569;
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    width: min(260px, 40vw);
+    height: 100vh;
+    padding: 16px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 20;
+    transition: transform 0.25s ease-in-out;
+    box-shadow: rgba(0, 0, 0, 0.25) 0px 10px 20px;
+    transform: translateX(-100%);
+  }
+
+  .sidebar.open {
+    transform: translateX(0);
+  }
+
+  .sidebar.closed {
+    transform: translateX(-100%);
+  }
+
+  .header {
+    margin-bottom: 1rem;
+  }
+
+  .closeButton {
+    display: inline-flex;
+  }
+
+  .menu {
+    list-style: none;
+    padding: 0;
+    flex: 1;
+  }
+
+  .menu li {
+    width: 100%;
+  }
+
+  .link {
+    padding: 10px 12px;
+    font-size: 2rem;
+  }
+
+  .logoutBtn {
+    width: 100%;
+  }
 }
