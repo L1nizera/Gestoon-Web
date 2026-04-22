@@ -513,7 +513,7 @@ function Home() {
       </div>
 
       {/* ===== MOBILE (CARDS) ===== */}
-      <div className={styles.mobileOnly}>
+      <div className={styles.cardsContainer}>
         {lista.map((task) => (
           <div
             key={task.id}
