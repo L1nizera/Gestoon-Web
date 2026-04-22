@@ -1,26 +1,40 @@
 .container {
   background: #f5f6fa;
   min-height: 100vh;
-  padding: 5rem; /* 50px */
+  padding: 5rem;
 }
 
 .card {
-  max-width: 100rem; /* 1000px */
+  max-width: 100rem;
   margin: auto;
-  background: #fff;
-  padding: 4rem; /* 40px */
-  border-radius: 1.6rem; /* 16px */
-  box-shadow: 0 0.8rem 2.5rem rgba(0,0,0,0.08); /* 8px 25px */
+  background: linear-gradient(180deg, #ffffff, #f9fafb);
+  padding: 4rem;
+  border-radius: 1.6rem;
+  box-shadow: 0 0.8rem 2.5rem rgba(0, 0, 0, 0.08);
+  animation: fadeIn 0.4s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .title {
-  margin-bottom: 3rem; /* 30px */
+  margin-bottom: 3rem;
+  font-size: 2.4rem;
+  font-weight: 600;
 }
 
 /* layout */
 .content {
   display: flex;
-  gap: 6rem; /* 60px */
+  gap: 6rem;
   align-items: flex-start;
 }
 
@@ -31,17 +45,17 @@
   align-items: center;
 }
 
-.foto {
-  width: 18rem; /* 180px */
-  height: 18rem; /* 180px */
+.foto,
+.fotoPlaceholder {
+  width: 18rem;
+  height: 18rem;
   border-radius: 50%;
   object-fit: cover;
+  border: 4px solid #e2e8f0;
+  box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.1);
 }
 
 .fotoPlaceholder {
-  width: 18rem; /* 180px */
-  height: 18rem; /* 180px */
-  border-radius: 50%;
   background: #ddd;
   display: flex;
   align-items: center;
@@ -53,38 +67,123 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 2rem; /* 20px */
+  gap: 2rem;
 }
 
 .infoGroup {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem; /* 5px */
+  gap: 0.5rem;
 }
 
 .infoGroup span {
-  font-size: 1.4rem; /* 14px */
-  color: #777;
+  font-size: 1.2rem;
+  color: #94a3b8;
 }
 
 .infoGroup p {
-  background: #f9f9f9;
-  padding: 1.2rem; /* 12px */
-  border-radius: 0.8rem; /* 8px */
-  border: 0.1rem solid #eee; /* 1px */
+  background: #f1f5f9;
+  padding: 1.2rem;
+  border-radius: 0.8rem;
+  border: 0.1rem solid #e2e8f0;
   margin: 0;
+  font-size: 1.5rem;
+  font-weight: 500;
 }
 
 .btnFoto {
-  margin-top: 1rem; /* 10px */
-  padding: 1rem 1.5rem; /* 10px 15px */
+  margin-top: 1rem;
+  padding: 1rem 1.5rem;
   border: none;
-  border-radius: 0.8rem; /* 8px */
-  background: #1e293b;
+  border-radius: 0.8rem;
+  background: linear-gradient(135deg, #1e293b, #334155);
+  transition: all 0.2s ease;
   color: white;
   cursor: pointer;
 }
 
 .btnFoto:hover {
   background: #334155;
+  transform: translateY(-2px);
+  box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15);
+}
+
+/* ========================= */
+/* RESPONSIVIDADE */
+/* ========================= */
+
+/* Tablets */
+@media (max-width: 1024px) {
+  .container {
+    padding: 3rem;
+  }
+
+  .card {
+    padding: 3rem;
+  }
+
+  .content {
+    gap: 3rem;
+  }
+}
+
+/* Celulares (iPhone 14 e similares ~390px) */
+@media (max-width: 768px) {
+  .container {
+    padding: 2rem;
+  }
+
+  .card {
+    padding: 2rem;
+  }
+
+  .content {
+    flex-direction: column;
+    /* empilha tudo */
+    align-items: center;
+    gap: 2rem;
+  }
+
+  .foto,
+  .fotoPlaceholder {
+    width: 14rem;
+    height: 14rem;
+  }
+
+  .infoSection {
+    width: 100%;
+  }
+}
+
+/* Celulares pequenos */
+@media (max-width: 480px) {
+  .container {
+    padding: 1.5rem;
+  }
+
+  .card {
+    padding: 1.5rem;
+    border-radius: 1.2rem;
+  }
+
+  .title {
+    margin-bottom: 2rem;
+    text-align: center;
+  }
+
+  .foto,
+  .fotoPlaceholder {
+    width: 12rem;
+    height: 12rem;
+  }
+
+  .infoGroup p {
+    font-size: 1.3rem;
+  }
+
+  .btnFoto {
+    width: 100%;
+    /* botão ocupa largura toda */
+    text-align: center;
+  }
 }
