@@ -417,7 +417,6 @@ function Home() {
         </button>
       </div>
 
-      <div className={styles.alinhaBtn}>
 
 
       <div className={styles.acoes}>
@@ -452,64 +451,63 @@ function Home() {
                 Título {ordemTitulo === "az" ? "↑" : ordemTitulo === "za" ? "↓" : ""}
               </th>
 
-                <th>Status</th>
-                <th>Prioridade</th>
-                <th>Setor</th>
-                <th>Criado por</th>
-                <th>Hora</th>
+              <th>Status</th>
+              <th>Prioridade</th>
+              <th>Setor</th>
+              <th>Criado por</th>
+              <th>Hora</th>
 
-                <th
-                  className={ordemData ? styles.colunaAtiva : ""}
-                  onClick={() =>
-                    setOrdemData((prev) => {
-                      if (prev === null) return "recente";
-                      if (prev === "recente") return "antigo";
-                      return null;
-                    })
-                  }
-                >
-                  Data{" "}
-                  {ordemData === "recente"
-                    ? "↓"
-                    : ordemData === "antigo"
-                      ? "↑"
-                      : ""}
-                </th>
+              <th
+                className={ordemData ? styles.colunaAtiva : ""}
+                onClick={() =>
+                  setOrdemData((prev) => {
+                    if (prev === null) return "recente";
+                    if (prev === "recente") return "antigo";
+                    return null;
+                  })
+                }
+              >
+                Data{" "}
+                {ordemData === "recente"
+                  ? "↓"
+                  : ordemData === "antigo"
+                    ? "↑"
+                    : ""}
+              </th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {lista.map((task) => (
+              <tr
+                key={task.id}
+                onClick={(e) => {
+                  if (e.target.tagName === "BUTTON") return;
+                  setSelectedTask(task);
+                }}
+              >
+                <td>{task.titulo}</td>
+
+                <td>
+                  <span className={`${styles.badge} ${styles[statusMap[task.status]]}`}>
+                    {task.status}
+                  </span>
+                </td>
+
+                <td>
+                  <span className={`${styles.badge} ${styles[prioridadeMap[task.prioridade]]}`}>
+                    {task.prioridade}
+                  </span>
+                </td>
+
+                <td>{task.setor}</td>
+                <td>{task.criadoPor}</td>
+                <td>{task.horaCriacao}</td>
+                <td>{task.dataCriacao}</td>
               </tr>
-            </thead>
-
-            <tbody>
-              {lista.map((task) => (
-                <tr
-                  key={task.id}
-                  onClick={(e) => {
-                    if (e.target.tagName === "BUTTON") return;
-                    setSelectedTask(task);
-                  }}
-                >
-                  <td>{task.titulo}</td>
-
-                  <td>
-                    <span className={`${styles.badge} ${styles[statusMap[task.status]]}`}>
-                      {task.status}
-                    </span>
-                  </td>
-
-                  <td>
-                    <span className={`${styles.badge} ${styles[prioridadeMap[task.prioridade]]}`}>
-                      {task.prioridade}
-                    </span>
-                  </td>
-
-                  <td>{task.setor}</td>
-                  <td>{task.criadoPor}</td>
-                  <td>{task.horaCriacao}</td>
-                  <td>{task.dataCriacao}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+            ))}
+          </tbody>
+        </table>
       </div>
 
       {/* ===== MOBILE (CARDS) ===== */}

@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
-import styles from "./style.module.css";
+import styles from "../Home/style.module.css";
 import jsPDF from "jspdf";
+import Modal from "../../components/Modal/Modal";
 import autoTable from "jspdf-autotable";
 
 // MOCK (igual você faz com tasks)
@@ -243,188 +244,252 @@ function Funcionarios() {
 
     return (
         <div className={styles.dashboard}>
-            <h1>Funcionários</h1>
+            <div className={styles.cardContainer}>
+                <h1>Funcionários</h1>
 
-            {/* BUSCA */}
-            <div className={styles.topActions}>
-                <input
-                    className={styles.busca}
-                    placeholder="Buscar funcionário..."
-                    onChange={(e) => setBusca(e.target.value)}
-                />
-            </div>
-
-            {/* FILTROS */}
-            <div className={styles.filtrosAvancados}>
-                <div>
-                    <small>Setor:</small>
-                    <select onChange={(e) => setSetorFiltro(e.target.value)}>
-                        <option value="">Todos</option>
-                        {setores.map((s) => (
-                            <option key={s}>{s}</option>
-                        ))}
-                    </select>
+                {/* BUSCA */}
+                <div className={styles.topActions}>
+                    <input
+                        className={styles.busca}
+                        placeholder="Buscar funcionário..."
+                        onChange={(e) => setBusca(e.target.value)}
+                    />
                 </div>
 
-                <div>
-                    <small>Status:</small>
-                    <select onChange={(e) => setAtivoFiltro(e.target.value)}>
-                        <option value="">Todos</option>
-                        <option value="true">Ativo</option>
-                        <option value="false">Inativo</option>
-                    </select>
-                </div>
-            </div>
-            <div className={styles.alinharBtn}>
 
-            <button className={styles.cadastrarBtn} onClick={() => setCreateModal(true)}>
-                Cadastrar +
-            </button>
-            </div>
-
-            {/* ===== DESKTOP (TABELA) ===== */}
-            <div className={`${styles.tabelaContainer} ${styles.desktopOnly}`}>
-                <table className={styles.tabela}>
-                    <thead>
-                        <tr>
-                            <th
-                                onClick={() =>
-                                    setOrdemNome((prev) =>
-                                        prev === "az" ? "za" : prev === "za" ? null : "az"
-                                    )
-                                }
-                            >
-                                Nome {ordemNome === "az" ? "↑" : ordemNome === "za" ? "↓" : ""}
-                            </th>
-                            <th className={styles.textCenter}>Email</th>
-                            <th className={styles.textCenter}>Setor</th>
-                            <th className={styles.textCenter}>Cargo</th>
-                            <th className={styles.textCenter}>Status</th>
-                            <th
-                                className={styles.textCenter}
-                                onClick={() =>
-                                    setOrdemData((prev) =>
-                                        prev === "recente"
-                                            ? "antigo"
-                                            : prev === "antigo"
-                                                ? null
-                                                : "recente"
-                                    )
-                                }
-                            >
-                                Data{" "}
-                                {ordemData === "recente"
-                                    ? "↓"
-                                    : ordemData === "antigo"
-                                        ? "↑"
-                                        : ""}
-                            </th>
-                        </tr>
-                    </thead>
-
-                    <tbody>
-                        {lista.map((f) => (
-                            <tr key={f.id} onClick={() => setSelected(f)}>
-                                <td>{f.nome}</td>
-                                <td className={styles.textCenter}>{f.email}</td>
-                                <td className={styles.textCenter}>{f.setor}</td>
-                                <td className={styles.textCenter}>{f.cargo}</td>
-                                <td className={styles.textCenter}>
-                                    <span
-                                        className={`${styles.badge} ${styles[f.ativo ? "statusConcluida" : "statusCancelada"]
-                                            }`}
-                                    >
-                                        {f.ativo ? "Ativo" : "Inativo"}
-                                    </span>
-                                </td>
-                                <td className={styles.textCenter}>{f.dataCriacao}</td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
-
-            {/* ===== MOBILE (CARDS) ===== */}
-            <div className={styles.mobileOnly}>
-                {lista.map((f) => (
-                    <div
-                        key={f.id}
-                        className={styles.card}
-                        onClick={() => setSelected(f)}
-                    >
-                        <div className={styles.cardHeader}>
-                            <strong>{f.nome}</strong>
-                            <span
-                                className={`${styles.badge} ${styles[f.ativo ? "statusConcluida" : "statusCancelada"]
-                                    }`}
-                            >
-                                {f.ativo ? "Ativo" : "Inativo"}
-                            </span>
-                        </div>
-
-                        <div className={styles.cardBody}>
-                            <p><strong>Email:</strong> {f.email}</p>
-                            <p><strong>Setor:</strong> {f.setor}</p>
-                            <p><strong>Cargo:</strong> {f.cargo}</p>
-                            <p><strong>Data:</strong> {f.dataCriacao}</p>
-                        </div>
+                {/* FILTROS */}
+                <div className={styles.filtrosAvancados}>
+                    <div>
+                        <small>Setor:</small>
+                        <select onChange={(e) => setSetorFiltro(e.target.value)}>
+                            <option value="">Todos</option>
+                            {setores.map((s) => (
+                                <option key={s}>{s}</option>
+                            ))}
+                        </select>
                     </div>
-                ))}
-            </div>
 
-            {/* MODAL */}
-            {selected && (
-                <>
-                    <div className={styles.overlay} onClick={() => setSelected(null)} />
+                    <div>
+                        <small>Status:</small>
+                        <select onChange={(e) => setAtivoFiltro(e.target.value)}>
+                            <option value="">Todos</option>
+                            <option value="true">Ativo</option>
+                            <option value="false">Inativo</option>
+                        </select>
+                    </div>
+                </div>
 
-                    <div className={styles.taskModal}>
-                        <h2>{selected.nome}</h2>
+                <div className={styles.acoes}>
+                    <button
+                        className={styles.btnSecondary}
+                        onClick={() => {
+                            setBusca("");
+                            setSetorFiltro("");
+                            setAtivoFiltro("");
+                        }}
+                    >
+                        Limpar Filtros
+                    </button>
+
+                    <button
+                        className={styles.criarbtn}
+                        onClick={() => setCreateModal(true)}
+                    >
+                        Cadastrar Funcionário
+                    </button>
+                </div>
+
+                {/* ===== DESKTOP (TABELA) ===== */}
+                <div className={`${styles.tabelaContainer} ${styles.desktopOnly}`}>
+                    <table className={styles.tabela}>
+                        <thead>
+                            <tr>
+                                <th
+                                    onClick={() =>
+                                        setOrdemNome((prev) =>
+                                            prev === "az" ? "za" : prev === "za" ? null : "az"
+                                        )
+                                    }
+                                >
+                                    Nome {ordemNome === "az" ? "↑" : ordemNome === "za" ? "↓" : ""}
+                                </th>
+                                <th className={styles.textCenter}>Email</th>
+                                <th className={styles.textCenter}>Setor</th>
+                                <th className={styles.textCenter}>Cargo</th>
+                                <th className={styles.textCenter}>Status</th>
+                                <th
+                                    className={styles.textCenter}
+                                    onClick={() =>
+                                        setOrdemData((prev) =>
+                                            prev === "recente"
+                                                ? "antigo"
+                                                : prev === "antigo"
+                                                    ? null
+                                                    : "recente"
+                                        )
+                                    }
+                                >
+                                    Data{" "}
+                                    {ordemData === "recente"
+                                        ? "↓"
+                                        : ordemData === "antigo"
+                                            ? "↑"
+                                            : ""}
+                                </th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {lista.map((f) => (
+                                <tr
+                                    key={f.id}
+                                    onClick={(e) => {
+                                        if (e.target.tagName === "BUTTON") return;
+                                        setSelected(f);
+                                    }}
+                                >
+                                    <td>{f.nome}</td>
+                                    <td className={styles.textCenter}>{f.email}</td>
+                                    <td className={styles.textCenter}>{f.setor}</td>
+                                    <td className={styles.textCenter}>{f.cargo}</td>
+                                    <td className={styles.textCenter}>
+                                        <span
+                                            className={`${styles.badge} ${styles[f.ativo ? "statusConcluida" : "statusCancelada"]
+                                                }`}
+                                        >
+                                            {f.ativo ? "Ativo" : "Inativo"}
+                                        </span>
+                                    </td>
+                                    <td className={styles.textCenter}>{f.dataCriacao}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+
+                {/* ===== MOBILE (CARDS) ===== */}
+                <div className={styles.mobileOnly}>
+                    {lista.map((f) => (
+                        <div
+                            key={f.id}
+                            className={styles.card}
+                            onClick={() => setSelected(f)}
+                        >
+                            <div className={styles.cardHeader}>
+                                <strong>{f.nome}</strong>
+                                <span
+                                    className={`${styles.badge} ${styles[f.ativo ? "statusConcluida" : "statusCancelada"]
+                                        }`}
+                                >
+                                    {f.ativo ? "Ativo" : "Inativo"}
+                                </span>
+                            </div>
+
+                            <div className={styles.cardBody}>
+                                <div className={styles.modalGrid}>
+                                    <div>
+                                        <strong>Email</strong>
+                                        <p>{f.email}</p>
+                                    </div>
+
+                                    <div>
+                                        <strong>Setor</strong>
+                                        <p>{f.setor}</p>
+                                    </div>
+
+                                    <div>
+                                        <strong>Cargo</strong>
+                                        <p>{f.cargo}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+
+                {/* MODAL */}
+                {selected && (
+                    <Modal
+                        title={selected.nome}
+                        onClose={() => setSelected(null)}
+                        variant="between"
+                        actions={
+                            <>
+                                <button
+                                    className={styles.btnClose}
+                                    onClick={() => setSelected(null)}
+                                >
+                                    Fechar
+                                </button>
+
+                                <button
+                                    className={styles.btnPrimary}
+                                    onClick={() => {
+                                        setSelected(null);
+                                        setEdit(selected);
+                                    }}
+                                >
+                                    Editar
+                                </button>
+
+                                <button
+                                    className={styles.btnDanger}
+                                    onClick={() => excluir(selected.id)}
+                                >
+                                    Excluir
+                                </button>
+                            </>
+                        }
+                    >
                         <p><strong>Email:</strong> {selected.email}</p>
                         <p><strong>Setor:</strong> {selected.setor}</p>
                         <p><strong>Cargo:</strong> {selected.cargo}</p>
+                    </Modal>
+                )}
 
-                        <div className={styles.modalActions}>
-                            <button
-                                className={styles.btnClose}
-                                onClick={() => setSelected(null)}
-                            >
-                                Fechar
-                            </button>
+                {/* MODAL CRIAR */}
+                {createModal && (
+                    <Modal
+                        title="Novo Funcionário"
+                        onClose={() => setCreateModal(false)}
+                        variant="between"
+                        actions={
+                            <>
+                                <button
+                                    className={styles.btnDanger}
+                                    onClick={() => setCreateModal(false)}
+                                >
+                                    Fechar
+                                </button>
 
-                            <button
-                                className={styles.btnPrimary}
-                                onClick={() => {
-                                    setSelected(null);
-                                    setEdit({ ...selected });
-                                }}
-                            >
-                                Editar
-                            </button>
+                                <button
+                                    className={styles.btnSecondary}
+                                    onClick={() =>
+                                        setNovoFuncionario({
+                                            nome: "",
+                                            email: "",
+                                            setor: "",
+                                            cargo: "",
+                                            ativo: true,
+                                        })
+                                    }
+                                >
+                                    Limpar
+                                </button>
 
-                            <button
-                                className={styles.btnDanger}
-                                onClick={() => excluir(selected.id)}
-                            >
-                                Excluir
-                            </button>
-                        </div>
-                    </div>
-                </>
-            )}
-
-            {/* MODAL CRIAR */}
-            {createModal && (
-                <>
-                    <div className={styles.overlay} onClick={() => setCreateModal(false)} />
-
-                    <div className={styles.taskModal}>
-                        <h2>Novo Funcionário</h2>
-
+                                <button
+                                    className={styles.btnPrimary}
+                                    onClick={criarFuncionario}
+                                >
+                                    Criar
+                                </button>
+                            </>
+                        }
+                    >
                         <div className={styles.formGrid}>
                             <div className={styles.formGroup}>
                                 <label>Nome</label>
                                 <input
-                                    type="text"
                                     value={novoFuncionario.nome}
                                     onChange={(e) =>
                                         setNovoFuncionario({ ...novoFuncionario, nome: e.target.value })
@@ -435,7 +500,6 @@ function Funcionarios() {
                             <div className={styles.formGroup}>
                                 <label>Email</label>
                                 <input
-                                    type="email"
                                     value={novoFuncionario.email}
                                     onChange={(e) =>
                                         setNovoFuncionario({ ...novoFuncionario, email: e.target.value })
@@ -461,7 +525,6 @@ function Funcionarios() {
                             <div className={styles.formGroup}>
                                 <label>Cargo</label>
                                 <input
-                                    type="text"
                                     value={novoFuncionario.cargo}
                                     onChange={(e) =>
                                         setNovoFuncionario({ ...novoFuncionario, cargo: e.target.value })
@@ -485,40 +548,36 @@ function Funcionarios() {
                                 </select>
                             </div>
                         </div>
+                    </Modal>
+                )}
 
-                        <div className={styles.modalActions}>
-                            <button
-                                className={styles.btnSecondary}
-                                onClick={() => setCreateModal(false)}
-                            >
-                                Cancelar
-                            </button>
+                {edit && (
+                    <Modal
+                        title="Editar Funcionário"
+                        onClose={() => setEdit(null)}
+                        variant="between"
+                        actions={
+                            <>
+                                <button
+                                    className={styles.btnSecondary}
+                                    onClick={() => setEdit(null)}
+                                >
+                                    Cancelar
+                                </button>
 
-                            <button
-                                className={styles.btnPrimary}
-                                onClick={criarFuncionario}
-                                disabled={!novoFuncionario.nome || !novoFuncionario.email}
-                            >
-                                Criar
-                            </button>
-                        </div>
-                    </div>
-                </>
-            )}
-
-            {edit && (
-                <>
-                    <div className={styles.overlay} onClick={() => setEdit(null)} />
-
-                    <div className={styles.taskModal} onClick={(e) => e.stopPropagation()}>
-                        <h2>Editar Funcionário</h2>
-
+                                <button
+                                    className={styles.btnPrimary}
+                                    onClick={salvarEdicao}
+                                >
+                                    Salvar
+                                </button>
+                            </>
+                        }
+                    >
                         <div className={styles.formGrid}>
-                            {/* NOME */}
                             <div className={styles.formGroup}>
                                 <label>Nome</label>
                                 <input
-                                    type="text"
                                     value={edit.nome}
                                     onChange={(e) =>
                                         setEdit({ ...edit, nome: e.target.value })
@@ -526,11 +585,9 @@ function Funcionarios() {
                                 />
                             </div>
 
-                            {/* EMAIL */}
                             <div className={styles.formGroup}>
                                 <label>Email</label>
                                 <input
-                                    type="email"
                                     value={edit.email}
                                     onChange={(e) =>
                                         setEdit({ ...edit, email: e.target.value })
@@ -538,7 +595,6 @@ function Funcionarios() {
                                 />
                             </div>
 
-                            {/* SETOR */}
                             <div className={styles.formGroup}>
                                 <label>Setor</label>
                                 <select
@@ -553,11 +609,9 @@ function Funcionarios() {
                                 </select>
                             </div>
 
-                            {/* CARGO */}
                             <div className={styles.formGroup}>
                                 <label>Cargo</label>
                                 <input
-                                    type="text"
                                     value={edit.cargo}
                                     onChange={(e) =>
                                         setEdit({ ...edit, cargo: e.target.value })
@@ -565,7 +619,6 @@ function Funcionarios() {
                                 />
                             </div>
 
-                            {/* STATUS */}
                             <div className={styles.formGroup}>
                                 <label>Status</label>
                                 <select
@@ -582,38 +635,24 @@ function Funcionarios() {
                                 </select>
                             </div>
 
-                            {/* DATA (bloqueado) */}
                             <div className={styles.formGroup}>
-                                <label>Data de criação</label>
-                                <input type="text" value={edit.dataCriacao} disabled />
+                                <label>Data de Criação</label>
+                                <input
+                                    value={edit.dataCriacao}
+                                    disabled
+                                />
                             </div>
                         </div>
+                    </Modal>
+                )}
 
-                        <div className={styles.modalActions}>
-                            <button
-                                className={styles.btnSecondary}
-                                onClick={() => setEdit(null)}
-                            >
-                                Cancelar
-                            </button>
-
-                            <button
-                                className={styles.btnPrimary}
-                                onClick={salvarEdicao}
-                            >
-                                Salvar
-                            </button>
-                        </div>
-                    </div>
-                </>
-            )}
-
-            <div className={styles.footerActions}>
-                <button className={styles.exportBtn} onClick={exportarPDF}>
-                    Exportar PDF
-                </button>
+                <div className={styles.footerActions}>
+                    <button className={styles.exportBtn} onClick={exportarPDF}>
+                        Exportar PDF
+                    </button>
+                </div>
             </div>
-        </div>
+        </div >
     );
 }
 
