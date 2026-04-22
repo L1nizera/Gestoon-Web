@@ -144,6 +144,54 @@ export default function Tarefas() {
             <div className={styles.emptyState}>Nenhuma tarefa ativa encontrada.</div>
           )}
         </div>
+
+        {/* ===== MOBILE (CARDS) ===== */}
+        <div className={styles.cardsContainer}>
+          {activeTasks.map((task) => (
+            <div key={task.id} className={styles.card}>
+              {/* HEADER */}
+              <div className={styles.cardHeader}>
+                <h1>{task.titulo}</h1>
+                <StatusBadge status={task.status} />
+              </div>
+
+              {/* BODY */}
+              <div className={styles.cardBody}>
+                <p>
+                  <strong>Prioridade:</strong> {task.prioridade}
+                </p>
+                <p>
+                  <strong>Setor:</strong> {task.setor}
+                </p>
+                <p>
+                  <strong>Criado por:</strong> {task.criadoPor}
+                </p>
+                <p>
+                  <strong>Descrição:</strong> {task.descricao}
+                </p>
+              </div>
+
+              {/* FOOTER */}
+              <div className={styles.cardFooter}>
+                <span>{task.dataCriacao}</span>
+                <span>{task.horaCriacao}</span>
+              </div>
+
+              {/* ACTIONS */}
+              <div className={styles.cardActions}>
+                <TaskActions
+                  task={task}
+                  onAccept={(id) => updateStatus(id, "Em andamento")}
+                  onComplete={(id) => updateStatus(id, "Concluída")}
+                  onCancel={(id) => updateStatus(id, "Cancelada")}
+                />
+              </div>
+            </div>
+          ))}
+          {activeTasks.length === 0 && (
+            <div className={styles.emptyState}>Nenhuma tarefa ativa encontrada.</div>
+          )}
+        </div>
       </section>
     </div>
   );

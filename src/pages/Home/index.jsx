@@ -513,7 +513,7 @@ function Home() {
       </div>
 
       {/* ===== MOBILE (CARDS) ===== */}
-      <div className={styles.cardsContainer}>
+      <div className={styles.mobileOnly}>
         {lista.map((task) => (
           <div
             key={task.id}
@@ -522,7 +522,7 @@ function Home() {
           >
             {/* HEADER */}
             <div className={styles.cardHeader}>
-              <strong>{task.titulo}</strong>
+              <h1>{task.titulo}</h1>
 
               <span className={`${styles.badge} ${styles[statusMap[task.status]]}`}>
                 {task.status}
