@@ -119,6 +119,11 @@ function Funcionarios() {
         ativo: true,
     });
 
+    function limparFiltros() {
+        setSetorFiltro("");
+        setAtivoFiltro("");
+    }
+
     const setores = [
         "Administrativo",
         "Financeiro",
@@ -126,7 +131,7 @@ function Funcionarios() {
         "Atendimento",
         "Limpeza",
         "Estoque",
-        "Logística"
+        "Logística",
     ];
 
     // ===== FILTRO =====
@@ -135,7 +140,7 @@ function Funcionarios() {
 
         if (busca) {
             lista = lista.filter((f) =>
-                f.nome.toLowerCase().includes(busca.toLowerCase())
+                f.nome.toLowerCase().includes(busca.toLowerCase()),
             );
         }
 
@@ -145,7 +150,7 @@ function Funcionarios() {
 
         if (ativoFiltro !== "") {
             lista = lista.filter((f) =>
-                ativoFiltro === "true" ? f.ativo : !f.ativo
+                ativoFiltro === "true" ? f.ativo : !f.ativo,
             );
         }
 
@@ -228,20 +233,6 @@ function Funcionarios() {
         });
     }
 
-    function excluir(id) {
-        if (!confirm("Excluir funcionário?")) return;
-        setListaState(listaState.filter((f) => f.id !== id));
-        setSelected(null);
-    }
-
-    function salvarEdicao() {
-        setListaState((prev) =>
-            prev.map((f) => (f.id === edit.id ? edit : f))
-        );
-
-        setEdit(null);
-    }
-
     return (
         <div className={styles.dashboard}>
             <div className={styles.cardContainer}>
@@ -261,7 +252,10 @@ function Funcionarios() {
                 <div className={styles.filtrosAvancados}>
                     <div>
                         <small>Setor:</small>
-                        <select onChange={(e) => setSetorFiltro(e.target.value)}>
+                        <select
+                            value={setorFiltro}
+                            onChange={(e) => setSetorFiltro(e.target.value)}
+                        >
                             <option value="">Todos</option>
                             {setores.map((s) => (
                                 <option key={s}>{s}</option>
@@ -271,7 +265,10 @@ function Funcionarios() {
 
                     <div>
                         <small>Status:</small>
-                        <select onChange={(e) => setAtivoFiltro(e.target.value)}>
+                        <select
+                            value={ativoFiltro}
+                            onChange={(e) => setAtivoFiltro(e.target.value)}
+                        >
                             <option value="">Todos</option>
                             <option value="true">Ativo</option>
                             <option value="false">Inativo</option>
@@ -281,18 +278,14 @@ function Funcionarios() {
 
                 <div className={styles.acoes}>
                     <button
-                        className={styles.btnSecondary}
-                        onClick={() => {
-                            setBusca("");
-                            setSetorFiltro("");
-                            setAtivoFiltro("");
-                        }}
+                        className={styles.limparBtn}
+                        onClick={limparFiltros}
                     >
                         Limpar Filtros
                     </button>
 
                     <button
-                        className={styles.criarbtn}
+                        className={styles.criarBtn}
                         onClick={() => setCreateModal(true)}
                     >
                         Cadastrar Funcionário
@@ -305,10 +298,13 @@ function Funcionarios() {
                         <thead>
                             <tr>
                                 <th
+                                    className={ordemNome ? styles.colunaAtiva : ""}
                                     onClick={() =>
-                                        setOrdemNome((prev) =>
-                                            prev === "az" ? "za" : prev === "za" ? null : "az"
-                                        )
+                                        setOrdemNome((prev) => {
+                                            if (prev === null) return "az";
+                                            if (prev === "az") return "za";
+                                            return null;
+                                        })
                                     }
                                 >
                                     Nome {ordemNome === "az" ? "↑" : ordemNome === "za" ? "↓" : ""}
@@ -318,15 +314,13 @@ function Funcionarios() {
                                 <th className={styles.textCenter}>Cargo</th>
                                 <th className={styles.textCenter}>Status</th>
                                 <th
-                                    className={styles.textCenter}
+                                    className={`${styles.textCenter} ${ordemData ? styles.colunaAtiva : ""}`}
                                     onClick={() =>
-                                        setOrdemData((prev) =>
-                                            prev === "recente"
-                                                ? "antigo"
-                                                : prev === "antigo"
-                                                    ? null
-                                                    : "recente"
-                                        )
+                                        setOrdemData((prev) => {
+                                            if (prev === null) return "recente";
+                                            if (prev === "recente") return "antigo";
+                                            return null;
+                                        })
                                     }
                                 >
                                     Data{" "}

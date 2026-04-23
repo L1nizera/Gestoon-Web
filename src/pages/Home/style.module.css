@@ -266,7 +266,7 @@ select {
 
 @media (max-width: 768px) {
   .footerActions {
-    justify-content: center;
+    justify-content: right;
   }
 }
 
@@ -281,7 +281,7 @@ select {
   font-weight: 500;
   transition: 0.2s;
   width: 13rem;
-  max-width: 100%;
+  width: auto;
 }
 
 .limparBtn:active {
@@ -303,14 +303,15 @@ select {
   font-weight: 500;
   transition: 0.2s;
   width: 13rem;
-  max-width: 100%;
+  width: auto;
 }
 
 
 .acoes {
   display: flex;
   justify-content: space-between;
-  margin-top: 10px;
+  margin-top: 1rem;
+  margin-bottom: 2rem;
   gap: 1rem;
 }
 
@@ -327,7 +328,7 @@ select {
 
   .limparBtn,
   .criarBtn {
-    width: 30%;
+    width: 40%;
   }
 }
 
@@ -565,24 +566,35 @@ select {
 
 /* ===== Legenda Gráfico ==== */
 
-:global(.legenda) {
+.legenda {
   margin-top: 1rem;
-  transition: all 0.2 ease;
+  transition: all 0.2s ease;
 }
 
-:global(.legenda div) {
+.legenda div {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 0.8rem;
   font-size: 1.4rem;
 }
 
-:global(.cor) {
+.cor {
   width: 1rem;
   height: 1rem;
   border-radius: 50%;
 }
 
+@media (max-width: 768px) {
+  .legenda div {
+    font-size: 2.5rem;
+  }
+
+  .cor {
+    width: 0.8rem;
+    height: 0.8rem;
+  }
+}
 /* ===== BUSCA ===== */
 
 .exportBtn {
@@ -611,6 +623,7 @@ select {
   color: white;
   animation: pulse;
 }
+
 
 /* ===== ANIMAÇÕES GERAIS ===== */
 

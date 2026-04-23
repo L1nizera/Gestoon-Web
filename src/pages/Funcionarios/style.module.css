@@ -14,6 +14,7 @@
 .busca {
   flex: 1;
   min-width: 220px;
+  justify-content: center;
 }
 
 /* ===== DASHBOARD ===== */
@@ -75,11 +76,12 @@ select {
   cursor: pointer;
   appearance: none;
   background-color: white;
+  min-width: 15rem;
 }
 
 @media (max-width: 768px) {
   .filtrosAvancados {
-    flex-direction: column;
+    flex-direction: row;
   }
 
   .busca {
@@ -180,10 +182,32 @@ select {
 }
 
 
+@media (max-width: 768px) {
+  .cadastrarBtn {
+    width: 20rem;
+    font-size: 2.5rem;
+  }
+}
+
+.exportBtn {
+  padding: 0.5rem 0.5rem;
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 0.6rem;
+  cursor: pointer;
+  font-weight: 500;
+  transition: 0.2s;
+}
+
+.exportBtn:hover {
+  background: #1d4ed8;
+}
+
 .footerActions {
   display: flex;
   justify-content: flex-end;
-  margin-top: 1.5rem;
+  margin-top: 3rem;
 }
 
 /* ===== BUSCA ===== */
@@ -195,7 +219,7 @@ select {
   padding: 1rem 1.2rem;
   border-radius: 0.8rem;
   border: 0.1rem solid #cbd5e1;
-  font-size: 1.3rem;
+  font-size: 1.6rem;
   transition: all 0.2s ease;
 }
 
@@ -234,6 +258,14 @@ select {
   position: sticky;
   top: 0;
   z-index: 1;
+}
+
+.tabela th:hover {
+  background: #334155;
+}
+
+.tabela th:active {
+  background: #2563eb;
 }
 
 .tabela th,
@@ -321,7 +353,7 @@ select {
   justify-content: space-between;
   align-items: center; /* 🔥 alinha melhor vertical */
   gap: 1rem;
-  margin-bottom: 1rem;
+  margin-top: 1rem;
 }
 
 /* ===== BOTÕES ===== */
@@ -337,6 +369,19 @@ select {
   align-items: center;
   justify-content: center;
   transition: all 0.2s ease;
+}
+
+.criarBtn {
+  background: #1e293b;
+  color: white;
+  border: none;
+  padding: 0.8rem 1.4rem;
+  border-radius: 0.6rem;
+  cursor: pointer;
+  font-weight: 500;
+  transition: 0.2s;
+  width: 13rem;
+  width: auto;
 }
 
 .btnPrimary {
@@ -403,6 +448,8 @@ select {
     display: flex;
     flex-direction: column;
     gap: 12px;
+    max-height: 60vh;
+    overflow-y: auto;
   }
 }
 
