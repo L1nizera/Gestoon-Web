@@ -1,11 +1,10 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import styles from "./style.module.css";
 import { tasks } from "../../data/Tasks";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import Modal from "../../components/Modal/Modal";
-
 
 function Home() {
   const [selectedTask, setSelectedTask] = useState(null);
@@ -20,6 +19,15 @@ function Home() {
   const [tasksState, setTasksState] = useState(tasks);
   const [editTask, setEditTask] = useState(null);
   const [menuAtivo, setMenuAtivo] = useState("tarefas");
+  const [isMobile, setIsMobile] = useState(
+    typeof window !== "undefined" ? window.innerWidth < 768 : false,
+  );
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   // ===== MODAL CRIAR =====
   const [createTaskOpen, setCreateTaskOpen] = useState(false);
@@ -418,39 +426,38 @@ function Home() {
       </div>
 
       <div className={styles.alinhaBtn}>
+        <div className={styles.acoes}>
+          <button className={styles.limparBtn} onClick={limparFiltros}>
+            Limpar Filtros
+          </button>
 
+          <button
+            className={styles.criarBtn}
+            onClick={() => setCreateTaskOpen(true)}
+          >
+            Criar Tarefa
+          </button>
+        </div>
 
-      <div className={styles.acoes}>
-        <button className={styles.limparBtn} onClick={limparFiltros}>
-          Limpar Filtros
-        </button>
-
-        <button
-          className={styles.criarBtn}
-          onClick={() => setCreateTaskOpen(true)}
-        >
-          Criar Tarefa
-        </button>
-      </div>
-
-      {/* ===== TABELA ===== */}
-      {/* ===== DESKTOP (TABELA) ===== */}
-      <div className={`${styles.tabelaContainer} ${styles.desktopOnly}`}>
-        <table className={styles.tabela}>
-          <thead>
-            <tr>
-              <th
-                className={ordemTitulo ? styles.colunaAtiva : ""}
-                onClick={() =>
-                  setOrdemTitulo((prev) => {
-                    if (prev === null) return "az";
-                    if (prev === "az") return "za";
-                    return null;
-                  })
-                }
-              >
-                Título {ordemTitulo === "az" ? "↑" : ordemTitulo === "za" ? "↓" : ""}
-              </th>
+        {/* ===== TABELA ===== */}
+        {/* ===== DESKTOP (TABELA) ===== */}
+        <div className={`${styles.tabelaContainer} ${styles.desktopOnly}`}>
+          <table className={styles.tabela}>
+            <thead>
+              <tr>
+                <th
+                  className={ordemTitulo ? styles.colunaAtiva : ""}
+                  onClick={() =>
+                    setOrdemTitulo((prev) => {
+                      if (prev === null) return "az";
+                      if (prev === "az") return "za";
+                      return null;
+                    })
+                  }
+                >
+                  Título{" "}
+                  {ordemTitulo === "az" ? "↑" : ordemTitulo === "za" ? "↓" : ""}
+                </th>
 
                 <th>Status</th>
                 <th>Prioridade</th>
@@ -490,13 +497,17 @@ function Home() {
                   <td>{task.titulo}</td>
 
                   <td>
-                    <span className={`${styles.badge} ${styles[statusMap[task.status]]}`}>
+                    <span
+                      className={`${styles.badge} ${styles[statusMap[task.status]]}`}
+                    >
                       {task.status}
                     </span>
                   </td>
 
                   <td>
-                    <span className={`${styles.badge} ${styles[prioridadeMap[task.prioridade]]}`}>
+                    <span
+                      className={`${styles.badge} ${styles[prioridadeMap[task.prioridade]]}`}
+                    >
                       {task.prioridade}
                     </span>
                   </td>
@@ -524,7 +535,9 @@ function Home() {
             <div className={styles.cardHeader}>
               <h1>{task.titulo}</h1>
 
-              <span className={`${styles.badge} ${styles[statusMap[task.status]]}`}>
+              <span
+                className={`${styles.badge} ${styles[statusMap[task.status]]}`}
+              >
                 {task.status}
               </span>
             </div>
@@ -533,13 +546,19 @@ function Home() {
             <div className={styles.cardBody}>
               <p>
                 <strong>Prioridade:</strong>{" "}
-                <span className={`${styles.badge} ${styles[prioridadeMap[task.prioridade]]}`}>
+                <span
+                  className={`${styles.badge} ${styles[prioridadeMap[task.prioridade]]}`}
+                >
                   {task.prioridade}
                 </span>
               </p>
 
-              <p><strong>Setor:</strong> {task.setor}</p>
-              <p><strong>Criado por:</strong> {task.criadoPor}</p>
+              <p>
+                <strong>Setor:</strong> {task.setor}
+              </p>
+              <p>
+                <strong>Criado por:</strong> {task.criadoPor}
+              </p>
 
               <div className={styles.cardFooter}>
                 <span>{task.horaCriacao}</span>
@@ -555,7 +574,6 @@ function Home() {
         <Modal
           title={selectedTask.titulo}
           variant="between"
-
           onClose={() => setSelectedTask(null)}
           actions={
             <>
@@ -585,7 +603,9 @@ function Home() {
           <div className={styles.modalGrid}>
             <div>
               <strong>Prioridade:</strong>
-              <span className={`${styles.badge} ${styles[prioridadeMap[selectedTask.prioridade]]}`}>
+              <span
+                className={`${styles.badge} ${styles[prioridadeMap[selectedTask.prioridade]]}`}
+              >
                 {selectedTask.prioridade}
               </span>
             </div>
@@ -725,33 +745,39 @@ function Home() {
           variant="between"
           actions={
             <>
-              <button className={styles.btnDanger} onClick={() => {
-                setCreateTaskOpen(false);
-                setNovaTask({
-                  titulo: "",
-                  setor: "Caixa",
-                  prioridade: "Média",
-                  status: "Pendente",
-                  descricao: "",
-                });
-              }}>Fechar
+              <button
+                className={styles.btnDanger}
+                onClick={() => {
+                  setCreateTaskOpen(false);
+                  setNovaTask({
+                    titulo: "",
+                    setor: "Caixa",
+                    prioridade: "Média",
+                    status: "Pendente",
+                    descricao: "",
+                  });
+                }}
+              >
+                Fechar
               </button>
 
-
-              <button className={styles.btnSecondary} onClick={() =>
-                setNovaTask({
-                  titulo: "",
-                  setor: "Caixa",
-                  prioridade: "Média",
-                  status: "Pendente",
-                  descricao: "",
-                })
-              }
-              >Limpar
+              <button
+                className={styles.btnSecondary}
+                onClick={() =>
+                  setNovaTask({
+                    titulo: "",
+                    setor: "Caixa",
+                    prioridade: "Média",
+                    status: "Pendente",
+                    descricao: "",
+                  })
+                }
+              >
+                Limpar
               </button>
 
-
-              <button className={styles.btnPrimary}
+              <button
+                className={styles.btnPrimary}
                 onClick={criarTask}
                 disabled={!novaTask.titulo}
               >
@@ -760,7 +786,6 @@ function Home() {
             </>
           }
         >
-
           <div className={styles.formGrid}>
             {/* TÍTULO */}
             <div className={`${styles.formGroup} ${styles.full}`}>
@@ -844,24 +869,27 @@ function Home() {
 
       {/* ==== Gráfico ==== */}
       <div className={styles.grafico}>
-        <h3>Status das tarefas</h3>
+        <h2>Status das tarefas</h2>
 
-        <ResponsiveContainer width="100%" height={400}>
+        <ResponsiveContainer width="100%" height={isMobile ? 220 : 400}>
           <PieChart>
             <Pie
               data={dataGrafico}
               dataKey="value"
               nameKey="name"
-              outerRadius={120}
-              innerRadius={50}
+              outerRadius={isMobile ? 70 : 120}
+              innerRadius={isMobile ? 30 : 50}
               activeShape={null}
               isAnimationActive={false}
               stroke="none"
-              label={({ name, percent }) =>
-                `${name}: ${(percent * 100).toFixed(0)}%`
+              label={
+                isMobile
+                  ? false
+                  : ({ name, percent }) =>
+                      `${name}: ${(percent * 100).toFixed(0)}%`
               }
               labelLine={false}
-              fontSize={20}
+              fontSize={isMobile ? 12 : 20}
             >
               {dataGrafico.map((entry, index) => (
                 <Cell
@@ -876,11 +904,11 @@ function Home() {
         </ResponsiveContainer>
 
         {/* legenda manual */}
-        <div className="legenda">
+        <div className={styles.legenda}>
           {dataGrafico.map((item, i) => (
             <div key={i}>
               <span
-                className="cor"
+                className={styles.cor}
                 style={{
                   background: ["#ef4444", "#f59e0b", "#22c55e", "#6b7280"][i],
                 }}

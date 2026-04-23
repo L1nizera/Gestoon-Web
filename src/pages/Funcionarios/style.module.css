@@ -10,7 +10,7 @@ body {
 .topActions {
   margin-bottom: 1rem;
   display: flex;
-  justify-content: flex-end; /* 🔥 corrigido */
+  justify-content: left;
 }
 
 /* ===== DASHBOARD ===== */
@@ -22,7 +22,7 @@ body {
 
 @media (max-width: 768px) {
   .dashboard {
-    padding: 1.5rem; /* 🔥 corrigido */
+    padding: 1.5rem;
   }
 }
 
@@ -60,18 +60,19 @@ body {
   padding: 0.6rem 0.8rem;
   border-radius: 0.6rem;
   border: 0.1rem solid #cbd5e1;
-  font-size: 16px; /* 🔥 evita zoom no mobile */
+  font-size: 16px;
 }
 
 select {
   cursor: pointer;
   appearance: none;
   background-color: white;
+  min-width: 15rem;
 }
 
 @media (max-width: 768px) {
   .filtrosAvancados {
-    flex-direction: column;
+    flex-direction: row;
   }
 
   .busca {
@@ -172,12 +173,11 @@ select {
   border-radius: 0.6rem;
   cursor: pointer;
   font-weight: 500;
-  font-size: large;
+  font-size: 1.9rem;
   transition: 0.2s;
   margin-bottom: 1.5rem;
   margin-top: 3rem;
-  width: 20rem;
-  margin-right: 1px;  
+  width: 18rem;
 }
 
 .cadastrarBtn:active {
@@ -189,10 +189,32 @@ select {
   background: #629b06;
 }
 
+@media (max-width: 768px) {
+  .cadastrarBtn {
+    width: 20rem;
+    font-size: 2.5rem;
+  }
+}
+
+.exportBtn {
+  padding: 0.5rem 0.5rem;
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 0.6rem;
+  cursor: pointer;
+  font-weight: 500;
+  transition: 0.2s;
+}
+
+.exportBtn:hover {
+  background: #1d4ed8;
+}
+
 .footerActions {
   display: flex;
   justify-content: flex-end;
-  margin-top: 1.5rem;
+  margin-top: 3rem;
 }
 
 .alinharBtn {
@@ -204,11 +226,11 @@ select {
 
 .busca {
   width: 100%;
-  max-width: 30rem; /* 🔥 corrigido */
+  max-width: 30rem;
   padding: 1rem 1.2rem;
   border-radius: 0.8rem;
   border: 0.1rem solid #cbd5e1;
-  font-size: 1.3rem;
+  font-size: 1.6rem;
   transition: all 0.2s ease;
 }
 
@@ -287,7 +309,7 @@ select {
 
 @media (max-width: 768px) {
   .modalActions {
-    grid-template-columns: 1fr; /* 🔥 corrigido */
+    grid-template-columns: 1fr;
   }
 }
 
@@ -367,6 +389,8 @@ button:active {
     display: flex;
     flex-direction: column;
     gap: 12px;
+    max-height: 60vh;
+    overflow-y: auto;
   }
 }
 
