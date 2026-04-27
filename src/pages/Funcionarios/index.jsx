@@ -200,6 +200,15 @@ function Funcionarios() {
 
         doc.save("funcionarios.pdf");
     }
+    const salvarEdicao = () => {
+        if (!edit) return;
+
+        setListaState((prev) =>
+            prev.map((f) => (f.id === edit.id ? edit : f))
+        );
+
+        setEdit(null);
+    };
 
     function criarFuncionario() {
         if (!novoFuncionario.nome || !novoFuncionario.email) return;
@@ -370,7 +379,7 @@ function Funcionarios() {
                             onClick={() => setSelected(f)}
                         >
                             <div className={styles.cardHeader}>
-                                <strong>{f.nome}</strong>
+                                <h2>{f.nome}</h2>
                                 <span
                                     className={`${styles.badge} ${styles[f.ativo ? "statusConcluida" : "statusCancelada"]
                                         }`}
@@ -419,8 +428,8 @@ function Funcionarios() {
                                 <button
                                     className={styles.btnPrimary}
                                     onClick={() => {
-                                        setSelected(null);
                                         setEdit(selected);
+                                        setSelected(null);
                                     }}
                                 >
                                     Editar
@@ -435,9 +444,12 @@ function Funcionarios() {
                             </>
                         }
                     >
-                        <p><strong>Email:</strong> {selected.email}</p>
-                        <p><strong>Setor:</strong> {selected.setor}</p>
-                        <p><strong>Cargo:</strong> {selected.cargo}</p>
+
+                        <div    className={styles.modalGrid}>
+                            <p><strong>Email:</strong> {selected.email}</p>
+                            <p><strong>Setor:</strong> {selected.setor}</p>
+                            <p><strong>Cargo:</strong> {selected.cargo}</p>
+                        </div>
                     </Modal>
                 )}
 
@@ -637,6 +649,7 @@ function Funcionarios() {
                                 />
                             </div>
                         </div>
+                
                     </Modal>
                 )}
 

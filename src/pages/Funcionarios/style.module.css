@@ -134,6 +134,8 @@ select {
 
 /* ===== MODAL ===== */
 
+
+
 .taskModal {
   position: fixed;
   top: 50%;
@@ -484,11 +486,11 @@ select {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 8px;
-  font-size: 15px;
+  font-size: 1.5rem;
 }
 
 .cardBody p {
   margin: 4px 0;
-  font-size: 13px;
+  font-size: 1.3rem;
   opacity: 0.9;
 }
