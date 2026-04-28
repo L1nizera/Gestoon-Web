@@ -10,6 +10,20 @@
   box-sizing: border-box;
 }
 
+.title {
+  font-size: 2.5rem;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 1rem;
+  color: white;
+}
+
+.separator {
+  border: none;
+  border-top: 1px solid #475569;
+  margin-bottom: 1.5rem;
+}
+
 .header {
   margin-bottom: 1.5rem;
 }
@@ -19,6 +33,16 @@
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
+}
+
+.menuButton {
+  display: none;
+  border: none;
+  background: transparent;
+  color: white;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 5px;
 }
 
 .closeButton {
@@ -100,16 +124,24 @@
     transform: translateX(0);
   }
 
-  .sidebar.closed {
-    transform: translateX(-100%);
-  }
-
-  .header {
-    margin-bottom: 1rem;
+  .menuButton {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .closeButton {
     display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .title {
+    font-size: 2rem;
+  }
+
+  .header {
+    margin-bottom: 1rem;
   }
 
   .menu {
