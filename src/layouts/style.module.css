@@ -6,8 +6,8 @@
 /* sidebar */
 .sideBar{
   width: min(220px, 100%);
-  background:#0f172a;
-  color:white;
+  background: var(--sidebar-bg);
+  color: var(--sidebar-text);
   flex-shrink:0;
 }
 
@@ -21,8 +21,8 @@
 /* topbar */
 .topBar{
   height:60px;
-  background:#0f172a;
-  color:white;
+  background: var(--sidebar-bg);
+  color: var(--sidebar-text);
   display:flex;
   align-items:center;
   padding:0 20px;
@@ -33,7 +33,7 @@
   flex:1;
   overflow-y:auto;
   padding:20px;
-  background:#f1f5f9;
+  background: var(--bg-main);
 }
 
 .mobileOverlay {

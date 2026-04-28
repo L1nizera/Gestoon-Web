@@ -1,5 +1,5 @@
 .container {
-  background: #f5f6fa;
+  background: var(--bg-main);
   min-height: 100vh;
   padding: 5rem;
 }
@@ -7,7 +7,7 @@
 .card {
   max-width: 100rem;
   margin: auto;
-  background: linear-gradient(180deg, #ffffff, #f9fafb);
+  background: var(--bg-card);
   padding: 4rem;
   border-radius: 1.6rem;
   box-shadow: 0 0.8rem 2.5rem rgba(0, 0, 0, 0.08);
@@ -51,12 +51,12 @@
   height: 18rem;
   border-radius: 50%;
   object-fit: cover;
-  border: 4px solid #e2e8f0;
+  border: 4px solid var(--border);
   box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.1);
 }
 
 .fotoPlaceholder {
-  background: #ddd;
+  background: var(--border);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -78,14 +78,14 @@
 
 .infoGroup span {
   font-size: 1.2rem;
-  color: #94a3b8;
+  color: var(--text-secondary);
 }
 
 .infoGroup p {
-  background: #f1f5f9;
+  background: var(--bg-main);
   padding: 1.2rem;
   border-radius: 0.8rem;
-  border: 0.1rem solid #e2e8f0;
+  border: 0.1rem solid var(--border);
   margin: 0;
   font-size: 1.5rem;
   font-weight: 500;
@@ -96,7 +96,7 @@
   padding: 1rem 1.5rem;
   border: none;
   border-radius: 0.8rem;
-  background: linear-gradient(135deg, #1e293b, #334155);
+  background: var(--sidebar-bg);
   transition: all 0.2s ease;
   color: white;
   cursor: pointer;

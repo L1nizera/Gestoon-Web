@@ -52,7 +52,7 @@
   gap: 2rem;
   align-items: flex-end;
   flex-wrap: wrap;
-  background: #f8fafc;
+  background: var(--bg-card);
   padding: 1.5rem;
   border-radius: 1rem;
   transition: all 0.25s ease;
@@ -67,7 +67,7 @@
   width: 100%;
   padding: 0.6rem 0.8rem;
   border-radius: 0.6rem;
-  border: 0.1rem solid #cbd5e1;
+  border: 0.1rem solid var(--border);
   font-size: 16px;
   /* 🔥 evita zoom no mobile */
 }
@@ -75,7 +75,7 @@
 select {
   cursor: pointer;
   appearance: none;
-  background-color: white;
+  background-color: var(--bg-card);
   min-width: 15rem;
 }
 
@@ -98,7 +98,7 @@ select {
 
 .filtrosAvancados small {
   font-size: 1.4rem;
-  color: #64748b;
+  color: var(--text-secondary);
 }
 
 /* ===== BADGES ===== */
@@ -111,13 +111,13 @@ select {
 }
 
 .statusConcluida {
-  background: #dcfce7;
-  color: #166534;
+  background: var(--success-bg);
+  color: var(--success);
 }
 
 .statusCancelada {
-  background: #e5e7eb;
-  color: #374151;
+  background: var(--bg-main);
+  color: var(--text-primary);
 }
 
 /* ===== OVERLAY ===== */
@@ -220,26 +220,26 @@ select {
   /* 🔥 corrigido */
   padding: 1rem 1.2rem;
   border-radius: 0.8rem;
-  border: 0.1rem solid #cbd5e1;
+  border: 0.1rem solid var(--border);
   font-size: 1.6rem;
   transition: all 0.2s ease;
 }
 
 .busca:focus {
   outline: none;
-  border-color: #5773af;
+  border-color: var(--primary);
   box-shadow: 0 0 0 0.3rem rgba(37, 99, 235, 0.2);
 }
 
 .busca:hover {
-  border-color: #758192;
+  border-color: var(--text-secondary);
 }
 
 /* ===== TABELA ===== */
 
 .tabelaContainer {
   margin-top: 16px;
-  background: #fff;
+  background: var(--bg-card);
   border-radius: 12px;
   overflow: hidden;
   /* CLIP no border-radius */
@@ -254,20 +254,20 @@ select {
 }
 
 .tabela thead {
-  background: #0f172a;
+  background: var(--sidebar-bg);
   /* cor escura padrão dashboard */
-  color: #fff;
+  color: var(--sidebar-text);
   position: sticky;
   top: 0;
   z-index: 1;
 }
 
 .tabela th:hover {
-  background: #334155;
+  background: var(--sidebar-hover);
 }
 
 .tabela th:active {
-  background: #2563eb;
+  background: var(--sidebar-active);
 }
 
 .tabela th,
@@ -428,7 +428,7 @@ select {
 .formGroup label {
   font-size: 1.2rem;
   margin-bottom: 0.4rem;
-  color: #475569;
+  color: var(--text-secondary);
 }
 
 /* CONTROLE RESPONSIVO */

@@ -1,7 +1,37 @@
+:root {
+  --bg-main: #f1f5f9;
+  --bg-card: #ffffff;
+  --border: #e2e8f0;
+
+  --text-primary: #1e293b;
+  --text-secondary: #64748b;
+
+  --primary: #2563eb;
+  --primary-hover: #1d4ed8;
+  --primary-light: #dbeafe;
+
+  --sidebar-bg: #0f172a;
+  --sidebar-hover: #1e293b;
+  --sidebar-active: #2563eb;
+  --sidebar-text: #e2e8f0;
+
+  --success: #22c55e;
+  --success-bg: #dcfce7;
+
+  --warning: #f59e0b;
+  --warning-bg: #fef3c7;
+
+  --danger: #ef4444;
+  --danger-bg: #fee2e2;
+
+  --info: #3b82f6;
+  --info-bg: #dbeafe;
+}
+
 #root {
   flex-direction: column;
-  background-color: #fafafa;
-  color: #212121;
+  background-color: var(--bg-main);
+  color: var(--text-primary);
   align-items: center;
   min-width: 32rem;
   min-height: 100vh;
@@ -76,7 +106,7 @@ input, select, textarea {
   width: 100%;
   padding: 0.8rem 1rem;
   margin: 0.8rem 0;
-  border: 0.1rem solid #ccc;
+  border: 0.1rem solid var(--border);
   border-radius: 0.4rem;
   box-sizing: border-box;
 }
@@ -91,14 +121,14 @@ table {
 
 th,
 td {
-  border: 0.1rem solid #ddd;
+  border: 0.1rem solid var(--border);
   padding: 1.2rem;
   text-align: left;
 }
 
 th {
   font-weight: 600;
-  color: #6b7280;
+  color: var(--text-secondary);
 }
 
 td{
