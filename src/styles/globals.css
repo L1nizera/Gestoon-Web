@@ -2,84 +2,124 @@
   /* BASE */
   --color-white: #ffffff;
   --color-black: #000000;
+
   --color-gray-25: #fafafa;
   --color-gray-50: #f8fafc;
   --color-gray-100: #f1f5f9;
   --color-gray-200: #e2e8f0;
   --color-gray-300: #cbd5e1;
-  --color-gray-900: #0f172a;
-  --color-slate-900: #1e293b;
+  --color-gray-900: #0b1220;
+
+  --color-slate-900: #020617;
   --color-slate-700: #334155;
   --color-slate-600: #475569;
   --color-slate-500: #64748b;
   --color-slate-400: #94a3b8;
-  --color-blue-500: #2563eb;
-  --color-blue-600: #1d4ed8;
-  --color-blue-100: #dbeafe;
+
+  /* 🔵 AZUL ENERGÉTICO */
+  --color-blue-400: #38bdf8;
+  --color-blue-500: #0ea5e9; /* primary */
+  --color-blue-600: #0284c7;
+  --color-blue-700: #0369a1;
+  --color-blue-100: #e0f2fe;
+
+  /* FEEDBACK */
   --color-green-500: #22c55e;
   --color-green-600: #16a34a;
   --color-green-700: #15803d;
   --color-green-100: #dcfce7;
+
   --color-amber-500: #f59e0b;
   --color-amber-100: #fef3c7;
+
   --color-red-500: #ef4444;
   --color-red-700: #b91c1c;
   --color-red-100: #fee2e2;
-  --color-sky-500: #3b82f6;
-  --color-sky-600: #0284c7;
-  --color-sky-100: #dbeafe;
+
+  --color-sky-500: var(--color-blue-500);
+  --color-sky-600: var(--color-blue-600);
+  --color-sky-100: var(--color-blue-100);
 
   /* SEMÂNTICO */
   --bg-main: var(--color-gray-100);
   --bg-card: var(--color-white);
   --bg-surface: var(--color-gray-50);
   --bg-surface-alt: var(--color-gray-25);
+
   --border-default: var(--color-gray-200);
   --border-muted: var(--color-gray-300);
+
   --text-primary: var(--color-gray-900);
-  --text-secondary: var(--color-slate-500);
-  --text-muted: var(--color-slate-700);
+  --text-secondary: var(--color-slate-600);
+  --text-muted: var(--color-slate-500);
   --text-on-dark: var(--color-white);
-  --shadow-soft: rgba(114, 113, 113, 0.27);
+
+  --shadow-soft: rgba(2, 6, 23, 0.08);
+
+  /* 🎯 PRIMARY */
   --color-primary: var(--color-blue-500);
+  --color-primary-hover: var(--color-blue-600);
+  --color-primary-active: var(--color-blue-700);
+  --color-primary-light: var(--color-blue-100);
+
   --color-success: var(--color-green-500);
   --color-warning: var(--color-amber-500);
   --color-danger: var(--color-red-500);
-  --color-info: var(--color-sky-500);
+  --color-info: var(--color-blue-400);
+
   --bg-success: var(--color-green-100);
   --bg-warning: var(--color-amber-100);
   --bg-danger: var(--color-red-100);
-  --bg-info: var(--color-sky-100);
-  --color-primary-light: var(--color-blue-100);
+  --bg-info: var(--color-blue-100);
 
-  /* CONTEXTO */
-  --sidebar-bg: var(--color-gray-900);
-  --sidebar-text: var(--color-white);
-  --sidebar-hover: var(--color-slate-900);
-  --sidebar-active: var(--color-primary);
+  /* 🔥 SIDEBAR ENERGÉTICA */
+  --sidebar-bg: linear-gradient(
+    180deg,
+    #020617 0%,
+    #020617 40%,
+    #0c4a6e 100%
+  );
 
+  --sidebar-text: #e0f2fe;
+
+  --sidebar-hover: rgba(14, 165, 233, 0.15);
+
+  --sidebar-active: var(--color-blue-500);
+
+  --sidebar-active-glow: 0 0 12px rgba(14, 165, 233, 0.6);
+
+  /* BOTÕES */
   --button-primary-bg: var(--color-primary);
-  --button-primary-hover: var(--color-blue-600);
-  --button-secondary-bg: var(--color-slate-500);
-  --button-secondary-hover: var(--color-slate-600);
+  --button-primary-hover: var(--color-primary-hover);
+
+  --button-secondary-bg: var(--color-slate-600);
+  --button-secondary-hover: var(--color-slate-700);
+
   --button-success-bg: var(--color-success);
   --button-success-hover: var(--color-green-600);
+
   --button-danger-bg: var(--color-danger);
   --button-danger-hover: var(--color-red-700);
-  --button-info-bg: var(--color-info);
-  --button-info-hover: var(--color-sky-600);
 
-  /* alias compatibilidade */
+  --button-info-bg: var(--color-info);
+  --button-info-hover: var(--color-blue-600);
+
+  /* ALIAS */
   --border: var(--border-default);
+
   --primary: var(--color-primary);
-  --primary-hover: var(--color-blue-600);
+  --primary-hover: var(--color-primary-hover);
   --primary-light: var(--color-primary-light);
+
   --success: var(--color-success);
   --success-bg: var(--bg-success);
+
   --warning: var(--color-warning);
   --warning-bg: var(--bg-warning);
+
   --danger: var(--color-danger);
   --danger-bg: var(--bg-danger);
+
   --info: var(--color-info);
   --info-bg: var(--bg-info);
 }
