@@ -11,13 +11,24 @@ function DashboardLayout() {
 
   return (
     <div className={styles.appLayout}>
-      <SideBar isOpen={sidebarOpen} onClose={handleCloseSidebar} onMenuClick={handleMenuToggle} />
+      <SideBar isOpen={sidebarOpen} onClose={handleCloseSidebar} />
 
       {sidebarOpen && (
         <div className={styles.mobileOverlay} onClick={handleCloseSidebar} />
       )}
 
       <div className={styles.mainArea}>
+        <div className={styles.topBar}>
+          <button
+            type="button"
+            className={styles.mobileMenuButton}
+            onClick={handleMenuToggle}
+            aria-label={sidebarOpen ? "Fechar menu" : "Abrir menu"}
+          >
+            <span className={styles.hamburger} />
+          </button>
+        </div>
+
         <main className={styles.mainContent}>
           <Outlet />
         </main>

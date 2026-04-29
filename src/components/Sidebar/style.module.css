@@ -1,5 +1,5 @@
 .sidebar {
-  width: min(220px, 100%);
+  width: min(260px, 100%);
   max-width: 260px;
   background: var(--sidebar-bg);
   color: var(--sidebar-text);
@@ -35,16 +35,6 @@
   gap: 1rem;
 }
 
-.menuButton {
-  display: none;
-  border: none;
-  background: transparent;
-  color: var(--sidebar-text);
-  font-size: 1.5rem;
-  cursor: pointer;
-  padding: 5px;
-}
-
 .closeButton {
   display: none;
   border: none;
@@ -72,7 +62,7 @@
   display: block;
   color: var(--sidebar-text);
   background: var(--sidebar-hover);
-  padding: 8px 10px;
+  padding: 10px 12px;
   border-radius: 5px;
   margin-bottom: 8px;
   text-decoration: none;
@@ -88,7 +78,7 @@
 .active {
   background: var(--sidebar-active);
   font-weight: bold;
-  border-left: 4px solid var(--sidebar-active);
+  border-left: 4px solid var(--primary);
 }
 
 /* BOTÃO SAIR */
@@ -108,26 +98,27 @@
 
 @media (max-width: 768px) {
   .sidebar {
-    width: min(260px, 40vw);
-    height: 100vh;
-    padding: 16px;
+    width: 50vw;
+    max-width: 50vw;
     position: fixed;
     top: 0;
     left: 0;
     z-index: 20;
-    transition: transform 0.25s ease-in-out;
-    box-shadow: rgba(0, 0, 0, 0.25) 0px 10px 20px;
+    height: 100vh;
+    padding: 24px 18px;
     transform: translateX(-100%);
+    transition: transform 0.25s ease-in-out;
+    box-shadow: rgba(0, 0, 0, 0.28) 0px 20px 40px;
+    overflow-y: auto;
+    background: var(--sidebar-bg);
   }
 
   .sidebar.open {
     transform: translateX(0);
   }
 
-  .menuButton {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
+  .sidebar.closed {
+    transform: translateX(-100%);
   }
 
   .closeButton {
@@ -144,19 +135,13 @@
     margin-bottom: 1rem;
   }
 
-  .menu {
-    list-style: none;
-    padding: 0;
-    flex: 1;
-  }
-
   .menu li {
     width: 100%;
   }
 
   .link {
-    padding: 10px 12px;
-    font-size: 2rem;
+    padding: 12px 14px;
+    font-size: 1.4rem;
   }
 
   .logoutBtn {
