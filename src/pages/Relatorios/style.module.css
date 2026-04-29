@@ -48,8 +48,8 @@
 }
 
 .relatoriosExportButton {
-  background: #0284c7;
-  color: white;
+  background: var(--button-primary-bg);
+  color: var(--color-white);
   min-width: 18rem; /* 180px */
 }
 
@@ -59,13 +59,13 @@
 }
 
 .btnSecondary {
-  background: white;
-  color: #334155;
-  border: 0.1rem solid #cbd5e1; /* 1px */
+  background: var(--bg-card);
+  color: var(--text-primary);
+  border: 0.1rem solid var(--border-default); /* 1px */
 }
 
 .btnSecondary:hover {
-  background: #f1f5f9;
+  background: var(--bg-main);
 }
 
 .relatoriosFiltros {
@@ -80,13 +80,13 @@
   flex-direction: column;
   gap: 0.8rem; /* 8px */
   padding: 1.8rem; /* 18px */
-  background: white;
-  border: 0.1rem solid #e2e8f0; /* 1px */
+  background: var(--bg-card);
+  border: 0.1rem solid var(--border-default); /* 1px */
   border-radius: 1.4rem; /* 14px */
 }
 
 .filtroCard label {
-  color: #334155;
+  color: var(--text-primary);
   font-size: 0.95rem;
   font-weight: 600;
 }
@@ -94,16 +94,16 @@
 .filtroCard input {
   width: 100%;
   padding: 1rem 1.2rem; /* 10px 12px */
-  border: 0.1rem solid #cbd5e1; /* 1px */
+  border: 0.1rem solid var(--border-default); /* 1px */
   border-radius: 1rem; /* 10px */
-  background: #f8fafc;
-  color: #0f172a;
+  background: var(--bg-surface);
+  color: var(--text-primary);
 }
 
 .filtroCard input:focus {
   outline: none;
-  border-color: #0284c7;
-  background: white;
+  border-color: var(--color-primary);
+  background: var(--bg-card);
 }
 
 .filtroActions {
@@ -112,20 +112,20 @@
   align-items: center;
   gap: 1.6rem; /* 16px */
   padding: 1.8rem; /* 18px */
-  background: white;
-  border: 0.1rem solid #e2e8f0; /* 1px */
+  background: var(--bg-card);
+  border: 0.1rem solid var(--border-default); /* 1px */
   border-radius: 1.4rem; /* 14px */
 }
 
 .filtroCount {
-  color: #64748b;
+  color: var(--text-secondary);
   font-size: 0.95rem;
 }
 
 .relatoriosTableWrapper {
   overflow-x: auto;
-  background: white;
-  border: 0.1rem solid #e2e8f0; /* 1px */
+  background: var(--bg-card);
+  border: 0.1rem solid var(--border-default); /* 1px */
   border-radius: 1.4rem; /* 14px */
   padding: 1.6rem; /* 16px */
 }
@@ -144,19 +144,19 @@
 }
 
 .relatoriosTable th {
-  background: #f8fafc;
-  color: #0f172a;
+  background: var(--bg-surface);
+  color: var(--text-primary);
   font-weight: 700;
 }
 
 .relatoriosTable tbody tr:hover {
-  background: #f1f5f9;
+  background: var(--bg-main);
 }
 
 .semResultados {
   text-align: center;
   padding: 2.8rem 0; /* 28px */
-  color: #64748b;
+  color: var(--text-secondary);
 }
 
 @media (max-width: 900px) { /* 900px */

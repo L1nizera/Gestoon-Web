@@ -55,11 +55,11 @@
 /* animação quando passa ou clica */
 
 .loginBox input:hover{
-  border-color: var(--primary);
+  border-color: var(--color-primary);
 }
 
 .loginBox input:focus{
-  border-color: var(--primary);
+  border-color: var(--color-primary);
   box-shadow:0 0 0.5rem rgba(37,99,235,0.4); /* 5px */
 }
 
@@ -68,7 +68,7 @@
 .button{
   width:100%;
   padding:1.2rem; /* 12px */
-  background: var(--primary);
+  background: var(--button-primary-bg);
   color: var(--bg-card);
   border:none;
   border-radius:0.6rem; /* 6px */
@@ -80,7 +80,7 @@
 /* hover botão */
 
 .button:hover{
-  background: var(--primary-hover);
+  background: var(--button-primary-hover);
   transform: translateY(-0.2rem); /* -2px */
   box-shadow:0 0.6rem 1.5rem rgba(0,0,0,0.2); /* 6px 15px */
 }
@@ -108,7 +108,7 @@
 .filtrosAvancados select{
   padding:0.6rem; /* 6px */
   border-radius:0.6rem; /* 6px */
-  border:0.1rem solid #ccc; /* 1px */
+  border:0.1rem solid var(--border-default); /* 1px */
 }
 
 .tabelaContainer{
