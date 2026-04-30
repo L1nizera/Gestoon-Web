@@ -96,14 +96,14 @@
   padding: 1rem 1.5rem;
   border: none;
   border-radius: 0.8rem;
-  background: var(--sidebar-bg);
+  background: var(--color-slate-600);
   transition: all 0.2s ease;
   color: white;
   cursor: pointer;
 }
 
 .btnFoto:hover {
-  background: #334155;
+  background: var(--color-slate-700);
   transform: translateY(-2px);
   box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15);
 }

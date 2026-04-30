@@ -10,14 +10,15 @@
   --color-gray-200: #e2e8f0;
   --color-gray-300: #cbd5e1;
   --color-gray-400: #94a3b8;
-  --color-gray-900: #0f172a;
+  --color-gray-900: #334155;
 
   /* SLATE (base estrutural) */
-  --color-slate-900: #020617;
+  --color-slate-900: #334155;
   --color-slate-800: #0b1220;
   --color-slate-700: #1e293b;
   --color-slate-600: #334155;
   --color-slate-500: #475569;
+  
 
   /* ================= 🔵 PRIMARY (ENERGIA) ================= */
   --color-primary-100: #e0f2fe;
