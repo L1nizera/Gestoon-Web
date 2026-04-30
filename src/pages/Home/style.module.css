@@ -510,6 +510,8 @@ select {
   border: 0.1rem solid var(--border-default);
 }
 
+
+
 .tabela thead th {
   position: sticky;
   top: 0;

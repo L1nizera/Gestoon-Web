@@ -1,25 +1,51 @@
-
 import { useMemo, useState } from "react";
 import { tasks } from "../../data/Tasks";
-import styles from "./style.module.css";
+import styles from "../Home/style.module.css";
 
 const funcionariosMock = [
   { id: 1, nome: "João Silva", cargo: "Supervisor", dataCriacao: "10/03/2026" },
   { id: 2, nome: "Maria Souza", cargo: "Caixa", dataCriacao: "22/02/2026" },
-  { id: 3, nome: "Carlos Mendes", cargo: "Motorista", dataCriacao: "05/01/2026" },
+  {
+    id: 3,
+    nome: "Carlos Mendes",
+    cargo: "Motorista",
+    dataCriacao: "05/01/2026",
+  },
   { id: 4, nome: "Ana Oliveira", cargo: "Analista", dataCriacao: "18/03/2026" },
   { id: 5, nome: "Bruno Rocha", cargo: "Auxiliar", dataCriacao: "30/01/2026" },
   { id: 6, nome: "Fernanda Lima", cargo: "Gerente", dataCriacao: "12/02/2026" },
-  { id: 7, nome: "Ricardo Alves", cargo: "Repositor", dataCriacao: "25/03/2026" },
-  { id: 8, nome: "Juliana Costa", cargo: "Atendente", dataCriacao: "08/01/2026" },
-  { id: 9, nome: "Paulo Henrique", cargo: "Coordenador", dataCriacao: "14/02/2026" },
-  { id: 10, nome: "Camila Santos", cargo: "Auxiliar de Limpeza", dataCriacao: "27/03/2026" },
+  {
+    id: 7,
+    nome: "Ricardo Alves",
+    cargo: "Repositor",
+    dataCriacao: "25/03/2026",
+  },
+  {
+    id: 8,
+    nome: "Juliana Costa",
+    cargo: "Atendente",
+    dataCriacao: "08/01/2026",
+  },
+  {
+    id: 9,
+    nome: "Paulo Henrique",
+    cargo: "Coordenador",
+    dataCriacao: "14/02/2026",
+  },
+  {
+    id: 10,
+    nome: "Camila Santos",
+    cargo: "Auxiliar de Limpeza",
+    dataCriacao: "27/03/2026",
+  },
 ];
 
 function Relatorios() {
   const [nomeFiltro, setNomeFiltro] = useState("");
   const [cargoFiltro, setCargoFiltro] = useState("");
   const [dataFiltro, setDataFiltro] = useState("");
+  const [ordemNome, setOrdemNome] = useState(null);
+  const cargos = [...new Set(funcionariosMock.map((f) => f.cargo))];
 
   const listaFiltrada = useMemo(() => {
     return funcionariosMock
@@ -45,10 +71,16 @@ function Relatorios() {
         };
       })
       .filter((funcionario) => {
-        const nomeMatch = funcionario.nome.toLowerCase().includes(nomeFiltro.toLowerCase());
-        const cargoMatch = funcionario.cargo.toLowerCase().includes(cargoFiltro.toLowerCase());
+        const nomeMatch = funcionario.nome
+          .toLowerCase()
+          .includes(nomeFiltro.toLowerCase());
+
+        const cargoMatch = cargoFiltro
+          ? funcionario.cargo === cargoFiltro
+          : true;
 
         let dataMatch = true;
+
         if (dataFiltro) {
           const [dia, mes, ano] = funcionario.dataCriacao.split("/");
           const dataFuncionario = new Date(`${ano}-${mes}-${dia}`);
@@ -57,8 +89,15 @@ function Relatorios() {
         }
 
         return nomeMatch && cargoMatch && dataMatch;
+      })
+      .sort((a, b) => {
+        if (!ordemNome) return 0;
+
+        return ordemNome === "az"
+          ? a.nome.localeCompare(b.nome)
+          : b.nome.localeCompare(a.nome);
       });
-  }, [nomeFiltro, cargoFiltro, dataFiltro]);
+  }, [nomeFiltro, cargoFiltro, dataFiltro, ordemNome]);
 
   function limparFiltros() {
     setNomeFiltro("");
@@ -67,98 +106,115 @@ function Relatorios() {
   }
 
   function handleExport() {
-    alert("Exportar relatório: funcionalidade visual pronta para integração futura.");
+    alert(
+      "Exportar relatório: funcionalidade visual pronta para integração futura.",
+    );
   }
 
   return (
-    <div className={styles.relatoriosPage}>
-      <div className={styles.relatoriosHeader}>
-        <div>
-          <p className={styles.relatoriosLabel}>Relatórios</p>
-          <h1>Relatório de Funcionários</h1>
-          <p className={styles.relatoriosSubtitle}>
-            Acompanhe o cadastro dos colaboradores, incluindo tarefas concluídas e não concluídas.
-          </p>
-        </div>
+    <div className={styles.dashboard}>
+      <div className={styles.cardContainer}>
+        {/* HEADER */}
+        <h1>Relatório de Funcionários</h1>
 
-        <button className={styles.relatoriosExportButton} type="button" onClick={handleExport}>
-          Exportar relatório
-        </button>
-      </div>
-
-      <section className={styles.relatoriosFiltros}>
-        <div className={styles.filtroCard}>
-          <label htmlFor="nomeFiltro">Nome</label>
+        <div className={styles.topActions}>
           <input
-            id="nomeFiltro"
-            type="text"
+            className={styles.busca}
+            placeholder="Buscar funcionário..."
             value={nomeFiltro}
-            onChange={(event) => setNomeFiltro(event.target.value)}
-            placeholder="Buscar por nome"
+            onChange={(e) => setNomeFiltro(e.target.value)}
           />
         </div>
 
-        <div className={styles.filtroCard}>
-          <label htmlFor="cargoFiltro">Cargo</label>
-          <input
-            id="cargoFiltro"
-            type="text"
-            value={cargoFiltro}
-            onChange={(event) => setCargoFiltro(event.target.value)}
-            placeholder="Buscar por cargo"
-          />
-        </div>
+        {/* FILTROS */}
+        <div className={styles.filtrosAvancados}>
+          <div>
+            <small>Cargo:</small>
+            <select
+              value={cargoFiltro}
+              onChange={(e) => setCargoFiltro(e.target.value)}
+            >
+              <option value="">Todos</option>
 
-        <div className={styles.filtroCard}>
-          <label htmlFor="dataFiltro">Data de cadastro</label>
-          <input
-            id="dataFiltro"
-            type="date"
-            value={dataFiltro}
-            onChange={(event) => setDataFiltro(event.target.value)}
-          />
-        </div>
+              {cargos.map((cargo) => (
+                <option key={cargo} value={cargo}>
+                  {cargo}
+                </option>
+              ))}
+            </select>
+          </div>
 
-        <div className={styles.filtroActions}>
-          <button type="button" className={styles.btnSecondary} onClick={limparFiltros}>
-            Limpar filtros
+          <div>
+            <small>Data:</small>
+            <input
+              type="date"
+              value={dataFiltro}
+              onChange={(e) => setDataFiltro(e.target.value)}
+            />
+          </div>
+        </div>
+        
+        {/* AÇÕES */}
+        <div className={styles.acoes}>
+          <button className={styles.btnSecondary} onClick={limparFiltros}>
+            Limpar Filtros
           </button>
-          <span className={styles.filtroCount}>{listaFiltrada.length} funcionário(s) encontrados</span>
-        </div>
-      </section>
 
-      <section className={styles.relatoriosTableWrapper}>
-        <table className={styles.relatoriosTable}>
-          <thead>
-            <tr>
-              <th>Nome</th>
-              <th>Cargo</th>
-              <th>Data de cadastro</th>
-              <th>Concluídas</th>
-              <th>Não concluídas</th>
-            </tr>
-          </thead>
-          <tbody>
-            {listaFiltrada.length > 0 ? (
-              listaFiltrada.map((funcionario) => (
-                <tr key={funcionario.id}>
-                  <td>{funcionario.nome}</td>
-                  <td>{funcionario.cargo}</td>
-                  <td>{funcionario.dataCriacao}</td>
-                  <td>{funcionario.concluidas}</td>
-                  <td>{funcionario.naoConcluidas}</td>
-                </tr>
-              ))
-            ) : (
+          <span>{listaFiltrada.length} encontrados</span>
+        </div>
+
+        {/* TABELA */}
+        <div className={`${styles.tabelaContainer} ${styles.desktopOnly}`}>
+          <table className={styles.tabela}>
+            <thead>
               <tr>
-                <td colSpan="5" className={styles.semResultados}>
-                  Nenhum funcionário encontrado com os filtros aplicados.
-                </td>
+                <th
+                  onClick={() =>
+                    setOrdemNome((prev) => {
+                      if (prev === null) return "az";
+                      if (prev === "az") return "za";
+                      return null;
+                    })
+                  }
+                >
+                  Nome{" "}
+                  {ordemNome === "az" ? "↑" : ordemNome === "za" ? "↓" : ""}
+                </th>
+                <th className={styles.textCenter}>Cargo</th>
+                <th className={styles.textCenter}>Data</th>
+                <th className={styles.textCenter}>Concluídas</th>
+                <th className={styles.textCenter}>Pendentes</th>
               </tr>
-            )}
-          </tbody>
-        </table>
-      </section>
+            </thead>
+
+            <tbody>
+              {listaFiltrada.length > 0 ? (
+                listaFiltrada.map((f) => (
+                  <tr key={f.id}>
+                    <td>{f.nome}</td>
+                    <td className={styles.textCenter}>{f.cargo}</td>
+                    <td className={styles.textCenter}>{f.dataCriacao}</td>
+                    <td className={styles.textCenter}>{f.concluidas}</td>
+                    <td className={styles.textCenter}>{f.naoConcluidas}</td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="5" className={styles.textCenter}>
+                    Nenhum resultado encontrado
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        <div className={styles.footerActions}>
+          <button className={styles.exportBtn} onClick={handleExport}>
+            Exportar Relatório
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

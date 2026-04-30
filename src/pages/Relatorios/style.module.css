@@ -1,182 +1,158 @@
-.relatoriosPage {
+.dashboard {
   display: flex;
   flex-direction: column;
-  gap: 2.4rem; /* 24px */
-  padding: 2rem; /* 20px */
-  background: var(--bg-card);
-  border-radius: 1.2rem; /* 12px */
-  min-height: 100%;
+  gap: 2rem;
+  padding: 2rem;
 }
 
-.relatoriosHeader {
+/* HEADER */
+.header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  gap: 2rem; /* 20px */
+  margin-bottom: 0.5rem;
+}
+
+.footerActions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 1.5rem;
+}
+
+.topActions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
   flex-wrap: wrap;
 }
 
-.relatoriosLabel {
-  display: inline-block;
-  margin-bottom: 0.8rem; /* 8px */
-  font-size: 0.9rem;
+.busca {
+  flex: 1;
+  min-width: 220px;
+}
+
+.label {
+  font-size: 0.85rem;
   color: var(--text-secondary);
   text-transform: uppercase;
-  letter-spacing: 0.08em;
 }
 
-.relatoriosHeader h1 {
-  margin-bottom: 0.8rem; /* 8px */
-  font-size: clamp(1.8rem, 2vw, 2.4rem);
-  color: var(--text-primary);
-}
-
-.relatoriosSubtitle {
+.subtitle {
   color: var(--text-secondary);
-  line-height: 1.6;
-  max-width: 64rem; /* 640px */
+  max-width: 600px;
 }
 
-.relatoriosExportButton,
-.btnSecondary {
-  border: none;
-  border-radius: 1rem; /* 10px */
-  padding: 1.2rem 1.8rem; /* 12px 18px */
-  font-weight: 600;
-  cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
-}
-
-.relatoriosExportButton {
+/* BOTÃO */
+.exportBtn {
   background: var(--button-primary-bg);
-  color: var(--color-white);
-  min-width: 18rem; /* 180px */
+  color: white;
+  padding: 1rem 1.6rem;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
 }
 
-.relatoriosExportButton:hover {
-  transform: translateY(-0.1rem); /* -1px */
-  box-shadow: 0 1.2rem 2.2rem rgba(2, 132, 199, 0.18); /* 12px 22px */
+/* FILTROS */
+.filtros {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr auto;
+  gap: 1rem;
+  align-items: end;
+}
+
+.filtroActions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+
+  background: var(--bg-card);
+  padding: 0.8rem 1rem;
+  border-radius: 10px;
+  border: 1px solid var(--border-default);
+}
+
+.filtroCard input {
+  padding: 0.7rem;
+  border-radius: 8px;
+  border: 1px solid var(--border-default);
+  background: var(--bg-surface);
 }
 
 .btnSecondary {
+  height: 42px;
+  padding: 0 1.2rem;
+  border-radius: 8px;
+  border: 1px solid var(--border-default);
   background: var(--bg-card);
-  color: var(--text-primary);
-  border: 0.1rem solid var(--border-default); /* 1px */
-}
-
-.btnSecondary:hover {
-  background: var(--bg-main);
-}
-
-.relatoriosFiltros {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(22rem, 1fr)); /* 220px */
-  gap: 1.6rem; /* 16px */
-  align-items: end;
+  cursor: pointer;
+  white-space: nowrap;
 }
 
 .filtroCard {
   display: flex;
   flex-direction: column;
-  gap: 0.8rem; /* 8px */
-  padding: 1.8rem; /* 18px */
+  gap: 0.4rem;
   background: var(--bg-card);
-  border: 0.1rem solid var(--border-default); /* 1px */
-  border-radius: 1.4rem; /* 14px */
-}
-
-.filtroCard label {
-  color: var(--text-primary);
-  font-size: 0.95rem;
-  font-weight: 600;
+  padding: 1rem;
+  border-radius: 10px;
+  border: 1px solid var(--border-default);
 }
 
 .filtroCard input {
-  width: 100%;
-  padding: 1rem 1.2rem; /* 10px 12px */
-  border: 0.1rem solid var(--border-default); /* 1px */
-  border-radius: 1rem; /* 10px */
-  background: var(--bg-surface);
-  color: var(--text-primary);
+  padding: 0.6rem;
+  border-radius: 6px;
+  border: 1px solid var(--border-default);
 }
 
-.filtroCard input:focus {
-  outline: none;
-  border-color: var(--color-primary);
-  background: var(--bg-card);
-}
-
+/* AÇÕES */
 .filtroActions {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  gap: 1.6rem; /* 16px */
-  padding: 1.8rem; /* 18px */
+  justify-content: space-between;
   background: var(--bg-card);
-  border: 0.1rem solid var(--border-default); /* 1px */
-  border-radius: 1.4rem; /* 14px */
+  padding: 1rem;
+  border-radius: 10px;
+  border: 1px solid var(--border-default);
 }
 
-.filtroCount {
-  color: var(--text-secondary);
-  font-size: 0.95rem;
-}
-
-.relatoriosTableWrapper {
-  overflow-x: auto;
+/* TABELA */
+.tabelaContainer {
+  margin-top: 16px;
   background: var(--bg-card);
-  border: 0.1rem solid var(--border-default); /* 1px */
-  border-radius: 1.4rem; /* 14px */
-  padding: 1.6rem; /* 16px */
+  border-radius: 12px;
+  overflow: hidden;
+  max-height: 400px;
 }
 
-.relatoriosTable {
+.tabela {
   width: 100%;
   border-collapse: collapse;
-  min-width: 64rem; /* 640px */
 }
 
-.relatoriosTable th,
-.relatoriosTable td {
-  padding: 1.4rem 1.6rem; /* 14px 16px */
-  text-align: left;
-  border-bottom: 0.1rem solid #e2e8f0; /* 1px */
+.tabela thead {
+  background: var(--color-gray-900);
+  color: var(--text-on-dark);
+  position: sticky;
+  top: 0;
 }
 
-.relatoriosTable th {
+.tabela tr:nth-child(even) {
   background: var(--bg-surface);
-  color: var(--text-primary);
-  font-weight: 700;
 }
 
-.relatoriosTable tbody tr:hover {
+.tabela td {
+  padding: 1rem;
+  border-bottom: 1px solid #eee;
+}
+
+.tabela tr:hover {
   background: var(--bg-main);
 }
 
-.semResultados {
+.textCenter {
   text-align: center;
-  padding: 2.8rem 0; /* 28px */
-  color: var(--text-secondary);
 }
 
-@media (max-width: 900px) { /* 900px */
-  .relatoriosFiltros {
-    grid-template-columns: repeat(2, minmax(22rem, 1fr));
-  }
-}
 
-@media (max-width: 700px) { /* 700px */
-  .relatoriosHeader {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .relatoriosFiltros {
-    grid-template-columns: 1fr;
-  }
-
-  .filtroActions {
-    flex-direction: column;
-    align-items: stretch;
-  }
-}
