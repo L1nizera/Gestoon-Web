@@ -27,7 +27,6 @@ body {
   }
 }
 
-
 @keyframes fadeSlideIn {
   from {
     opacity: 0;
@@ -64,7 +63,6 @@ body {
   }
 }
 
-
 .filtrosAvancados {
   display: flex;
   gap: 1.5rem;
@@ -91,19 +89,22 @@ body {
   align-items: left;
   padding: 0.8rem 1rem;
   border-radius: 0.8rem;
-  border: 0.15rem solid var(--border);
+  border: 0.15rem solid rgba(0, 0, 0, 0.25);
   font-size: 1.4rem;
-  background: var(--bg-card);
-  transition: all 0.3s ease;
-  box-shadow: 0 0.2rem 0.4rem rgba(0, 0, 0, 0.05);
+  background: rgba(255, 255, 255, 0.03);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.02);
+  transition: all 0.25s ease;
 }
 
 .filtrosAvancados input:focus,
 .filtrosAvancados select:focus {
   outline: none;
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 0.3rem rgba(37, 99, 235, 0.2), 0 0.4rem 0.8rem rgba(0, 0, 0, 0.1);
-  transform: scale(1.02);
+  box-shadow:
+    0 0 0 0.25rem rgba(37, 99, 235, 0.25),
+    0 0.4rem 1rem rgba(0, 0, 0, 0.15);
+
+  transform: translateY(-1px);
 }
 
 .filtrosAvancados input:hover,
@@ -135,9 +136,8 @@ select {
   }
 }
 
-
 /* cada bloco (período, mês, setor) */
-.filtrosAvancados>div {
+.filtrosAvancados > div {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
@@ -158,7 +158,6 @@ select {
   font-weight: 500;
   transition: 0.2s;
 }
-
 
 .filtros button:hover {
   background: var(--button-secondary-hover);
@@ -256,7 +255,6 @@ select {
   }
 }
 
-
 /* botões */
 
 .footerActions {
@@ -270,7 +268,6 @@ select {
     justify-content: right;
   }
 }
-
 
 .limparBtn {
   background: var(--button-secondary-bg);
@@ -307,7 +304,6 @@ select {
   width: auto;
 }
 
-
 .acoes {
   display: flex;
   justify-content: space-between;
@@ -332,7 +328,6 @@ select {
     width: 40%;
   }
 }
-
 
 .criarBtn:active {
   background: var(--button-success-bg);
@@ -364,7 +359,11 @@ select {
 }
 
 .resumo div {
-  background: linear-gradient(135deg, var(--color-slate-900), var(--color-gray-900));
+  background: linear-gradient(
+    135deg,
+    var(--color-slate-900),
+    var(--color-gray-900)
+  );
   color: var(--color-white);
   padding: 1.4rem;
   border-radius: 1rem;
@@ -383,7 +382,8 @@ select {
   width: 30rem;
   padding: 1rem 1.2rem;
   border-radius: 0.8rem;
-  border: 0.1rem solid var(--border-default);
+  border: 0.15rem solid rgba(0, 0, 0, 0.25);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.02);
   font-size: 1.3rem;
   transition: all 0.2s ease;
 }
@@ -489,6 +489,7 @@ select {
   overflow-x: auto;
   background: var(--bg-card);
   margin-top: 1.5rem;
+  scrollbar-gutter: stable;
 }
 
 @media (max-width: 768px) {
@@ -503,14 +504,11 @@ select {
   }
 }
 
-
 .tabelascroll {
   border-radius: 1.2rem;
   overflow: hidden;
   border: 0.1rem solid var(--border-default);
 }
-
-
 
 .tabela thead th {
   position: sticky;
@@ -519,13 +517,22 @@ select {
 }
 
 .tabelaContainer::-webkit-scrollbar {
-  height: 0.8rem;
-  width: 0.8rem;
+  height: 0.9rem;
+  width: 0.9rem;
 }
 
 .tabelaContainer::-webkit-scrollbar-thumb {
-  background: var(--color-slate-400);
+  background: var(--color-slate-500);
   border-radius: 1rem;
+}
+
+.tabelaContainer::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.08);
+  border-radius: 1rem;
+}
+
+.tabelaContainer::-webkit-scrollbar-thumb:hover {
+  background: var(--color-slate-700);
 }
 
 /* ==== Gráfico ==== */
@@ -550,7 +557,6 @@ select {
     font-size: 1.4rem;
   }
 }
-
 
 .grafico:hover {
   transform: scale(1.01);
@@ -627,17 +633,20 @@ select {
   animation: pulse;
 }
 
-
 /* ===== ANIMAÇÕES GERAIS ===== */
 
 .tabela tr {
   cursor: pointer;
-  transition: background 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    background 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .tabela tr:hover {
   background: var(--color-gray-200);
-  box-shadow: inset 0.4rem 0 0 var(--color-primary), inset -0.4rem 0 0 var(--color-primary);
+  box-shadow:
+    inset 0.4rem 0 0 var(--color-primary),
+    inset -0.4rem 0 0 var(--color-primary);
 }
 
 @keyframes fadeIn {
@@ -670,7 +679,6 @@ button:focus,
 th:focus {
   outline: none;
 }
-
 
 .btnPrimary {
   background: var(--button-primary-bg);
@@ -742,20 +750,42 @@ th:focus {
   justify-content: center;
 }
 
-
 .modalHeader {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
   margin-bottom: 1.5rem;
   gap: 1rem;
+  border-bottom: 0.1rem solid var(--border-default);
+  padding-bottom: 1rem;
+  margin-bottom: 1.4rem;
 }
 
 .modalHeader h2 {
-  font-size: 1.8rem;
-  line-height: 1.3;
-  word-break: break-word;
-  max-width: 80%;
+  font-size: 2.4rem;
+  font-weight: 700;
+
+  color: var(--text-primary);
+
+  margin-bottom: 0.8rem;
+  letter-spacing: 0.02rem;
+
+  /* 🔥 destaque real */
+  position: relative;
+  padding-left: 1rem;
+}
+
+.modalHeader h2::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.4rem;
+
+  width: 0.4rem;
+  height: 70%;
+
+  background: var(--color-primary);
+  border-radius: 1rem;
 }
 
 @media (max-width: 768px) {
@@ -770,12 +800,11 @@ th:focus {
   }
 }
 
-
 .modalGrid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1.5rem;
-  margin-bottom: 1.5rem;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.2rem 2rem; /* mais respiro */
+  margin-bottom: 1rem;
 }
 
 @media (max-width: 768px) {
@@ -784,27 +813,61 @@ th:focus {
   }
 }
 
+.modalGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.4rem 2rem;
+  margin-bottom: 1.4rem;
+  padding-bottom: 1rem;
+  border-bottom: 0.1rem solid var(--border-default);
+  margin-top: 0.5rem;
+}
 
 .modalGrid div {
   display: flex;
   flex-direction: column;
+  gap: 0.3rem;
+  border-bottom: none;
 }
 
 .modalGrid strong {
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   color: var(--text-secondary);
+  font-weight: 500;
+  opacity: 0.65;
 }
 
 .modalGrid p {
-  margin: 0.2rem 0 0;
-  font-size: 1.4rem;
+  margin: 0;
+  font-size: 1.45rem;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.descricaoArea {
+  margin-top: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.descricaoArea strong {
+  display: block;
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+  margin-bottom: 0.6rem;
 }
 
 .descricaoBox {
-  background: var(--bg-main);
+  background: var(--bg-surface);
+  border: 0.1rem solid var(--border-default);
   padding: 1.2rem;
   border-radius: 0.8rem;
-  margin-bottom: 1.5rem;
+}
+
+.descricaoBox p {
+  margin: 0;
+  font-size: 1.4rem;
+  color: var(--text-primary);
 }
 
 .formGroup {
@@ -812,7 +875,6 @@ th:focus {
   flex-direction: column;
   margin-bottom: 1.2rem;
 }
-
 
 .formGroup.full {
   grid-column: span 2;
@@ -822,6 +884,57 @@ th:focus {
   font-size: 1.2rem;
   margin-bottom: 0.4rem;
   color: var(--text-secondary);
+  font-weight: 500;
+  opacity: 0.85;
+}
+
+.formGroup input,
+.formGroup select,
+.formGroup textarea {
+  width: 100%;
+  padding: 0.9rem 1rem;
+
+  border-radius: 0.8rem;
+
+  /* MAIS VISÍVEL */
+  border: 0.15rem solid rgba(0, 0, 0, 0.25);
+
+  background: rgba(255, 255, 255, 0.03);
+
+  font-size: 1.4rem;
+
+  transition: all 0.25s ease;
+}
+
+.formGroup input:hover,
+.formGroup select:hover,
+.formGroup textarea:hover {
+  border-color: var(--text-secondary);
+}
+
+.formGroup input:focus,
+.formGroup select:focus,
+.formGroup textarea:focus {
+  outline: none;
+
+  border-color: var(--color-primary);
+
+  box-shadow:
+    0 0 0 0.25rem rgba(37, 99, 235, 0.25),
+    0 0.4rem 1rem rgba(0, 0, 0, 0.15);
+
+  transform: translateY(-1px);
+}
+
+.formGroup input:disabled {
+  background: rgba(0, 0, 0, 0.05);
+  color: var(--text-secondary);
+  cursor: not-allowed;
+}
+
+.formGroup textarea {
+  resize: none; /* remove aquelas linhas e o puxar */
+  min-height: 120px;
 }
 
 .filtrosAvancados,
@@ -885,7 +998,6 @@ th:focus {
     font-size: 1rem;
   }
 }
-
 
 .cardBody p {
   margin: 4px 0;
