@@ -68,39 +68,51 @@
 .link {
   display: block;
   color: var(--sidebar-text);
-  background: var(--sidebar-hover);
+  background: rgba(255, 255, 255, 0.04);
   padding: 10px 12px;
-  border-radius: 5px;
+  border-radius: 8px;
   margin-bottom: 8px;
   text-decoration: none;
-  transition: 0.3s;
   font-size: 1.25rem;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  transition: all 0.25s ease;
 }
 
 .link:hover {
-  background: var(--sidebar-active);
+  background: rgba(37, 99, 235, 0.16);
+  border-color: rgba(37, 99, 235, 0.35);
+  transform: translateX(4px);
+  box-shadow: inset 4px 0 0 var(--primary);
 }
+
 
 /* ATIVO */
 .active {
-  background: var(--sidebar-active);
-  font-weight: bold;
-  border-left: 4px solid var(--primary);
+  background: rgba(37, 99, 235, 0.22);
+  border-color: rgba(37, 99, 235, 0.55);
+  color: var(--color-white);
+  box-shadow:
+    inset 4px 0 0 var(--primary),
+    0 0.4rem 1rem rgba(37, 99, 235, 0.12);
+  font-weight: 600;
 }
 
 /* BOTÃO SAIR */
 .logoutBtn {
-  background: var(--sidebar-hover);
+  background: rgba(255, 255, 255, 0.04);
   color: var(--sidebar-text);
   padding: 8px 10px;
-  border-radius: 5px;
-  border: none;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.04);
   cursor: pointer;
-  transition: 0.3s;
+  transition: all 0.25s ease;
 }
 
 .logoutBtn:hover {
-  background: var(--sidebar-active);
+  background: rgba(37, 99, 235, 0.16);
+  border-color: rgba(37, 99, 235, 0.35);
+  transform: translateX(4px);
+  box-shadow: inset 4px 0 0 var(--primary);
 }
 
 @media (max-width: 768px) {
@@ -144,11 +156,6 @@
 
   .menu li {
     width: 100%;
-  }
-
-  .link {
-    padding: 12px 14px;
-    font-size: 1.4rem;
   }
 
   .logoutBtn {

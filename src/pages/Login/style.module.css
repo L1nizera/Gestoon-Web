@@ -1,86 +1,65 @@
-/* fundo da página */
-
 .loginContainer {
   display: flex;
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  height: 100vh;
+  min-height: 100vh;
   background: var(--bg-main);
-  overflow:hidden;
-}
-
-/* titulo do sistema */
-
-.logo{
-  color: var(--text-primary);
-  font-size: 4.8rem; /* 48px */
-  margin-bottom: 3rem; /* 30px */
-  letter-spacing: 0.4rem; /* 3px */
-  text-shadow: 0 0.5rem 1rem rgba(0,0,0,0.3);
-  font-weight: bold;
+  overflow: hidden;
 }
 
 .logo {
+  color: var(--text-primary);
+  font-size: 4.8rem;
+  margin-bottom: 3rem;
+  letter-spacing: 0.4rem;
+  text-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.3);
+  font-weight: bold;
   animation: fadeUp 0.8s ease;
 }
 
-@keyframes fadeUp {
-  from {
-    opacity: 0.3;
-    transform: translateY(3.5rem);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* caixa do login */
-
 .loginBox {
   background: var(--bg-card);
-  padding: 4rem; /* 40px */
-  border-radius: 1.2rem; /* 12px */
-  width: 32rem; /* 320px */
-  border: solid 0.1rem var(--border); /* 1px */
-  box-shadow: 0rem 1rem 2.5rem rgba(0,0,0,0.2); /* 0 10px 25px */
-  display:flex;
-  flex-direction:column;
+  padding: 4rem;
+  border-radius: 1.2rem;
+  width: 32rem;
+  border: 0.1rem solid var(--border);
+  box-shadow: 0 1rem 2.5rem rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  animation: fadeUp 0.8s ease;
 }
 
-/* titulo login */
-
-.loginBox h2{
-  text-align:center;
-  margin-bottom:2.5rem; /* 25px */
+.loginBox h2 {
+  text-align: center;
+  margin-bottom: 2.5rem;
+  color: var(--text-primary);
 }
 
-/* inputs */
-
-.loginBox input{
-  width:100%;
-  padding:1.2rem; /* 12px */
-  margin-bottom:1.5rem; /* 15px */
-  border-radius:0.6rem; /* 6px */
-  border:0.1rem solid var(--border); /* 1px */
-  outline:none;
+.loginBox input {
+  width: 100%;
+  padding: 1.2rem;
+  margin-bottom: 1.5rem;
+  border-radius: 0.8rem;
+  border: 0.15rem solid rgba(0, 0, 0, 0.25);
+  outline: none;
   transition: all 0.25s ease;
   background: var(--bg-main);
+  color: var(--text-primary);
 }
 
-/* animação quando passa ou clica */
-
-.loginBox input:hover{
-  border-color: var(--color-primary);
-  transform: translateY(-0.2rem); /* -2px */
+.loginBox input:hover {
+  border-color: var(--text-secondary);
+  transform: translateY(-0.15rem);
 }
 
-.loginBox input:focus{
+.loginBox input:focus {
   border-color: var(--color-primary);
-  box-shadow:0 0 0.5rem rgba(37,99,235,0.4); /* 5px */
-
-  transform: scale(1.02);
+  background: var(--bg-card);
+  box-shadow:
+    0 0 0 0.3rem rgba(37, 99, 235, 0.25),
+    0 0.6rem 1.2rem rgba(0, 0, 0, 0.12);
+  transform: translateY(-0.2rem) scale(1.02);
 }
 
 .loginBox input::placeholder {
@@ -90,11 +69,30 @@
 }
 
 .loginBox input:focus::placeholder {
-  opacity: 0.5;
+  opacity: 0.45;
 }
 
-.loginBox {
-  animation: fadeUp 0.8s ease;
+.button {
+  width: 100%;
+  padding: 1.2rem;
+  background: var(--button-primary-bg);
+  color: var(--color-white);
+  border: none;
+  border-radius: 0.8rem;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.25s ease;
+}
+
+.button:hover {
+  background: var(--button-primary-hover);
+  transform: translateY(-0.2rem);
+  box-shadow: 0 0.6rem 1.5rem rgba(0, 0, 0, 0.2);
+}
+
+.button:active {
+  transform: scale(0.97);
+  box-shadow: none;
 }
 
 @keyframes fadeUp {
@@ -102,69 +100,9 @@
     opacity: 0.3;
     transform: translateY(3.5rem);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
   }
-}
-
-/* botão */
-
-.button{
-  width:100%;
-  padding:1.2rem; /* 12px */
-  background: var(--button-primary-bg);
-  color: var(--bg-card);
-  border:none;
-  border-radius:0.6rem; /* 6px */
-  cursor:pointer;
-  font-weight:bold;
-  transition: all 0.25s ease;
-}
-
-/* hover botão */
-
-.button:hover{
-  background: var(--button-primary-hover);
-  transform: translateY(-0.2rem); /* -2px */
-  box-shadow:0 0.6rem 1.5rem rgba(0,0,0,0.2); /* 6px 15px */
-}
-
-/* click botão */
-
-.button:active{
-  transform: translateY(0rem);
-  box-shadow:none;
-}
-
-.filtrosAvancados{
-  display:flex;
-  gap:2rem; /* 20px */
-  margin-bottom:1.5rem; /* 15px */
-}
-
-.filtrosAvancados label{
-  display:block;
-  font-size:1.2rem; /* 12px */
-  margin-bottom:0.5rem; /* 5px */
-}
-
-.filtrosAvancados input,
-.filtrosAvancados select{
-  padding:0.6rem; /* 6px */
-  border-radius:0.6rem; /* 6px */
-  border:0.1rem solid var(--border-default); /* 1px */
-}
-
-.tabelaContainer{
-  max-height: 40rem; /* 400px */
-  overflow-y: auto;
-  border-radius:1.2rem; /* 12px */
-  box-shadow:0 0.5rem 1.5rem rgba(0,0,0,0.1); /* 5px 15px */
-}
-
-.tabela th{
-  position: sticky;
-  top: 0;
-  z-index: 10;
 }

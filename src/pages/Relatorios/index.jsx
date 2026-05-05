@@ -5,39 +5,14 @@ import styles from "../Home/style.module.css";
 const funcionariosMock = [
   { id: 1, nome: "João Silva", cargo: "Supervisor", dataCriacao: "10/03/2026" },
   { id: 2, nome: "Maria Souza", cargo: "Caixa", dataCriacao: "22/02/2026" },
-  {
-    id: 3,
-    nome: "Carlos Mendes",
-    cargo: "Motorista",
-    dataCriacao: "05/01/2026",
-  },
+  { id: 3, nome: "Carlos Mendes", cargo: "Motorista", dataCriacao: "05/01/2026" },
   { id: 4, nome: "Ana Oliveira", cargo: "Analista", dataCriacao: "18/03/2026" },
   { id: 5, nome: "Bruno Rocha", cargo: "Auxiliar", dataCriacao: "30/01/2026" },
   { id: 6, nome: "Fernanda Lima", cargo: "Gerente", dataCriacao: "12/02/2026" },
-  {
-    id: 7,
-    nome: "Ricardo Alves",
-    cargo: "Repositor",
-    dataCriacao: "25/03/2026",
-  },
-  {
-    id: 8,
-    nome: "Juliana Costa",
-    cargo: "Atendente",
-    dataCriacao: "08/01/2026",
-  },
-  {
-    id: 9,
-    nome: "Paulo Henrique",
-    cargo: "Coordenador",
-    dataCriacao: "14/02/2026",
-  },
-  {
-    id: 10,
-    nome: "Camila Santos",
-    cargo: "Auxiliar de Limpeza",
-    dataCriacao: "27/03/2026",
-  },
+  { id: 7, nome: "Ricardo Alves", cargo: "Repositor", dataCriacao: "25/03/2026" },
+  { id: 8, nome: "Juliana Costa", cargo: "Atendente", dataCriacao: "08/01/2026" },
+  { id: 9, nome: "Paulo Henrique", cargo: "Coordenador", dataCriacao: "14/02/2026" },
+  { id: 10, nome: "Camila Santos", cargo: "Auxiliar de Limpeza", dataCriacao: "27/03/2026" },
 ];
 
 function Relatorios() {
@@ -45,15 +20,17 @@ function Relatorios() {
   const [cargoFiltro, setCargoFiltro] = useState("");
   const [dataFiltro, setDataFiltro] = useState("");
   const [ordemNome, setOrdemNome] = useState(null);
+  const [ordemData, setOrdemData] = useState(null);
+
   const cargos = [...new Set(funcionariosMock.map((f) => f.cargo))];
 
   const listaFiltrada = useMemo(() => {
     return funcionariosMock
       .map((funcionario) => {
-        const funcionarioPrimeiroNome = funcionario.nome.split(" ")[0];
+        const primeiroNome = funcionario.nome.split(" ")[0];
 
         const tarefasFuncionario = tasks.filter(
-          (tarefa) => tarefa.criadoPor === funcionarioPrimeiroNome,
+          (tarefa) => tarefa.criadoPor === primeiroNome,
         );
 
         const concluidas = tarefasFuncionario.filter(
@@ -85,38 +62,54 @@ function Relatorios() {
           const [dia, mes, ano] = funcionario.dataCriacao.split("/");
           const dataFuncionario = new Date(`${ano}-${mes}-${dia}`);
           const dataBusca = new Date(dataFiltro);
+
           dataMatch = dataFuncionario.getTime() === dataBusca.getTime();
         }
 
         return nomeMatch && cargoMatch && dataMatch;
       })
       .sort((a, b) => {
-        if (!ordemNome) return 0;
+        let resultado = 0;
 
-        return ordemNome === "az"
-          ? a.nome.localeCompare(b.nome)
-          : b.nome.localeCompare(a.nome);
+        if (ordemNome) {
+          resultado =
+            ordemNome === "az"
+              ? a.nome.localeCompare(b.nome)
+              : b.nome.localeCompare(a.nome);
+        }
+
+        if (resultado === 0 && ordemData) {
+          const [dA, mA, yA] = a.dataCriacao.split("/");
+          const [dB, mB, yB] = b.dataCriacao.split("/");
+
+          const dataA = new Date(`${yA}-${mA}-${dA}`);
+          const dataB = new Date(`${yB}-${mB}-${dB}`);
+
+          resultado = ordemData === "recente" ? dataB - dataA : dataA - dataB;
+        }
+
+        return resultado;
       });
-  }, [nomeFiltro, cargoFiltro, dataFiltro, ordemNome]);
+  }, [nomeFiltro, cargoFiltro, dataFiltro, ordemNome, ordemData]);
 
   function limparFiltros() {
     setNomeFiltro("");
     setCargoFiltro("");
     setDataFiltro("");
+    setOrdemNome(null);
+    setOrdemData(null);
   }
 
   function handleExport() {
-    alert(
-      "Exportar relatório: funcionalidade visual pronta para integração futura.",
-    );
+    alert("Exportar relatório: funcionalidade visual pronta para integração futura.");
   }
 
   return (
     <div className={styles.dashboard}>
       <div className={styles.cardContainer}>
-        {/* HEADER */}
         <h1>Relatório de Funcionários</h1>
 
+        {/* BUSCA */}
         <div className={styles.topActions}>
           <input
             className={styles.busca}
@@ -153,10 +146,10 @@ function Relatorios() {
             />
           </div>
         </div>
-        
+
         {/* AÇÕES */}
         <div className={styles.acoes}>
-          <button className={styles.btnSecondary} onClick={limparFiltros}>
+          <button className={styles.limparBtn} onClick={limparFiltros}>
             Limpar Filtros
           </button>
 
@@ -169,6 +162,7 @@ function Relatorios() {
             <thead>
               <tr>
                 <th
+                  className={ordemNome ? styles.colunaAtiva : ""}
                   onClick={() =>
                     setOrdemNome((prev) => {
                       if (prev === null) return "az";
@@ -180,8 +174,29 @@ function Relatorios() {
                   Nome{" "}
                   {ordemNome === "az" ? "↑" : ordemNome === "za" ? "↓" : ""}
                 </th>
+
                 <th className={styles.textCenter}>Cargo</th>
-                <th className={styles.textCenter}>Data</th>
+
+                <th
+                  className={`${styles.textCenter} ${
+                    ordemData ? styles.colunaAtiva : ""
+                  }`}
+                  onClick={() =>
+                    setOrdemData((prev) => {
+                      if (prev === null) return "recente";
+                      if (prev === "recente") return "antigo";
+                      return null;
+                    })
+                  }
+                >
+                  Data{" "}
+                  {ordemData === "recente"
+                    ? "↓"
+                    : ordemData === "antigo"
+                      ? "↑"
+                      : ""}
+                </th>
+
                 <th className={styles.textCenter}>Concluídas</th>
                 <th className={styles.textCenter}>Pendentes</th>
               </tr>
