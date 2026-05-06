@@ -76,14 +76,30 @@
 @media (max-width: 768px) {
   .appLayout {
     flex-direction: column;
+    margin-left: 0; /* CORREÇÃO PRINCIPAL */
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  .mainArea {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
   }
 
   .topBar {
     display: flex;
+    justify-content: flex-start;
+    padding: 1rem;
   }
 
   .mainContent {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
     padding: 1rem;
+    overflow-x: hidden;
   }
 
   .mobileOverlay {

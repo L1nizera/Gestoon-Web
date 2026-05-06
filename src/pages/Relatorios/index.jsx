@@ -1,6 +1,13 @@
 import { useMemo, useState } from "react";
 import { tasks } from "../../data/Tasks";
-import styles from "../Home/style.module.css";
+
+import PageLayout from "../../components/ui/PageLayout";
+import PageCard from "../../components/ui/PageCard";
+import SearchInput from "../../components/ui/SearchInput";
+import FilterPanel from "../../components/ui/FilterPanel";
+import PageActions from "../../components/ui/PageActions";
+import Button from "../../components/ui/Button";
+import DataTable from "../../components/ui/DataTable";
 
 const funcionariosMock = [
   { id: 1, nome: "João Silva", cargo: "Supervisor", dataCriacao: "10/03/2026" },
@@ -24,21 +31,43 @@ function Relatorios() {
 
   const cargos = [...new Set(funcionariosMock.map((f) => f.cargo))];
 
+  function handleSort(key) {
+    if (key === "nome") {
+      setOrdemNome((prev) => {
+        if (prev === null) return "az";
+        if (prev === "az") return "za";
+        return null;
+      });
+
+      setOrdemData(null);
+    }
+
+    if (key === "dataCriacao") {
+      setOrdemData((prev) => {
+        if (prev === null) return "recente";
+        if (prev === "recente") return "antigo";
+        return null;
+      });
+
+      setOrdemNome(null);
+    }
+  }
+
   const listaFiltrada = useMemo(() => {
     return funcionariosMock
       .map((funcionario) => {
         const primeiroNome = funcionario.nome.split(" ")[0];
 
         const tarefasFuncionario = tasks.filter(
-          (tarefa) => tarefa.criadoPor === primeiroNome,
+          (tarefa) => tarefa.criadoPor === primeiroNome
         );
 
         const concluidas = tarefasFuncionario.filter(
-          (tarefa) => tarefa.status === "Concluída",
+          (tarefa) => tarefa.status === "Concluída"
         ).length;
 
         const naoConcluidas = tarefasFuncionario.filter(
-          (tarefa) => tarefa.status !== "Concluída",
+          (tarefa) => tarefa.status !== "Concluída"
         ).length;
 
         return {
@@ -104,23 +133,47 @@ function Relatorios() {
     alert("Exportar relatório: funcionalidade visual pronta para integração futura.");
   }
 
+  const columns = [
+    {
+      key: "nome",
+      label: "Nome",
+      sortable: true,
+    },
+    {
+      key: "cargo",
+      label: "Cargo",
+      align: "center",
+    },
+    {
+      key: "dataCriacao",
+      label: "Data",
+      align: "center",
+      sortable: true,
+    },
+    {
+      key: "concluidas",
+      label: "Concluídas",
+      align: "center",
+    },
+    {
+      key: "naoConcluidas",
+      label: "Pendentes",
+      align: "center",
+    },
+  ];
+
   return (
-    <div className={styles.dashboard}>
-      <div className={styles.cardContainer}>
+    <PageLayout>
+      <PageCard>
         <h1>Relatório de Funcionários</h1>
 
-        {/* BUSCA */}
-        <div className={styles.topActions}>
-          <input
-            className={styles.busca}
-            placeholder="Buscar funcionário..."
-            value={nomeFiltro}
-            onChange={(e) => setNomeFiltro(e.target.value)}
-          />
-        </div>
+        <SearchInput
+          placeholder="Buscar funcionário..."
+          value={nomeFiltro}
+          onChange={setNomeFiltro}
+        />
 
-        {/* FILTROS */}
-        <div className={styles.filtrosAvancados}>
+        <FilterPanel>
           <div>
             <small>Cargo:</small>
             <select
@@ -145,92 +198,39 @@ function Relatorios() {
               onChange={(e) => setDataFiltro(e.target.value)}
             />
           </div>
-        </div>
+        </FilterPanel>
 
-        {/* AÇÕES */}
-        <div className={styles.acoes}>
-          <button className={styles.limparBtn} onClick={limparFiltros}>
-            Limpar Filtros
-          </button>
+        <PageActions
+          left={
+            <Button variant="danger" onClick={limparFiltros}>
+              Limpar Filtros
+            </Button>
+          }
+          center={<span>{listaFiltrada.length} encontrados</span>}
+        />
 
-          <span>{listaFiltrada.length} encontrados</span>
-        </div>
+        <DataTable
+          columns={columns}
+          data={listaFiltrada}
+          sortKey={ordemNome ? "nome" : ordemData ? "dataCriacao" : null}
+          sortDirection={ordemNome || ordemData}
+          onSort={handleSort}
+          emptyMessage="Nenhum resultado encontrado"
+        />
 
-        {/* TABELA */}
-        <div className={`${styles.tabelaContainer} ${styles.desktopOnly}`}>
-          <table className={styles.tabela}>
-            <thead>
-              <tr>
-                <th
-                  className={ordemNome ? styles.colunaAtiva : ""}
-                  onClick={() =>
-                    setOrdemNome((prev) => {
-                      if (prev === null) return "az";
-                      if (prev === "az") return "za";
-                      return null;
-                    })
-                  }
-                >
-                  Nome{" "}
-                  {ordemNome === "az" ? "↑" : ordemNome === "za" ? "↓" : ""}
-                </th>
-
-                <th className={styles.textCenter}>Cargo</th>
-
-                <th
-                  className={`${styles.textCenter} ${
-                    ordemData ? styles.colunaAtiva : ""
-                  }`}
-                  onClick={() =>
-                    setOrdemData((prev) => {
-                      if (prev === null) return "recente";
-                      if (prev === "recente") return "antigo";
-                      return null;
-                    })
-                  }
-                >
-                  Data{" "}
-                  {ordemData === "recente"
-                    ? "↓"
-                    : ordemData === "antigo"
-                      ? "↑"
-                      : ""}
-                </th>
-
-                <th className={styles.textCenter}>Concluídas</th>
-                <th className={styles.textCenter}>Pendentes</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {listaFiltrada.length > 0 ? (
-                listaFiltrada.map((f) => (
-                  <tr key={f.id}>
-                    <td>{f.nome}</td>
-                    <td className={styles.textCenter}>{f.cargo}</td>
-                    <td className={styles.textCenter}>{f.dataCriacao}</td>
-                    <td className={styles.textCenter}>{f.concluidas}</td>
-                    <td className={styles.textCenter}>{f.naoConcluidas}</td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="5" className={styles.textCenter}>
-                    Nenhum resultado encontrado
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-
-        <div className={styles.footerActions}>
-          <button className={styles.exportBtn} onClick={handleExport}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "flex-end",
+            marginTop: "1.5rem",
+          }}
+        >
+          <Button variant="primary" onClick={handleExport}>
             Exportar Relatório
-          </button>
+          </Button>
         </div>
-      </div>
-    </div>
+      </PageCard>
+    </PageLayout>
   );
 }
 

@@ -1,0 +1,37 @@
+.acoes {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1rem;
+  margin-bottom: 2rem;
+  gap: 1rem;
+}
+
+.side {
+  display: flex;
+  align-items: center;
+}
+
+.center {
+  font-size: 1.3rem;
+  color: var(--text-secondary);
+  align-self: center;
+}
+
+@media (max-width: 768px) {
+  .acoes {
+    flex-direction: row;
+    padding: 1.5rem;
+    height: fit-content;
+    box-shadow: 0px 10px 20px var(--shadow-soft);
+    border-radius: 2rem;
+  }
+
+  .side {
+    flex: 1;
+  }
+
+  .side button {
+    width: 100%;
+  }
+}

@@ -1,0 +1,28 @@
+.badge {
+  padding: 0.4rem 1rem;
+  border-radius: 99.9rem;
+  font-size: 1.2rem;
+  font-weight: 600;
+  display: inline-block;
+  width: fit-content;
+}
+
+.success {
+  background: var(--success-bg);
+  color: var(--success);
+}
+
+.warning {
+  background: var(--warning-bg);
+  color: var(--warning);
+}
+
+.danger {
+  background: var(--danger-bg);
+  color: var(--danger);
+}
+
+.neutral {
+  background: var(--bg-main);
+  color: var(--text-primary);
+}
