@@ -206,7 +206,7 @@ function Relatorios() {
               Limpar Filtros
             </Button>
           }
-          center={<span>{listaFiltrada.length} encontrados</span>}
+          right={<span>{listaFiltrada.length} encontrados</span>}
         />
 
         <DataTable

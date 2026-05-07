@@ -1,6 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
 import styles from "./style.module.css";
-import { tasks } from "../../data/Tasks";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
@@ -17,32 +16,136 @@ function Home() {
   const [ordemTitulo, setOrdemTitulo] = useState(null); // "az" | "za"
   const [dataInicio, setDataInicio] = useState("");
   const [dataFim, setDataFim] = useState("");
-  const [tasksState, setTasksState] = useState(tasks);
+  const [tasksState, setTasksState] = useState([]);
   const [editTask, setEditTask] = useState(null);
   const [menuAtivo, setMenuAtivo] = useState("tarefas");
   const [isMobile, setIsMobile] = useState(
     typeof window !== "undefined" ? window.innerWidth < 768 : false,
   );
-  
-  const [tarefas, setTarefas] = useState([]);
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const fetchDados = async () => {
-    try{
-      setLoading(true);
-      const response = await api.get('/tarefas');
-      setTarefas(response.data.dados);
-      console.log(response.data.dados);
+  const prioridadeApiMap = {
+    1: "Baixa",
+    2: "Média",
+    3: "Alta",
+  };
 
-setTarefas(response.data.dados);
+  const setorApiMap = {
+    1: "Administrativo",
+    2: "Financeiro",
+    3: "Operacional",
+    4: "Atendimento",
+    5: "Limpeza",
+    6: "Estoque",
+    7: "Logística",
+  };
+
+  const statusApiMap = {
+    0: "Pendente",
+    1: "Em andamento",
+    2: "Concluída",
+    3: "Cancelada",
+  };
+
+  function formatarStatus(status) {
+    const statusNumero = Number(status);
+
+    if (Number.isNaN(statusNumero)) {
+      return "Pendente";
+    }
+
+    return statusApiMap[statusNumero] || "Pendente";
+  }
+
+  function formatarDataHora(dataISO) {
+    if (!dataISO) {
+      return {
+        dataCriacao: "-",
+        horaCriacao: "-",
+      };
+    }
+
+    const data = new Date(dataISO);
+
+    return {
+      dataCriacao: data.toLocaleDateString("pt-BR"),
+      horaCriacao: data.toLocaleTimeString("pt-BR", {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+    };
+  }
+
+  function formatarData(dataISO) {
+    if (!dataISO) return "-";
+
+    const data = new Date(dataISO);
+
+    if (Number.isNaN(data.getTime())) return "-";
+
+    return data.toLocaleDateString("pt-BR");
+  }
+
+  function formatarCriadoPor(idUsuario) {
+    if (!idUsuario) return "-";
+
+    return `Usuário #${idUsuario}`;
+  }
+
+  const fetchDados = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const response = await api.get("/tarefas");
+
+      const tarefasFormatadas = response.data.dados.map((tarefa) => {
+        const { dataCriacao, horaCriacao } = formatarDataHora(
+          tarefa.tar_data_criacao
+        );
+
+        return {
+          id: tarefa.tar_id,
+          tarefaId: tarefa.tar_id,
+
+          titulo: tarefa.tar_titulo || "-",
+
+          status: formatarStatus(tarefa.atr_status),
+
+          prioridade:
+            prioridadeApiMap[Number(tarefa.tar_prioridade)] || "Média",
+
+          setor:
+            tarefa.set_nome ||
+            setorApiMap[Number(tarefa.tar_setor_id)] ||
+            `Setor #${tarefa.tar_setor_id}`,
+
+          criadoPor:
+            tarefa.usu_nome ||
+            formatarCriadoPor(tarefa.tar_criado_por),
+
+          prazo: formatarData(tarefa.tar_prazo),
+
+          estimativaMinutos: tarefa.tar_estimativa_minutos ?? "-",
+
+          dataCriacao,
+          horaCriacao,
+
+          descricao: tarefa.tar_descricao || "Sem descrição",
+        };
+      });
+
+      setTasksState(tarefasFormatadas);
     } catch (err) {
-      console.error('Erro ao buscar tarefas:', err.message);
-      setError("Não foi possivel carregar as tarefas.");
+      console.error("Erro ao buscar tarefas:", err.message);
+      setError("Não foi possível carregar as tarefas.");
     } finally {
       setLoading(false);
     }
   };
+
   useEffect(() => {
     fetchDados();
   }, []);
@@ -61,7 +164,7 @@ setTarefas(response.data.dados);
 
   const [novaTask, setNovaTask] = useState({
     titulo: "",
-    setor: "Caixa",
+    setor: "Administrativo",
     prioridade: "Média",
     status: "Pendente",
     descricao: "",
@@ -125,7 +228,7 @@ setTarefas(response.data.dados);
     // resetar
     setNovaTask({
       titulo: "",
-      setor: "Caixa",
+      setor: "Administrativo",
       prioridade: "Média",
       status: "Pendente",
       descricao: "",
@@ -149,27 +252,35 @@ setTarefas(response.data.dados);
 
     // ===== PREPARAR DADOS =====
     const dados = dadosExport.map((t) => [
+      t.tarefaId,
       t.titulo,
       t.status,
       t.prioridade,
       t.setor,
+      t.criadoPor,
+      t.estimativaMinutos,
+      t.prazo,
       t.dataCriacao,
       t.horaCriacao,
-      t.criadoPor,
       t.descricao || "-",
     ]);
+
+
     // ===== TABELA =====
     autoTable(doc, {
       startY: 30,
       head: [
         [
+          "ID",
           "Título",
           "Status",
           "Prioridade",
           "Setor",
+          "Criado por",
+          "Estimativa",
+          "Prazo",
           "Data",
           "Hora",
-          "Criado por",
           "Descrição",
         ],
       ],
@@ -203,13 +314,13 @@ setTarefas(response.data.dados);
   };
 
   const setores = [
-    "Caixa",
-    "Estoque",
-    "HortiFruti",
-    "Açougue",
-    "Padaria",
+    "Administrativo",
+    "Financeiro",
+    "Operacional",
+    "Atendimento",
     "Limpeza",
-    "Administração",
+    "Estoque",
+    "Logística",
   ];
 
   const prioridadeMap = {
@@ -322,6 +433,26 @@ setTarefas(response.data.dados);
     ],
     [pendentes, andamento, concluidas, canceladas],
   );
+
+  if (loading) {
+    return (
+      <div className={styles.dashboard}>
+        <div className={styles.cardContainer}>
+          <p>Carregando tarefas...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className={styles.dashboard}>
+        <div className={styles.cardContainer}>
+          <p style={{ color: "red" }}>{error}</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.dashboard}>
@@ -471,6 +602,8 @@ setTarefas(response.data.dados);
           <table className={styles.tabela}>
             <thead>
               <tr>
+                <th>ID</th>
+
                 <th
                   className={ordemTitulo ? styles.colunaAtiva : ""}
                   onClick={() =>
@@ -489,6 +622,8 @@ setTarefas(response.data.dados);
                 <th>Prioridade</th>
                 <th>Setor</th>
                 <th>Criado por</th>
+                <th>Estimativa</th>
+                <th>Prazo</th>
                 <th>Hora</th>
 
                 <th
@@ -512,42 +647,45 @@ setTarefas(response.data.dados);
             </thead>
 
             <tbody>
-  {tarefas?.map((tarefa) => (
-    <tr
-      key={tarefa.tar_id}
-      onClick={(e) => {
-        if (e.target.tagName === "BUTTON") return;
-        setSelectedTask(tarefa);
-      }}
-    >
-      <td>{tarefa.tar_titulo}</td>
+              {lista.map((task) => (
+                <tr
+                  key={task.id}
+                  onClick={(e) => {
+                    if (e.target.tagName === "BUTTON") return;
+                    setSelectedTask(task);
+                  }}
+                >
+                  <td>{task.tarefaId}</td>
 
-      <td>
-        <span
-          className={`${styles.badge} ${
-            styles[statusMap[tarefa.atr_status]]
-          }`}
-        >
-          {tarefa.atr_status}
-        </span>
-      </td>
+                  <td>{task.titulo}</td>
 
-      <td>
-        <span
-          className={`${styles.badge} ${
-            styles[prioridadeMap[tarefa.tar_prioridade]]
-          }`}
-        >
-          {tarefa.tar_prioridade}
-        </span>
-      </td>
+                  <td>
+                    <span
+                      className={`${styles.badge} ${styles[statusMap[task.status]] || styles.statusPendente
+                        }`}
+                    >
+                      {task.status}
+                    </span>
+                  </td>
 
-      <td>{tarefa.tar_setor_id}</td>
-      <td>{tarefa.tar_criado_por}</td>
-      <td>{tarefa.tar_data_criacao}</td>
-    </tr>
-  ))}
-</tbody>
+                  <td>
+                    <span
+                      className={`${styles.badge} ${styles[prioridadeMap[task.prioridade]]
+                        }`}
+                    >
+                      {task.prioridade}
+                    </span>
+                  </td>
+
+                  <td>{task.setor}</td>
+                  <td>{task.criadoPor}</td>
+                  <td>{task.estimativaMinutos} min</td>
+                  <td>{task.prazo}</td>
+                  <td>{task.horaCriacao}</td>
+                  <td>{task.dataCriacao}</td>
+                </tr>
+              ))}
+            </tbody>
           </table>
         </div>
 
@@ -559,8 +697,8 @@ setTarefas(response.data.dados);
               className={styles.card}
               onClick={() => setSelectedTask(task)}
             > */}
-              {/* HEADER */}
-              {/* <div className={styles.cardHeader}>
+        {/* HEADER */}
+        {/* <div className={styles.cardHeader}>
                 <h1>{task.titulo}</h1>
 
                 <span
@@ -570,8 +708,8 @@ setTarefas(response.data.dados);
                 </span>
               </div> */}
 
-              {/* BODY */}
-              {/* <div className={styles.cardBody}>
+        {/* BODY */}
+        {/* <div className={styles.cardBody}>
                 <p>
                   <strong>Prioridade:</strong>{" "}
                   <span
@@ -630,11 +768,27 @@ setTarefas(response.data.dados);
           >
             <div className={styles.modalGrid}>
               <div>
+                <strong>ID:</strong>
+                <p>{selectedTask.tarefaId}</p>
+              </div>
+
+              <div>
                 <strong>Prioridade:</strong>
                 <span
-                  className={`${styles.badge} ${styles[prioridadeMap[selectedTask.prioridade]]}`}
+                  className={`${styles.badge} ${styles[prioridadeMap[selectedTask.prioridade]]
+                    }`}
                 >
                   {selectedTask.prioridade}
+                </span>
+              </div>
+
+              <div>
+                <strong>Status:</strong>
+                <span
+                  className={`${styles.badge} ${styles[statusMap[selectedTask.status]] || styles.statusPendente
+                    }`}
+                >
+                  {selectedTask.status}
                 </span>
               </div>
 
@@ -646,6 +800,16 @@ setTarefas(response.data.dados);
               <div>
                 <strong>Criado por:</strong>
                 <p>{selectedTask.criadoPor}</p>
+              </div>
+
+              <div>
+                <strong>Estimativa:</strong>
+                <p>{selectedTask.estimativaMinutos} min</p>
+              </div>
+
+              <div>
+                <strong>Prazo:</strong>
+                <p>{selectedTask.prazo}</p>
               </div>
 
               <div>
@@ -782,7 +946,7 @@ setTarefas(response.data.dados);
                     setCreateTaskOpen(false);
                     setNovaTask({
                       titulo: "",
-                      setor: "Caixa",
+                      setor: "Administrativo",
                       prioridade: "Média",
                       status: "Pendente",
                       descricao: "",
@@ -797,7 +961,7 @@ setTarefas(response.data.dados);
                   onClick={() =>
                     setNovaTask({
                       titulo: "",
-                      setor: "Caixa",
+                      setor: "Administrativo",
                       prioridade: "Média",
                       status: "Pendente",
                       descricao: "",
@@ -917,7 +1081,7 @@ setTarefas(response.data.dados);
                   isMobile
                     ? false
                     : ({ name, percent }) =>
-                        `${name}: ${(percent * 100).toFixed(0)}%`
+                      `${name}: ${(percent * 100).toFixed(0)}%`
                 }
                 labelLine={false}
                 fontSize={isMobile ? 12 : 20}
@@ -950,7 +1114,7 @@ setTarefas(response.data.dados);
           </div>
         </div>
       </div>
-    </div>
+    </div >
   );
 }
 
