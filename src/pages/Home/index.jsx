@@ -5,6 +5,7 @@ import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import Modal from "../../components/Modal/Modal";
+import api from "../../services/api";
 
 function Home() {
   const [selectedTask, setSelectedTask] = useState(null);
@@ -22,6 +23,32 @@ function Home() {
   const [isMobile, setIsMobile] = useState(
     typeof window !== "undefined" ? window.innerWidth < 768 : false,
   );
+  
+  const [tarefas, setTarefas] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const fetchDados = async () => {
+    try{
+      setLoading(true);
+      const response = await api.get('/tarefas');
+      setTarefas(response.data.dados);
+      console.log(response.data.dados);
+
+setTarefas(response.data.dados);
+    } catch (err) {
+      console.error('Erro ao buscar tarefas:', err.message);
+      setError("Não foi possivel carregar as tarefas.");
+    } finally {
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
+    fetchDados();
+  }, []);
+
+  // if (loading && tarefas.length === 0) return <p>Carregando dados...</p>;
+  // if (error) return <p style={{ color: 'red' }}>{error}</p>;
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768);
@@ -485,52 +512,55 @@ function Home() {
             </thead>
 
             <tbody>
-              {lista.map((task) => (
-                <tr
-                  key={task.id}
-                  onClick={(e) => {
-                    if (e.target.tagName === "BUTTON") return;
-                    setSelectedTask(task);
-                  }}
-                >
-                  <td>{task.titulo}</td>
+  {tarefas?.map((tarefa) => (
+    <tr
+      key={tarefa.tar_id}
+      onClick={(e) => {
+        if (e.target.tagName === "BUTTON") return;
+        setSelectedTask(tarefa);
+      }}
+    >
+      <td>{tarefa.tar_titulo}</td>
 
-                  <td>
-                    <span
-                      className={`${styles.badge} ${styles[statusMap[task.status]]}`}
-                    >
-                      {task.status}
-                    </span>
-                  </td>
+      <td>
+        <span
+          className={`${styles.badge} ${
+            styles[statusMap[tarefa.atr_status]]
+          }`}
+        >
+          {tarefa.atr_status}
+        </span>
+      </td>
 
-                  <td>
-                    <span
-                      className={`${styles.badge} ${styles[prioridadeMap[task.prioridade]]}`}
-                    >
-                      {task.prioridade}
-                    </span>
-                  </td>
+      <td>
+        <span
+          className={`${styles.badge} ${
+            styles[prioridadeMap[tarefa.tar_prioridade]]
+          }`}
+        >
+          {tarefa.tar_prioridade}
+        </span>
+      </td>
 
-                  <td>{task.setor}</td>
-                  <td>{task.criadoPor}</td>
-                  <td>{task.horaCriacao}</td>
-                  <td>{task.dataCriacao}</td>
-                </tr>
-              ))}
-            </tbody>
+      <td>{tarefa.tar_setor_id}</td>
+      <td>{tarefa.tar_criado_por}</td>
+      <td>{tarefa.tar_data_criacao}</td>
+    </tr>
+  ))}
+</tbody>
           </table>
         </div>
 
         {/* ===== MOBILE (CARDS) ===== */}
-        <div className={styles.mobileOnly}>
+        {/* <div className={styles.mobileOnly}>
           {lista.map((task) => (
             <div
               key={task.id}
               className={styles.card}
               onClick={() => setSelectedTask(task)}
-            >
+            > */}
               {/* HEADER */}
-              <div className={styles.cardHeader}>
+              {/* <div className={styles.cardHeader}>
                 <h1>{task.titulo}</h1>
 
                 <span
@@ -538,10 +568,10 @@ function Home() {
                 >
                   {task.status}
                 </span>
-              </div>
+              </div> */}
 
               {/* BODY */}
-              <div className={styles.cardBody}>
+              {/* <div className={styles.cardBody}>
                 <p>
                   <strong>Prioridade:</strong>{" "}
                   <span
@@ -565,7 +595,7 @@ function Home() {
               </div>
             </div>
           ))}
-        </div>
+        </div> */}
 
         {/* ===== MODAL ===== */}
         {selectedTask && (
