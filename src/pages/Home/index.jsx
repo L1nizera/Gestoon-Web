@@ -690,15 +690,15 @@ function Home() {
         </div>
 
         {/* ===== MOBILE (CARDS) ===== */}
-        {/* <div className={styles.mobileOnly}>
+        <div className={styles.mobileOnly}>
           {lista.map((task) => (
             <div
               key={task.id}
               className={styles.card}
               onClick={() => setSelectedTask(task)}
-            > */}
+            >
         {/* HEADER */}
-        {/* <div className={styles.cardHeader}>
+        <div className={styles.cardHeader}>
                 <h1>{task.titulo}</h1>
 
                 <span
@@ -706,10 +706,10 @@ function Home() {
                 >
                   {task.status}
                 </span>
-              </div> */}
+              </div>
 
         {/* BODY */}
-        {/* <div className={styles.cardBody}>
+        <div className={styles.cardBody}>
                 <p>
                   <strong>Prioridade:</strong>{" "}
                   <span
@@ -733,7 +733,7 @@ function Home() {
               </div>
             </div>
           ))}
-        </div> */}
+        </div>
 
         {/* ===== MODAL ===== */}
         {selectedTask && (
