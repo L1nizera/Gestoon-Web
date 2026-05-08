@@ -94,6 +94,25 @@ function Home() {
     return `Usuário #${idUsuario}`;
   }
 
+  function formatarEstimativa(minutos) {
+    const valor = Number(minutos);
+
+    if (!valor || Number.isNaN(valor)) return "-";
+
+    if (valor < 60) {
+      return `${valor} min`;
+    }
+
+    const horas = Math.floor(valor / 60);
+    const minutosRestantes = valor % 60;
+
+    if (minutosRestantes === 0) {
+      return `${horas}h`;
+    }
+
+    return `${horas}h ${minutosRestantes}min`;
+  }
+
   const fetchDados = async () => {
     try {
       setLoading(true);
@@ -126,9 +145,8 @@ function Home() {
             tarefa.usu_nome ||
             formatarCriadoPor(tarefa.tar_criado_por),
 
-          prazo: formatarData(tarefa.tar_prazo),
-
-          estimativaMinutos: tarefa.tar_estimativa_minutos ?? "-",
+          estimativaMinutos: tarefa.tar_estimativa_minutos ?? "",
+          estimativaFormatada: formatarEstimativa(tarefa.tar_estimativa_minutos),
 
           dataCriacao,
           horaCriacao,
@@ -167,6 +185,7 @@ function Home() {
     setor: "Administrativo",
     prioridade: "Média",
     status: "Pendente",
+    estimativaMinutos: "",
     descricao: "",
   });
 
@@ -198,7 +217,14 @@ function Home() {
 
   function salvarEdicao() {
     setTasksState((prev) =>
-      prev.map((t) => (t.id === editTask.id ? editTask : t)),
+      prev.map((t) =>
+        t.id === editTask.id
+          ? {
+            ...editTask,
+            estimativaFormatada: formatarEstimativa(editTask.estimativaMinutos),
+          }
+          : t
+      )
     );
 
     setEditTask(null);
@@ -218,9 +244,11 @@ function Home() {
     const taskCompleta = {
       ...novaTask,
       id: Date.now(),
+      tarefaId: Date.now(),
       criadoPor: "Admin", // temporário
       dataCriacao,
       horaCriacao,
+      estimativaFormatada: formatarEstimativa(novaTask.estimativaMinutos),
     };
 
     setTasksState((prev) => [...prev, taskCompleta]);
@@ -231,6 +259,7 @@ function Home() {
       setor: "Administrativo",
       prioridade: "Média",
       status: "Pendente",
+      estimativaMinutos: "",
       descricao: "",
     });
 
@@ -258,8 +287,7 @@ function Home() {
       t.prioridade,
       t.setor,
       t.criadoPor,
-      t.estimativaMinutos,
-      t.prazo,
+      t.estimativaFormatada,
       t.dataCriacao,
       t.horaCriacao,
       t.descricao || "-",
@@ -278,7 +306,6 @@ function Home() {
           "Setor",
           "Criado por",
           "Estimativa",
-          "Prazo",
           "Data",
           "Hora",
           "Descrição",
@@ -605,7 +632,7 @@ function Home() {
                 <th>ID</th>
 
                 <th
-                  className={ordemTitulo ? styles.colunaAtiva : ""}
+                  className={`${styles.thSortable} ${ordemTitulo ? styles.colunaAtiva : ""}`}
                   onClick={() =>
                     setOrdemTitulo((prev) => {
                       if (prev === null) return "az";
@@ -623,11 +650,11 @@ function Home() {
                 <th>Setor</th>
                 <th>Criado por</th>
                 <th>Estimativa</th>
-                <th>Prazo</th>
                 <th>Hora</th>
 
                 <th
-                  className={`${styles.textCenter} ${ordemData ? styles.colunaAtiva : ""}`}
+                  className={`${styles.thSortable} ${styles.textCenter} ${ordemData ? styles.colunaAtiva : ""
+                    }`}
                   onClick={() =>
                     setOrdemData((prev) => {
                       if (prev === null) return "recente";
@@ -680,7 +707,6 @@ function Home() {
                   <td>{task.setor}</td>
                   <td>{task.criadoPor}</td>
                   <td>{task.estimativaMinutos} min</td>
-                  <td>{task.prazo}</td>
                   <td>{task.horaCriacao}</td>
                   <td>{task.dataCriacao}</td>
                 </tr>
@@ -697,8 +723,8 @@ function Home() {
               className={styles.card}
               onClick={() => setSelectedTask(task)}
             >
-        {/* HEADER */}
-        <div className={styles.cardHeader}>
+              {/* HEADER */}
+              <div className={styles.cardHeader}>
                 <h1>{task.titulo}</h1>
 
                 <span
@@ -708,8 +734,8 @@ function Home() {
                 </span>
               </div>
 
-        {/* BODY */}
-        <div className={styles.cardBody}>
+              {/* BODY */}
+              <div className={styles.cardBody}>
                 <p>
                   <strong>Prioridade:</strong>{" "}
                   <span
@@ -726,6 +752,10 @@ function Home() {
                   <strong>Criado por:</strong> {task.criadoPor}
                 </p>
 
+                <p>
+                  <strong>Estimativa:</strong> {task.estimativaFormatada}
+                </p>
+                
                 <div className={styles.cardFooter}>
                   <span>{task.horaCriacao}</span>
                   <span>{task.dataCriacao}</span>
@@ -804,12 +834,7 @@ function Home() {
 
               <div>
                 <strong>Estimativa:</strong>
-                <p>{selectedTask.estimativaMinutos} min</p>
-              </div>
-
-              <div>
-                <strong>Prazo:</strong>
-                <p>{selectedTask.prazo}</p>
+                <p>{selectedTask.estimativaFormatada}</p>
               </div>
 
               <div>
@@ -918,6 +943,22 @@ function Home() {
                 <input type="text" value={editTask.criadoPor} disabled />
               </div>
 
+              <div className={styles.formGroup}>
+                <label>Estimativa em minutos</label>
+                <input
+                  type="number"
+                  min="1"
+                  value={editTask.estimativaMinutos}
+                  onChange={(e) =>
+                    setEditTask({
+                      ...editTask,
+                      estimativaMinutos: e.target.value,
+                      estimativaFormatada: formatarEstimativa(e.target.value),
+                    })
+                  }
+                />
+              </div>
+
               <div className={`${styles.formGroup} ${styles.full}`}>
                 <label>Descrição</label>
                 <textarea
@@ -949,6 +990,7 @@ function Home() {
                       setor: "Administrativo",
                       prioridade: "Média",
                       status: "Pendente",
+                      estimativaMinutos: "",
                       descricao: "",
                     });
                   }}
@@ -964,6 +1006,7 @@ function Home() {
                       setor: "Administrativo",
                       prioridade: "Média",
                       status: "Pendente",
+                      estimativaMinutos: "",
                       descricao: "",
                     })
                   }
@@ -1039,6 +1082,23 @@ function Home() {
                   <option>Média</option>
                   <option>Baixa</option>
                 </select>
+              </div>
+
+              {/* Estimativa Minutos */}
+              <div className={styles.formGroup}>
+                <label>Estimativa em minutos</label>
+                <input
+                  type="number"
+                  min="1"
+                  value={novaTask.estimativaMinutos}
+                  onChange={(e) =>
+                    setNovaTask({
+                      ...novaTask,
+                      estimativaMinutos: e.target.value,
+                    })
+                  }
+                  placeholder="Ex: 90"
+                />
               </div>
 
               {/* DESCRIÇÃO */}
