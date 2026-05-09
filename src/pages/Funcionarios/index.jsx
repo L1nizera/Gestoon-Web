@@ -1,8 +1,9 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import styles from "../Home/style.module.css";
 import jsPDF from "jspdf";
 import Modal from "../../components/Modal/Modal";
 import autoTable from "jspdf-autotable";
+import api from '../../services/api';
 
 // MOCK (igual você faz com tasks)
 const funcionariosData = [
@@ -111,6 +112,11 @@ function Funcionarios() {
 
   const [createModal, setCreateModal] = useState(false);
 
+  const [funcionarios, setFuncionarios] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+
   const [novoFuncionario, setNovoFuncionario] = useState({
     nome: "",
     email: "",
@@ -118,6 +124,30 @@ function Funcionarios() {
     cargo: "",
     ativo: true,
   });
+
+  const fetchDados = async () => {
+    try {      setLoading(true);
+      // o await pausa a execução até receber a resposta da API
+      const response = await api.get('/funcionarios');
+      setFuncionarios(response.data.dados);
+      
+    } catch (err) {
+      // o axios coloca o erro detalhado em err.response.data
+      console.error("Erro na requisição:", err);
+      setError("Não foi possivel carregar os dados");
+    } finally {
+      //Executa independente de ter dado erro ou sucesso
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchDados();
+  }, []);
+
+  
+
+  
 
   function excluir(id) {
     if (!confirm("Excluir funcionário?")) return;
@@ -249,6 +279,8 @@ function Funcionarios() {
       ativo: true,
     });
   }
+// if (loading && funcionarios.length === 0) return <p>Carregando...</p>;
+//   if (error) return <p>{error}</p>;
 
   return (
     <div className={styles.dashboard}>
@@ -307,92 +339,97 @@ function Funcionarios() {
         </div>
 
         {/* ===== DESKTOP (TABELA) ===== */}
-        <div className={`${styles.tabelaContainer} ${styles.desktopOnly}`}>
-          <table className={styles.tabela}>
-            <thead>
-              <tr>
-                <th
-                  className={ordemNome ? styles.colunaAtiva : ""}
-                  onClick={() =>
-                    setOrdemNome((prev) => {
-                      if (prev === null) return "az";
-                      if (prev === "az") return "za";
-                      return null;
-                    })
-                  }
-                >
-                  Nome{" "}
-                  {ordemNome === "az" ? "↑" : ordemNome === "za" ? "↓" : ""}
-                </th>
-                <th className={styles.textCenter}>Email</th>
-                <th className={styles.textCenter}>Setor</th>
-                <th className={styles.textCenter}>Cargo</th>
-                <th className={styles.textCenter}>Status</th>
-                <th
-                  className={`${styles.textCenter} ${ordemData ? styles.colunaAtiva : ""}`}
-                  onClick={() =>
-                    setOrdemData((prev) => {
-                      if (prev === null) return "recente";
-                      if (prev === "recente") return "antigo";
-                      return null;
-                    })
-                  }
-                >
-                  Data{" "}
-                  {ordemData === "recente"
-                    ? "↑"
-                    : ordemData === "antigo"
-                      ? "↓"
-                      : ""}
-                </th>
-              </tr>
-            </thead>
+        
+        {/* {loading ? (
+  <p>Carregando...</p>
+) : ( */}
+  <div className={`${styles.tabelaContainer} ${styles.desktopOnly}`}>
+    <table className={styles.tabela}>
+      <thead>
+        <tr>
+          <th
+            className={ordemNome ? styles.colunaAtiva : ""}
+            onClick={() =>
+              setOrdemNome((prev) => {
+                if (prev === null) return "az";
+                if (prev === "az") return "za";
+                return null;
+              })
+            }
+          >
+            Nome{" "}
+            {ordemNome === "az" ? "↑" : ordemNome === "za" ? "↓" : ""}
+          </th>
 
-            <tbody>
-              {lista.map((f) => (
-                <tr
-                  key={f.id}
-                  onClick={(e) => {
-                    if (e.target.tagName === "BUTTON") return;
-                    setSelected(f);
-                  }}
-                >
-                  <td>{f.nome}</td>
-                  <td className={styles.textCenter}>{f.email}</td>
-                  <td className={styles.textCenter}>{f.setor}</td>
-                  <td className={styles.textCenter}>{f.cargo}</td>
-                  <td className={styles.textCenter}>
-                    <span
-                      className={`${styles.badge} ${
-                        styles[f.ativo ? "statusConcluida" : "statusCancelada"]
-                      }`}
-                    >
-                      {f.ativo ? "Ativo" : "Inativo"}
-                    </span>
-                  </td>
-                  <td className={styles.textCenter}>{f.dataCriacao}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+          <th className={styles.textCenter}>Email</th>
+          <th className={styles.textCenter}>Setor</th>
+          <th className={styles.textCenter}>Cargo</th>
+          <th className={styles.textCenter}>Status</th>
+
+          <th
+            className={`${styles.textCenter} ${
+              ordemData ? styles.colunaAtiva : ""
+            }`}
+            onClick={() =>
+              setOrdemData((prev) => {
+                if (prev === null) return "recente";
+                if (prev === "recente") return "antigo";
+                return null;
+              })
+            }
+          >
+            Data{" "}
+            {ordemData === "recente"
+              ? "↑"
+              : ordemData === "antigo"
+              ? "↓"
+              : ""}
+          </th>
+        </tr>
+      </thead>
+
+      <tbody>
+  {funcionarios.map((f) => (
+    <tr key={f.func_id}>
+      <td>{f.func_nome}</td>
+      <td className={styles.textCenter}>{f.func_email}</td>
+      <td className={styles.textCenter}>{f.func_setor_id}</td>
+      <td className={styles.textCenter}>{f.func_crg_id}</td>
+
+      <td className={styles.textCenter}>
+        <span
+          className={`${styles.badge} ${
+            styles[f.func_ativo ? "statusConcluida" : "statusCancelada"]
+          }`}
+        >
+          {f.func_ativo ? "Ativo" : "Inativo"}
+        </span>
+      </td>
+
+      <td className={styles.textCenter}>{f.func_data_criacao}</td>
+    </tr>
+  ))}
+</tbody>
+    </table>
+  </div>
+{/* )} */}
 
         {/* ===== MOBILE (CARDS) ===== */}
         <div className={styles.mobileOnly}>
-          {lista.map((f) => (
+          {funcionarios.map((f) => (
             <div
-              key={f.id}
+              key={f.func_id}
               className={styles.card}
               onClick={() => setSelected(f)}
             >
               <div className={styles.cardHeader}>
-                <h2>{f.nome}</h2>
+                <h2>{f.func_nome}</h2>
                 <span
                   className={`${styles.badge} ${
-                    styles[f.ativo ? "statusConcluida" : "statusCancelada"]
+                    styles[f.func_ativo ? "statusConcluida" : "statusCancelada"]
                   }`}
                 >
-                  {f.ativo ? "Ativo" : "Inativo"}
+                  {f.func_ativo ? "Ativo" : "Inativo"}
                 </span>
               </div>
 
@@ -400,33 +437,33 @@ function Funcionarios() {
                 <div className={styles.funcionarioInfo}>
                   <div>
                     <small>Email</small>
-                    <p>{f.email}</p>
+                    <p>{f.func_email}</p>
                   </div>
 
                   <div>
                     <small>Setor</small>
-                    <p>{f.setor}</p>
+                    <p>{f.func_setor_id}</p>
                   </div>
 
                   <div>
                     <small>Cargo</small>
-                    <p>{f.cargo}</p>
+                    <p>{f.func_crg_id}</p>
                   </div>
 
                   <div>
                     <small>Status</small>
                     <span
                       className={`${styles.badge} ${
-                        styles[f.ativo ? "statusConcluida" : "statusCancelada"]
+                        styles[f.func_ativo ? "statusConcluida" : "statusCancelada"]
                       }`}
                     >
-                      {f.ativo ? "Ativo" : "Inativo"}
+                      {f.func_ativo ? "Ativo" : "Inativo"}
                     </span>
                   </div>
 
                   <div>
                     <small>Data de criação</small>
-                    <p>{f.dataCriacao}</p>
+                    <p>{f.func_data_criacao}</p>
                   </div>
                 </div>
               </div>
