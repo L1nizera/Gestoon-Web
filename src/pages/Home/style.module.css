@@ -590,6 +590,13 @@ select {
   transition: all 0.3s ease;
 }
 
+.graficoVazio {
+  margin-top: 2rem;
+  color: var(--text-secondary);
+  font-size: 1.4rem;
+  text-align: center;
+}
+
 @media (max-width: 768px) {
   .grafico {
     padding: 1rem;

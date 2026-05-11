@@ -7,6 +7,7 @@ import Modal from "../../components/Modal/Modal";
 import api from "../../services/api";
 
 function Home() {
+  const [funcionariosMap, setFuncionariosMap] = useState({});
   const [selectedTask, setSelectedTask] = useState(null);
   const [filtro, setFiltro] = useState("Todos");
   const [busca, setBusca] = useState("");
@@ -40,6 +41,22 @@ function Home() {
     5: "Limpeza",
     6: "Estoque",
     7: "Logística",
+  };
+
+  const prioridadeToApiMap = {
+    Baixa: 1,
+    Média: 2,
+    Alta: 3,
+  };
+
+  const setorToApiMap = {
+    Administrativo: 1,
+    Financeiro: 2,
+    Operacional: 3,
+    Atendimento: 4,
+    Limpeza: 5,
+    Estoque: 6,
+    Logística: 7,
   };
 
   const statusApiMap = {
@@ -113,16 +130,32 @@ function Home() {
     return `${horas}h ${minutosRestantes}min`;
   }
 
+  async function buscarFuncionariosMap() {
+    const response = await api.get("/funcionarios");
+
+    const funcionarios = response.data.dados || response.data;
+
+    const mapa = {};
+
+    funcionarios.forEach((funcionario) => {
+      mapa[funcionario.func_id] = funcionario.func_nome;
+    });
+
+    return mapa;
+  }
+
   const fetchDados = async () => {
     try {
       setLoading(true);
       setError(null);
 
+      const mapaFuncionarios = await buscarFuncionariosMap();
+
       const response = await api.get("/tarefas");
 
       const tarefasFormatadas = response.data.dados.map((tarefa) => {
         const { dataCriacao, horaCriacao } = formatarDataHora(
-          tarefa.tar_data_criacao
+          tarefa.tar_data_criacao,
         );
 
         return {
@@ -142,11 +175,13 @@ function Home() {
             `Setor #${tarefa.tar_setor_id}`,
 
           criadoPor:
-            tarefa.usu_nome ||
-            formatarCriadoPor(tarefa.tar_criado_por),
+            mapaFuncionarios[Number(tarefa.tar_criado_por)] ||
+            `Funcionário #${tarefa.tar_criado_por}`,
 
           estimativaMinutos: tarefa.tar_estimativa_minutos ?? "",
-          estimativaFormatada: formatarEstimativa(tarefa.tar_estimativa_minutos),
+          estimativaFormatada: formatarEstimativa(
+            tarefa.tar_estimativa_minutos,
+          ),
 
           dataCriacao,
           horaCriacao,
@@ -220,51 +255,62 @@ function Home() {
       prev.map((t) =>
         t.id === editTask.id
           ? {
-            ...editTask,
-            estimativaFormatada: formatarEstimativa(editTask.estimativaMinutos),
-          }
-          : t
-      )
+              ...editTask,
+              estimativaFormatada: formatarEstimativa(
+                editTask.estimativaMinutos,
+              ),
+            }
+          : t,
+      ),
     );
 
     setEditTask(null);
   }
 
-  function criarTask() {
+  async function criarTask() {
     if (!novaTask.titulo.trim()) return;
 
-    const agora = new Date();
+    try {
+      const payload = {
+        titulo: novaTask.titulo,
+        descricao: novaTask.descricao,
+        prioridade: prioridadeToApiMap[novaTask.prioridade],
+        setorId: setorToApiMap[novaTask.setor],
+        criadoPor: 1,
+        estimativaMinutos: Number(novaTask.estimativaMinutos),
+        status: 0,
+        funcionarioId: 1,
+      };
 
-    const dataCriacao = agora.toLocaleDateString("pt-BR");
-    const horaCriacao = agora.toLocaleTimeString("pt-BR", {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
+      console.log("Setor escolhido:", novaTask.setor);
+      console.log("Setor convertido:", setorToApiMap[novaTask.setor]);
+      console.log("Payload enviado:", payload);
 
-    const taskCompleta = {
-      ...novaTask,
-      id: Date.now(),
-      tarefaId: Date.now(),
-      criadoPor: "Admin", // temporário
-      dataCriacao,
-      horaCriacao,
-      estimativaFormatada: formatarEstimativa(novaTask.estimativaMinutos),
-    };
+      await api.post("/tarefas", payload);
+      await fetchDados();
 
-    setTasksState((prev) => [...prev, taskCompleta]);
+      
+      setNovaTask({
+        titulo: "",
+        setor: "Administrativo",
+        prioridade: "Média",
+        status: "Pendente",
+        estimativaMinutos: "",
+        descricao: "",
+      });
 
-    // resetar
-    setNovaTask({
-      titulo: "",
-      setor: "Administrativo",
-      prioridade: "Média",
-      status: "Pendente",
-      estimativaMinutos: "",
-      descricao: "",
-    });
+      setCreateTaskOpen(false);
+    } catch (err) {
+      console.error("Erro ao criar tarefa:", err.response?.data || err.message);
 
-    setCreateTaskOpen(false);
+      alert(
+        err.response?.data?.dados ||
+          err.response?.data?.mensagem ||
+          "Erro ao criar tarefa. Verifique a API.",
+      );
+    }
   }
+
   // ===== Exportar PDF =====
   function exportarPDF() {
     const doc = new jsPDF();
@@ -292,7 +338,6 @@ function Home() {
       t.horaCriacao,
       t.descricao || "-",
     ]);
-
 
     // ===== TABELA =====
     autoTable(doc, {
@@ -459,6 +504,11 @@ function Home() {
       { name: "Canceladas", value: canceladas },
     ],
     [pendentes, andamento, concluidas, canceladas],
+  );
+
+  const dataGraficoFiltrado = useMemo(
+    () => dataGrafico.filter((item) => item.value > 0),
+    [dataGrafico],
   );
 
   if (loading) {
@@ -653,8 +703,9 @@ function Home() {
                 <th>Hora</th>
 
                 <th
-                  className={`${styles.thSortable} ${styles.textCenter} ${ordemData ? styles.colunaAtiva : ""
-                    }`}
+                  className={`${styles.thSortable} ${styles.textCenter} ${
+                    ordemData ? styles.colunaAtiva : ""
+                  }`}
                   onClick={() =>
                     setOrdemData((prev) => {
                       if (prev === null) return "recente";
@@ -688,8 +739,9 @@ function Home() {
 
                   <td>
                     <span
-                      className={`${styles.badge} ${styles[statusMap[task.status]] || styles.statusPendente
-                        }`}
+                      className={`${styles.badge} ${
+                        styles[statusMap[task.status]] || styles.statusPendente
+                      }`}
                     >
                       {task.status}
                     </span>
@@ -697,8 +749,9 @@ function Home() {
 
                   <td>
                     <span
-                      className={`${styles.badge} ${styles[prioridadeMap[task.prioridade]]
-                        }`}
+                      className={`${styles.badge} ${
+                        styles[prioridadeMap[task.prioridade]]
+                      }`}
                     >
                       {task.prioridade}
                     </span>
@@ -706,7 +759,7 @@ function Home() {
 
                   <td>{task.setor}</td>
                   <td>{task.criadoPor}</td>
-                  <td>{task.estimativaMinutos} min</td>
+                  <td>{task.estimativaFormatada}</td>
                   <td>{task.horaCriacao}</td>
                   <td>{task.dataCriacao}</td>
                 </tr>
@@ -755,7 +808,7 @@ function Home() {
                 <p>
                   <strong>Estimativa:</strong> {task.estimativaFormatada}
                 </p>
-                
+
                 <div className={styles.cardFooter}>
                   <span>{task.horaCriacao}</span>
                   <span>{task.dataCriacao}</span>
@@ -805,8 +858,9 @@ function Home() {
               <div>
                 <strong>Prioridade:</strong>
                 <span
-                  className={`${styles.badge} ${styles[prioridadeMap[selectedTask.prioridade]]
-                    }`}
+                  className={`${styles.badge} ${
+                    styles[prioridadeMap[selectedTask.prioridade]]
+                  }`}
                 >
                   {selectedTask.prioridade}
                 </span>
@@ -815,8 +869,10 @@ function Home() {
               <div>
                 <strong>Status:</strong>
                 <span
-                  className={`${styles.badge} ${styles[statusMap[selectedTask.status]] || styles.statusPendente
-                    }`}
+                  className={`${styles.badge} ${
+                    styles[statusMap[selectedTask.status]] ||
+                    styles.statusPendente
+                  }`}
                 >
                   {selectedTask.status}
                 </span>
@@ -1129,7 +1185,7 @@ function Home() {
           <ResponsiveContainer width="100%" height={isMobile ? 220 : 400}>
             <PieChart>
               <Pie
-                data={dataGrafico}
+                data={dataGraficoFiltrado}
                 dataKey="value"
                 nameKey="name"
                 outerRadius={isMobile ? 70 : 120}
@@ -1141,17 +1197,21 @@ function Home() {
                   isMobile
                     ? false
                     : ({ name, percent }) =>
-                      `${name}: ${(percent * 100).toFixed(0)}%`
+                        `${name}: ${(percent * 100).toFixed(0)}%`
                 }
                 labelLine={false}
                 fontSize={isMobile ? 12 : 20}
               >
-                {dataGrafico.map((entry, index) => (
-                  <Cell
-                    key={index}
-                    fill={["#ef4444", "#f59e0b", "#22c55e", "#6b7280"][index]}
-                  />
-                ))}
+                {dataGraficoFiltrado.map((entry) => {
+                  const colorMap = {
+                    Pendentes: "#ef4444",
+                    "Em andamento": "#f59e0b",
+                    Concluídas: "#22c55e",
+                    Canceladas: "#6b7280",
+                  };
+
+                  return <Cell key={entry.name} fill={colorMap[entry.name]} />;
+                })}
               </Pie>
 
               <Tooltip />
@@ -1160,21 +1220,28 @@ function Home() {
 
           {/* legenda manual */}
           <div className={styles.legenda}>
-            {dataGrafico.map((item, i) => (
-              <div key={i}>
-                <span
-                  className={styles.cor}
-                  style={{
-                    background: ["#ef4444", "#f59e0b", "#22c55e", "#6b7280"][i],
-                  }}
-                ></span>
-                {item.name} ({item.value})
-              </div>
-            ))}
+            {dataGraficoFiltrado.map((item) => {
+              const colorMap = {
+                Pendentes: "#ef4444",
+                "Em andamento": "#f59e0b",
+                Concluídas: "#22c55e",
+                Canceladas: "#6b7280",
+              };
+
+              return (
+                <div key={item.name}>
+                  <span
+                    className={styles.cor}
+                    style={{ background: colorMap[item.name] }}
+                  ></span>
+                  {item.name} ({item.value})
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>
-    </div >
+    </div>
   );
 }
 
