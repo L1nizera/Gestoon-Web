@@ -75,26 +75,16 @@ function Funcionarios() {
   const cargoToApiMap = {
     Gerente: 1,
     Supervisor: 2,
-    Analista: 3,
-    Auxiliar: 4,
-    Caixa: 5,
-    Motorista: 6,
-    Repositor: 7,
-    Atendente: 8,
-    Coordenador: 9,
-    "Auxiliar de Limpeza": 10,
+    Caixa: 3,
+    Repositor: 4,
+    "Auxiliar de Limpeza": 5,
   };
-
+  
   const cargos = [
     "Gerente",
     "Supervisor",
-    "Analista",
-    "Auxiliar",
     "Caixa",
-    "Motorista",
     "Repositor",
-    "Atendente",
-    "Coordenador",
     "Auxiliar de Limpeza",
   ];
 
@@ -199,9 +189,8 @@ function Funcionarios() {
       align: "center",
       render: (row) => (
         <span
-          className={`${styles.badge} ${
-            row.ativo ? styles.statusConcluida : styles.statusCancelada
-          }`}
+          className={`${styles.badge} ${row.ativo ? styles.statusConcluida : styles.statusCancelada
+            }`}
         >
           {row.ativo ? "Ativo" : "Inativo"}
         </span>
@@ -285,8 +274,8 @@ function Funcionarios() {
 
       alert(
         err.response?.data?.dados ||
-          err.response?.data?.mensagem ||
-          "Erro ao editar funcionário. Verifique a API.",
+        err.response?.data?.mensagem ||
+        "Erro ao editar funcionário. Verifique a API.",
       );
     }
   }
@@ -351,8 +340,8 @@ function Funcionarios() {
 
       alert(
         err.response?.data?.dados ||
-          err.response?.data?.mensagem ||
-          "Erro ao cadastrar funcionário. Verifique a API.",
+        err.response?.data?.mensagem ||
+        "Erro ao cadastrar funcionário. Verifique a API.",
       );
     }
   }
@@ -601,11 +590,10 @@ function Funcionarios() {
                 <strong>Status:</strong>
 
                 <span
-                  className={`${styles.badge} ${
-                    selected.ativo
-                      ? styles.statusConcluida
-                      : styles.statusCancelada
-                  }`}
+                  className={`${styles.badge} ${selected.ativo
+                    ? styles.statusConcluida
+                    : styles.statusCancelada
+                    }`}
                 >
                   {selected.ativo ? "Ativo" : "Inativo"}
                 </span>
