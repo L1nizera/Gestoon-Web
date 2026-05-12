@@ -66,6 +66,13 @@ function Home() {
     3: "Cancelada",
   };
 
+  const statusToApiMap = {
+    Pendente: 0,
+    "Em andamento": 1,
+    Concluída: 2,
+    Cancelada: 3,
+  };
+
   function formatarStatus(status) {
     const statusNumero = Number(status);
 
@@ -237,12 +244,27 @@ function Home() {
     setOrdemTitulo(null);
   }
 
-  function excluirTask(id) {
-    if (!confirm("Tem certeza que deseja excluir?")) return;
+  async function excluirTask(id) {
+    if (!confirm("Tem certeza que deseja excluir esta tarefa?")) return;
 
-    const novaLista = tasksState.filter((t) => t.id !== id);
-    setTasksState(novaLista);
-    setSelectedTask(null);
+    try {
+      await api.delete(`/tarefas/${id}`);
+
+      await fetchDados();
+
+      setSelectedTask(null);
+    } catch (err) {
+      console.error(
+        "Erro ao excluir tarefa:",
+        err.response?.data || err.message,
+      );
+
+      alert(
+        err.response?.data?.dados ||
+          err.response?.data?.mensagem ||
+          "Erro ao excluir tarefa. Verifique a API.",
+      );
+    }
   }
 
   function abrirEdicao(task) {
@@ -250,21 +272,62 @@ function Home() {
     setEditTask({ ...task });
   }
 
-  function salvarEdicao() {
-    setTasksState((prev) =>
-      prev.map((t) =>
-        t.id === editTask.id
-          ? {
-              ...editTask,
-              estimativaFormatada: formatarEstimativa(
-                editTask.estimativaMinutos,
-              ),
-            }
-          : t,
-      ),
-    );
+  async function salvarEdicao() {
+    if (!editTask.titulo.trim()) {
+      alert("O título da tarefa é obrigatório.");
+      return;
+    }
 
-    setEditTask(null);
+    const setorId = setorToApiMap[editTask.setor];
+    const prioridade = prioridadeToApiMap[editTask.prioridade];
+    const status = statusToApiMap[editTask.status];
+
+    if (!setorId) {
+      alert("Setor inválido.");
+      return;
+    }
+
+    if (!prioridade) {
+      alert("Prioridade inválida.");
+      return;
+    }
+
+    if (status === undefined) {
+      alert("Status inválido.");
+      return;
+    }
+
+    try {
+      const payload = {
+        titulo: editTask.titulo,
+        descricao: editTask.descricao,
+        prioridade,
+        setorId,
+        criadoPor: 1,
+        estimativaMinutos: Number(editTask.estimativaMinutos),
+        status,
+        funcionarioId: 1,
+      };
+
+      console.log("Payload edição tarefa:", payload);
+
+      await api.patch(`/tarefas/${editTask.tarefaId}`, payload);
+
+      await fetchDados();
+
+      setEditTask(null);
+    } catch (err) {
+      console.error(
+        "Erro ao editar tarefa:",
+        err.response?.data || err.message,
+      );
+
+      alert(
+        err.response?.data?.dados ||
+          err.response?.data?.mensagem ||
+          "Erro ao editar tarefa. Verifique a API.",
+      );
+    }
   }
 
   async function criarTask() {
@@ -278,7 +341,7 @@ function Home() {
         setorId: setorToApiMap[novaTask.setor],
         criadoPor: 1,
         estimativaMinutos: Number(novaTask.estimativaMinutos),
-        status: 0,
+        status: statusToApiMap[novaTask.status],
         funcionarioId: 1,
       };
 
@@ -289,7 +352,6 @@ function Home() {
       await api.post("/tarefas", payload);
       await fetchDados();
 
-      
       setNovaTask({
         titulo: "",
         setor: "Administrativo",

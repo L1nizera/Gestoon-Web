@@ -14,9 +14,20 @@ function Funcionarios() {
   const [ordemData, setOrdemData] = useState(null);
 
   const [selected, setSelected] = useState(null);
+  const [editFuncionario, setEditFuncionario] = useState(null);
+  const [createFuncionarioOpen, setCreateFuncionarioOpen] = useState(false);
   const [funcionarios, setFuncionarios] = useState([]);
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const [novoFuncionario, setNovoFuncionario] = useState({
+    nome: "",
+    email: "",
+    setor: "Administrativo",
+    cargo: "Gerente",
+    ativo: true,
+  });
 
   const setores = [
     "Administrativo",
@@ -51,6 +62,42 @@ function Funcionarios() {
     10: "Auxiliar de Limpeza",
   };
 
+  const setorToApiMap = {
+    Administrativo: 1,
+    Financeiro: 2,
+    Operacional: 3,
+    Atendimento: 4,
+    Limpeza: 5,
+    Estoque: 6,
+    Logística: 7,
+  };
+
+  const cargoToApiMap = {
+    Gerente: 1,
+    Supervisor: 2,
+    Analista: 3,
+    Auxiliar: 4,
+    Caixa: 5,
+    Motorista: 6,
+    Repositor: 7,
+    Atendente: 8,
+    Coordenador: 9,
+    "Auxiliar de Limpeza": 10,
+  };
+
+  const cargos = [
+    "Gerente",
+    "Supervisor",
+    "Analista",
+    "Auxiliar",
+    "Caixa",
+    "Motorista",
+    "Repositor",
+    "Atendente",
+    "Coordenador",
+    "Auxiliar de Limpeza",
+  ];
+
   const statusBadgeMap = {
     ativo: "statusConcluida",
     inativo: "statusCancelada",
@@ -58,40 +105,59 @@ function Funcionarios() {
   };
 
   function parseDateValue(value) {
-    if (!value) return { formatted: "-", iso: "" };
-
-    if (typeof value === "string" && /^\d{2}\/\d{2}\/\d{4}$/.test(value)) {
-      const [day, month, year] = value.split("/");
-      const date = new Date(`${year}-${month}-${day}`);
-
-      if (!Number.isNaN(date.getTime())) {
-        return {
-          formatted: date.toLocaleDateString("pt-BR"),
-          iso: date.toISOString(),
-        };
-      }
+    if (!value) {
+      return {
+        data: "-",
+        hora: "-",
+        iso: "",
+      };
     }
 
     const date = new Date(value);
 
     if (Number.isNaN(date.getTime())) {
-      return { formatted: "-", iso: "" };
+      return {
+        data: "-",
+        hora: "-",
+        iso: "",
+      };
     }
 
     return {
-      formatted: `${date.toLocaleDateString("pt-BR")} ${date.toLocaleTimeString(
-        "pt-BR",
-        {
-          hour: "2-digit",
-          minute: "2-digit",
-        },
-      )}`,
+      data: date.toLocaleDateString("pt-BR"),
+      hora: date.toLocaleTimeString("pt-BR", {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
       iso: date.toISOString(),
     };
   }
 
   function normalizeBoolean(value) {
-    return [true, 1, "1", "true", "Ativo", "ativo"].includes(value);
+    if (value === true) return true;
+    if (value === false) return false;
+
+    if (value === 1 || value === "1") return true;
+    if (value === 0 || value === "0") return false;
+
+    // Caso o MySQL retorne BIT(1) como Buffer
+    if (value && typeof value === "object" && Array.isArray(value.data)) {
+      return Number(value.data[0]) === 1;
+    }
+
+    // Caso venha Uint8Array/Buffer direto
+    if (value && typeof value === "object" && value[0] !== undefined) {
+      return Number(value[0]) === 1;
+    }
+
+    if (typeof value === "string") {
+      const normalized = value.toLowerCase().trim();
+
+      if (normalized === "ativo" || normalized === "true") return true;
+      if (normalized === "inativo" || normalized === "false") return false;
+    }
+
+    return false;
   }
 
   function formatStatus(value) {
@@ -133,11 +199,19 @@ function Funcionarios() {
       align: "center",
       render: (row) => (
         <span
-          className={`${styles.badge} ${styles[getStatusBadgeClass(row.ativo)]}`}
+          className={`${styles.badge} ${
+            row.ativo ? styles.statusConcluida : styles.statusCancelada
+          }`}
         >
-          {formatStatus(row.ativo)}
+          {row.ativo ? "Ativo" : "Inativo"}
         </span>
       ),
+    },
+
+    {
+      key: "horaCriacao",
+      label: "Hora",
+      align: "center",
     },
     {
       key: "dataCriacao",
@@ -176,12 +250,121 @@ function Funcionarios() {
     return null;
   }
 
+  function abrirEdicaoFuncionario(funcionario) {
+    setSelected(null);
+    setEditFuncionario({ ...funcionario });
+  }
+
+  async function salvarEdicaoFuncionario() {
+    if (!editFuncionario.nome.trim()) {
+      alert("O nome do funcionário é obrigatório.");
+      return;
+    }
+
+    try {
+      const payload = {
+        nome: editFuncionario.nome,
+        email: editFuncionario.email,
+        setorId: setorToApiMap[editFuncionario.setor],
+        cargoId: cargoToApiMap[editFuncionario.cargo],
+        ativo: editFuncionario.ativo ? 1 : 0,
+      };
+
+      console.log("Payload edição funcionário:", payload);
+
+      await api.patch(`/funcionarios/${editFuncionario.id}`, payload);
+
+      await fetchDados();
+
+      setEditFuncionario(null);
+    } catch (err) {
+      console.error(
+        "Erro ao editar funcionário:",
+        err.response?.data || err.message,
+      );
+
+      alert(
+        err.response?.data?.dados ||
+          err.response?.data?.mensagem ||
+          "Erro ao editar funcionário. Verifique a API.",
+      );
+    }
+  }
+
+  function validarEmail(email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  }
+
+  async function criarFuncionario() {
+    if (!novoFuncionario.nome.trim()) {
+      alert("O nome do funcionário é obrigatório.");
+      return;
+    }
+
+    if (!validarEmail(novoFuncionario.email)) {
+      alert("Email inválido.");
+      return;
+    }
+
+    const setorId = setorToApiMap[novoFuncionario.setor];
+    const cargoId = cargoToApiMap[novoFuncionario.cargo];
+
+    if (!setorId) {
+      alert("Setor inválido.");
+      return;
+    }
+
+    if (!cargoId) {
+      alert("Cargo inválido.");
+      return;
+    }
+
+    try {
+      const payload = {
+        nome: novoFuncionario.nome,
+        email: novoFuncionario.email,
+        setor: setorId,
+        cargo: cargoId,
+        ativo: novoFuncionario.ativo ? 1 : 0,
+      };
+
+      console.log("Payload cadastro funcionário:", payload);
+
+      await api.post("/funcionarios", payload);
+
+      await fetchDados();
+
+      setNovoFuncionario({
+        nome: "",
+        email: "",
+        setor: "Administrativo",
+        cargo: "Gerente",
+        ativo: true,
+      });
+
+      setCreateFuncionarioOpen(false);
+    } catch (err) {
+      console.error(
+        "Erro ao cadastrar funcionário:",
+        err.response?.data || err.message,
+      );
+
+      alert(
+        err.response?.data?.dados ||
+          err.response?.data?.mensagem ||
+          "Erro ao cadastrar funcionário. Verifique a API.",
+      );
+    }
+  }
+
   const fetchDados = async () => {
     try {
       setLoading(true);
       setError(null);
 
       const response = await api.get("/funcionarios");
+
+      console.log("Funcionários vindos da API:", response.data?.dados);
 
       const funcionariosFormatados = (response.data?.dados || []).map(
         (funcionario) => {
@@ -203,9 +386,10 @@ function Funcionarios() {
               `Cargo #${funcionario.func_crg_id}`,
 
             ativo,
-            status: formatStatus(funcionario.func_ativo),
+            status: ativo ? "Ativo" : "Inativo",
 
-            dataCriacao: date.formatted,
+            dataCriacao: date.data,
+            horaCriacao: date.hora,
             dataCriacaoISO: date.iso,
           };
         },
@@ -240,9 +424,7 @@ function Funcionarios() {
     if (ativoFiltro !== "") {
       const ativoValor = ativoFiltro === "true";
 
-      resultado = resultado.filter(
-        (func) => func.ativo === ativoValor,
-      );
+      resultado = resultado.filter((func) => func.ativo === ativoValor);
     }
 
     resultado.sort((a, b) => {
@@ -259,24 +441,14 @@ function Funcionarios() {
         const dataA = new Date(a.dataCriacaoISO);
         const dataB = new Date(b.dataCriacaoISO);
 
-        ordenacao =
-          ordemData === "recente"
-            ? dataB - dataA
-            : dataA - dataB;
+        ordenacao = ordemData === "recente" ? dataB - dataA : dataA - dataB;
       }
 
       return ordenacao;
     });
 
     return resultado;
-  }, [
-    funcionarios,
-    busca,
-    setorFiltro,
-    ativoFiltro,
-    ordemNome,
-    ordemData,
-  ]);
+  }, [funcionarios, busca, setorFiltro, ativoFiltro, ordemNome, ordemData]);
 
   function limparFiltros() {
     setBusca("");
@@ -290,16 +462,20 @@ function Funcionarios() {
     const doc = new jsPDF();
 
     const dados = lista.map((func) => [
+      func.id,
       func.nome,
       func.email,
       func.setor,
       func.cargo,
       func.status,
       func.dataCriacao,
+      func.horaCriacao,
     ]);
 
     autoTable(doc, {
-      head: [["Nome", "Email", "Setor", "Cargo", "Status", "Data"]],
+      head: [
+        ["ID", "Nome", "Email", "Setor", "Cargo", "Status", "Data", "Hora"],
+      ],
       body: dados,
     });
 
@@ -353,20 +529,13 @@ function Funcionarios() {
         </div>
 
         <div className={styles.acoes}>
-          <button
-            className={styles.limparBtn}
-            onClick={limparFiltros}
-          >
+          <button className={styles.limparBtn} onClick={limparFiltros}>
             Limpar Filtros
           </button>
 
           <button
             className={styles.criarBtn}
-            onClick={() =>
-              alert(
-                "Cadastro de funcionário não está disponível nesta versão.",
-              )
-            }
+            onClick={() => setCreateFuncionarioOpen(true)}
           >
             Cadastrar Funcionário
           </button>
@@ -382,16 +551,8 @@ function Funcionarios() {
             data={lista}
             rowKey="id"
             onRowClick={setSelected}
-            sortKey={
-              ordemNome
-                ? "nome"
-                : ordemData
-                  ? "dataCriacao"
-                  : null
-            }
-            sortDirection={getSortDirection(
-              ordemNome ? "nome" : "dataCriacao",
-            )}
+            sortKey={ordemNome ? "nome" : ordemData ? "dataCriacao" : null}
+            sortDirection={getSortDirection(ordemNome ? "nome" : "dataCriacao")}
             onSort={handleSort}
             emptyMessage="Nenhum funcionário encontrado"
           />
@@ -403,12 +564,21 @@ function Funcionarios() {
             onClose={() => setSelected(null)}
             variant="between"
             actions={
-              <button
-                className={styles.btnClose}
-                onClick={() => setSelected(null)}
-              >
-                Fechar
-              </button>
+              <>
+                <button
+                  className={styles.btnClose}
+                  onClick={() => setSelected(null)}
+                >
+                  Fechar
+                </button>
+
+                <button
+                  className={styles.btnPrimary}
+                  onClick={() => abrirEdicaoFuncionario(selected)}
+                >
+                  Editar
+                </button>
+              </>
             }
           >
             <div className={styles.modalGrid}>
@@ -431,20 +601,267 @@ function Funcionarios() {
                 <strong>Status:</strong>
 
                 <span
-                  className={`${styles.badge} ${styles[getStatusBadgeClass(selected.ativo)]}`}
+                  className={`${styles.badge} ${
+                    selected.ativo
+                      ? styles.statusConcluida
+                      : styles.statusCancelada
+                  }`}
                 >
-                  {selected.status}
+                  {selected.ativo ? "Ativo" : "Inativo"}
                 </span>
+              </div>
+
+              <div>
+                <strong>Data de cadastro:</strong>
+                <p>{selected.dataCriacao}</p>
+              </div>
+            </div>
+          </Modal>
+        )}
+
+        {createFuncionarioOpen && (
+          <Modal
+            title="Cadastrar Funcionário"
+            onClose={() => setCreateFuncionarioOpen(false)}
+            variant="between"
+            actions={
+              <>
+                <button
+                  className={styles.btnDanger}
+                  onClick={() => setCreateFuncionarioOpen(false)}
+                >
+                  Fechar
+                </button>
+
+                <button
+                  className={styles.btnSecondary}
+                  onClick={() =>
+                    setNovoFuncionario({
+                      nome: "",
+                      email: "",
+                      setor: "Administrativo",
+                      cargo: "Gerente",
+                      ativo: true,
+                    })
+                  }
+                >
+                  Limpar
+                </button>
+
+                <button
+                  className={styles.btnPrimary}
+                  onClick={criarFuncionario}
+                >
+                  Cadastrar
+                </button>
+              </>
+            }
+          >
+            <div className={styles.formGrid}>
+              <div className={`${styles.formGroup} ${styles.full}`}>
+                <label>Nome</label>
+                <input
+                  type="text"
+                  value={novoFuncionario.nome}
+                  onChange={(e) =>
+                    setNovoFuncionario({
+                      ...novoFuncionario,
+                      nome: e.target.value,
+                    })
+                  }
+                  placeholder="Digite o nome..."
+                />
+              </div>
+
+              <div className={`${styles.formGroup} ${styles.full}`}>
+                <label>Email</label>
+                <input
+                  type="email"
+                  value={novoFuncionario.email}
+                  onChange={(e) =>
+                    setNovoFuncionario({
+                      ...novoFuncionario,
+                      email: e.target.value,
+                    })
+                  }
+                  placeholder="Digite o email..."
+                />
+              </div>
+
+              <div className={styles.formGroup}>
+                <label>Setor</label>
+                <select
+                  value={novoFuncionario.setor}
+                  onChange={(e) =>
+                    setNovoFuncionario({
+                      ...novoFuncionario,
+                      setor: e.target.value,
+                    })
+                  }
+                >
+                  {setores.map((setor) => (
+                    <option key={setor} value={setor}>
+                      {setor}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className={styles.formGroup}>
+                <label>Cargo</label>
+                <select
+                  value={novoFuncionario.cargo}
+                  onChange={(e) =>
+                    setNovoFuncionario({
+                      ...novoFuncionario,
+                      cargo: e.target.value,
+                    })
+                  }
+                >
+                  {cargos.map((cargo) => (
+                    <option key={cargo} value={cargo}>
+                      {cargo}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className={styles.formGroup}>
+                <label>Status</label>
+                <select
+                  value={novoFuncionario.ativo ? "1" : "0"}
+                  onChange={(e) =>
+                    setNovoFuncionario({
+                      ...novoFuncionario,
+                      ativo: e.target.value === "1",
+                    })
+                  }
+                >
+                  <option value="1">Ativo</option>
+                  <option value="0">Inativo</option>
+                </select>
+              </div>
+            </div>
+          </Modal>
+        )}
+
+        {editFuncionario && (
+          <Modal
+            title="Editar Funcionário"
+            onClose={() => setEditFuncionario(null)}
+            variant="between"
+            actions={
+              <>
+                <button
+                  className={styles.btnSecondary}
+                  onClick={() => setEditFuncionario(null)}
+                >
+                  Cancelar
+                </button>
+
+                <button
+                  className={styles.btnPrimary}
+                  onClick={salvarEdicaoFuncionario}
+                >
+                  Salvar
+                </button>
+              </>
+            }
+          >
+            <div className={styles.formGrid}>
+              <div className={`${styles.formGroup} ${styles.full}`}>
+                <label>Nome</label>
+                <input
+                  type="text"
+                  value={editFuncionario.nome}
+                  onChange={(e) =>
+                    setEditFuncionario({
+                      ...editFuncionario,
+                      nome: e.target.value,
+                    })
+                  }
+                />
+              </div>
+
+              <div className={`${styles.formGroup} ${styles.full}`}>
+                <label>Email</label>
+                <input
+                  type="email"
+                  value={editFuncionario.email}
+                  onChange={(e) =>
+                    setEditFuncionario({
+                      ...editFuncionario,
+                      email: e.target.value,
+                    })
+                  }
+                />
+              </div>
+
+              <div className={styles.formGroup}>
+                <label>Setor</label>
+                <select
+                  value={editFuncionario.setor}
+                  onChange={(e) =>
+                    setEditFuncionario({
+                      ...editFuncionario,
+                      setor: e.target.value,
+                    })
+                  }
+                >
+                  {setores.map((setor) => (
+                    <option key={setor} value={setor}>
+                      {setor}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className={styles.formGroup}>
+                <label>Cargo</label>
+                <select
+                  value={editFuncionario.cargo}
+                  onChange={(e) =>
+                    setEditFuncionario({
+                      ...editFuncionario,
+                      cargo: e.target.value,
+                    })
+                  }
+                >
+                  {cargos.map((cargo) => (
+                    <option key={cargo} value={cargo}>
+                      {cargo}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className={styles.formGroup}>
+                <label>Status</label>
+                <select
+                  value={editFuncionario.ativo ? "1" : "0"}
+                  onChange={(e) =>
+                    setEditFuncionario({
+                      ...editFuncionario,
+                      ativo: e.target.value === "1",
+                      status: e.target.value === "1" ? "Ativo" : "Inativo",
+                    })
+                  }
+                >
+                  <option value="1">Ativo</option>
+                  <option value="0">Inativo</option>
+                </select>
+              </div>
+
+              <div className={styles.formGroup}>
+                <label>ID</label>
+                <input type="text" value={editFuncionario.id} disabled />
               </div>
             </div>
           </Modal>
         )}
 
         <div className={styles.footerActions}>
-          <button
-            className={styles.exportBtn}
-            onClick={exportarPDF}
-          >
+          <button className={styles.exportBtn} onClick={exportarPDF}>
             Exportar PDF
           </button>
         </div>
