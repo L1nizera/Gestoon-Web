@@ -1,13 +1,13 @@
 import { useMemo, useState } from "react";
-import { tasks } from "../../data/Tasks";
+import { tasks } from "../../../data/Tasks";
 
-import PageLayout from "../../components/ui/PageLayout";
-import PageCard from "../../components/ui/PageCard";
-import SearchInput from "../../components/ui/SearchInput";
-import FilterPanel from "../../components/ui/FilterPanel";
-import PageActions from "../../components/ui/PageActions";
-import Button from "../../components/ui/Button";
-import DataTable from "../../components/ui/DataTable";
+import PageLayout from "../../../components/ui/PageLayout";
+import PageCard from "../../../components/ui/PageCard";
+import SearchInput from "../../../components/ui/SearchInput";
+import FilterPanel from "../../../components/ui/FilterPanel";
+import PageActions from "../../../components/ui/PageActions";
+import Button from "../../../components/ui/Button";
+import DataTable from "../../../components/ui/DataTable";
 
 const funcionariosMock = [
   { id: 1, nome: "João Silva", cargo: "Supervisor", dataCriacao: "10/03/2026" },

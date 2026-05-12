@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import styles from "./style.module.css";
-import { tasks } from "../../data/Tasks";
+import { tasks } from "../../../data/Tasks";
 
 const statusClasses = {
   Pendente: styles.statusPendente,

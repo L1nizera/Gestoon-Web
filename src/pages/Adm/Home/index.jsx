@@ -3,8 +3,8 @@ import styles from "./style.module.css";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import Modal from "../../components/Modal/Modal";
-import api from "../../services/api";
+import Modal from "../../../components/Modal/Modal";
+import api from "../../../services/api";
 
 function Home() {
   const [funcionariosMap, setFuncionariosMap] = useState({});
