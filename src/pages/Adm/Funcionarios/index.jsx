@@ -1,10 +1,10 @@
 import { useState, useMemo, useEffect } from "react";
 import styles from "../Home/style.module.css";
 import jsPDF from "jspdf";
-import Modal from "../../components/Modal/Modal";
+import Modal from "../../../components/Modal/Modal";
 import autoTable from "jspdf-autotable";
-import DataTable from "../../components/ui/DataTable";
-import api from "../../services/api";
+import DataTable from "../../../components/ui/DataTable";
+import api from "../../../services/api";
 
 function Funcionarios() {
   const [busca, setBusca] = useState("");

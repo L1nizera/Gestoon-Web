@@ -1,13 +1,13 @@
 
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
-import Login from "./pages/Login/index";
-import Home from "./pages/Home";
-import DashboardLayout from "./layouts/index";
-import Funcionarios from "./pages/Funcionarios/index";
-import Perfil from "./pages/Perfil/index";
-import Relatorios from "./pages/Relatorios";
-import Tarefas from "./pages/Tarefas";
-import Historico from "./pages/Historico";
+import Login from "./pages/Login";
+import Home from "./pages/Adm/Home";
+import DashboardLayout from "./layouts";
+import Funcionarios from "./pages/Adm/Funcionarios";
+import Perfil from "./pages/Perfil";
+import Relatorios from "./pages/Adm/Relatorios";
+import Tarefas from "./pages/Funcionarios/Tarefas";
+import Historico from "./pages/Funcionarios/Historico";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 
