@@ -139,6 +139,7 @@ body {
 .filtrosContainer {
   display: flex;
   gap: 1.2rem;
+  justify-content: flex-end;
   align-items: flex-end;
   flex-wrap: wrap;
   background: var(--bg-card);
@@ -204,6 +205,8 @@ body {
     flex-direction: column;
     gap: 1rem;
     padding: 1rem;
+    justify-content: stretch;
+    align-items: stretch;
   }
 
   .filtroGroup select,
@@ -266,6 +269,8 @@ body {
 /* ===== TABLE WRAPPER ===== */
 .tableWrapper {
   overflow-x: auto;
+  overflow-y: auto;
+  max-height: 70vh;
   background: var(--bg-card);
   border-radius: 1.2rem;
   border: 0.1rem solid var(--border-default);
@@ -274,7 +279,55 @@ body {
 }
 
 .tableWrapper::-webkit-scrollbar {
+  width: 0.8rem;
   height: 0.8rem;
+}
+
+.desktopOnly {
+  display: block;
+}
+
+.mobileOnly {
+  display: none;
+}
+
+.card {
+  background: var(--bg-surface-alt);
+  border-radius: 12px;
+  padding: 14px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  transition: 0.2s;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+@media (max-width: 768px) {
+  .cardHeader strong {
+    font-size: 1rem;
+  }
+}
+
+.cardBody p {
+  margin: 4px 0;
+  font-size: 13px;
+}
+
+.cardFooter {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+  font-size: 12px;
+  opacity: 0.7;
 }
 
 .tableWrapper::-webkit-scrollbar-track {
@@ -291,6 +344,11 @@ body {
 .tableWrapper::-webkit-scrollbar-thumb:hover {
   background: var(--text-primary);
   opacity: 1;
+}
+
+/* ===== MOBILE CARDS CONTAINER (ESCONDIDO NO DESKTOP) ===== */
+.mobileCardsContainer {
+  display: none;
 }
 
 .table {
@@ -822,28 +880,146 @@ body {
     min-width: auto;
   }
 
-  .table th,
-  .table td {
-    padding: 0.9rem 0.8rem;
-    font-size: 1.2rem;
-  }
-
-  .table th {
-    font-size: 1.2rem;
-  }
-
   .sectionHeader {
     flex-direction: column;
     align-items: stretch;
   }
 
-  .tableWrapper {
-    border-radius: 1rem;
-  }
-
   .btnAccept {
     min-width: 11rem;
     padding: 0.7rem 1rem;
+    font-size: 1.2rem;
+  }
+
+  /* ═════════════════════════════════════════════════════════════════ */
+  /* 📱 DESKTOP TABLE → MOBILE CARDS (768px breakpoint) */
+  /* ═════════════════════════════════════════════════════════════════ */
+
+  /* ESCONDER TABELA NO MOBILE */
+  .desktopOnly {
+    display: none !important;
+  }
+
+  .tableWrapper {
+    display: none;
+  }
+
+  /* MOSTRAR CARDS NO MOBILE */
+  .mobileOnly {
+    display: flex !important;
+    flex-direction: column;
+    gap: 12px;
+    max-height: calc(75vh - 240px);
+    overflow-y: auto;
+    padding-right: 0.5rem;
+  }
+
+  .mobileCardsContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    max-height: calc(100vh - 280px);
+    overflow-y: auto;
+    padding: 0.5rem 0;
+  }
+
+  .mobileCardsContainer::-webkit-scrollbar {
+    width: 0.6rem;
+  }
+
+  .mobileCardsContainer::-webkit-scrollbar-track {
+    background: var(--bg-surface);
+    border-radius: 1rem;
+  }
+
+  .mobileCardsContainer::-webkit-scrollbar-thumb {
+    background: var(--text-secondary);
+    border-radius: 1rem;
+    opacity: 0.6;
+  }
+
+  .mobileCardsContainer::-webkit-scrollbar-thumb:hover {
+    background: var(--text-primary);
+    opacity: 1;
+  }
+
+  /* CARD MOBILE */
+  .mobileCard {
+    background: var(--bg-card);
+    border-radius: 1rem;
+    padding: 1.2rem;
+    border: 0.1rem solid var(--border-default);
+    box-shadow: 0 0.4rem 1.2rem rgba(2, 6, 23, 0.05);
+    transition: all 0.3s ease;
+    animation: fadeRow 0.2s ease;
+  }
+
+  .mobileCard:hover {
+    box-shadow: 0 0.8rem 2rem rgba(2, 6, 23, 0.1);
+    transform: translateY(-2px);
+  }
+
+  .mobileCard:active {
+    transform: scale(0.98);
+  }
+
+  /* CABEÇALHO DO CARD */
+  .mobileCardHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 0.8rem;
+    margin-bottom: 1rem;
+    border-bottom: 0.1rem solid var(--border-default);
+    padding-bottom: 1rem;
+  }
+
+  .mobileCardHeader strong {
+    font-size: 1.35rem;
+    color: var(--text-primary);
+    flex: 1;
+    word-break: break-word;
+  }
+
+  /* CORPO DO CARD */
+  .mobileCardBody {
+    margin-bottom: 1rem;
+  }
+
+  .mobileCardBody p {
+    margin: 0.7rem 0;
+    font-size: 1.3rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+  }
+
+  .mobileCardBody strong {
+    color: var(--text-primary);
+    font-weight: 600;
+  }
+
+  /* RODAPÉ DO CARD */
+  .mobileCardFooter {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1.2rem;
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 0.1rem solid var(--border-default);
+  }
+
+  /* AÇÕES DO CARD */
+  .mobileCardActions {
+    display: flex;
+    gap: 0.8rem;
+  }
+
+  .mobileCard .btnAccept {
+    width: 100%;
+    min-width: auto;
+    padding: 0.85rem 1rem;
     font-size: 1.2rem;
   }
 }
@@ -899,107 +1075,44 @@ body {
     display: none;
   }
 
-  /* MOBILE CARDS VIEW */
+  /* REFINAMENTOS ADICIONAIS PARA 480px */
   .mobileCardsContainer {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    max-height: calc(100vh - 300px);
-    overflow-y: auto;
-    padding: 0.5rem 0;
-  }
-
-  .mobileCardsContainer::-webkit-scrollbar {
-    width: 0.6rem;
-  }
-
-  .mobileCardsContainer::-webkit-scrollbar-track {
-    background: var(--bg-main);
-    border-radius: 1rem;
-  }
-
-  .mobileCardsContainer::-webkit-scrollbar-thumb {
-    background: var(--text-secondary);
-    border-radius: 1rem;
+    max-height: calc(100vh - 250px);
   }
 
   .mobileCard {
-    background: var(--bg-card);
-    border-radius: 1rem;
-    padding: 1.2rem;
-    border: 0.1rem solid var(--border-default);
-    box-shadow: 0 0.4rem 1.2rem rgba(2, 6, 23, 0.05);
-    transition: all 0.3s ease;
-  }
-
-  .mobileCard:active {
-    transform: scale(0.98);
+    padding: 1rem;
+    border-radius: 0.8rem;
   }
 
   .mobileCardHeader {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
     gap: 0.5rem;
-    margin-bottom: 1rem;
-    border-bottom: 0.1rem solid var(--border-default);
-    padding-bottom: 1rem;
+    padding-bottom: 0.8rem;
+    margin-bottom: 0.8rem;
   }
 
   .mobileCardHeader strong {
-    font-size: 1.35rem;
-    color: var(--text-primary);
-    flex: 1;
-    word-break: break-word;
+    font-size: 1.25rem;
   }
 
   .mobileCardBody {
-    margin-bottom: 1rem;
+    margin-bottom: 0.8rem;
   }
 
   .mobileCardBody p {
-    margin: 0.6rem 0;
+    margin: 0.5rem 0;
     font-size: 1.2rem;
-    color: var(--text-secondary);
-  }
-
-  .mobileCardBody strong {
-    color: var(--text-primary);
-    font-weight: 600;
   }
 
   .mobileCardFooter {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    margin-bottom: 0.8rem;
+    padding-bottom: 0.8rem;
     font-size: 1.1rem;
-    color: var(--text-muted);
-    margin-bottom: 1rem;
-    padding-bottom: 1rem;
-    border-bottom: 0.1rem solid var(--border-default);
-  }
-
-  .mobileCardActions {
-    display: flex;
-    gap: 0.8rem;
-  }
-
-  .mobileCardActions button {
-    flex: 1;
-    padding: 0.75rem;
-    font-size: 1.2rem;
-    border: none;
-    border-radius: 0.6rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
   }
 
   .mobileCard .btnAccept {
-    width: 100%;
-    min-width: auto;
-    padding: 0.85rem;
-    font-size: 1.2rem;
+    padding: 0.75rem 0.8rem;
+    font-size: 1.1rem;
   }
 
   .emptyState {
@@ -1009,11 +1122,6 @@ body {
 
   .emptyStateIcon {
     font-size: 3rem;
-  }
-
-  /* MODAL AJUSTADO */
-  .filtrosContainer {
-    border-radius: 1rem;
   }
 
   .section {

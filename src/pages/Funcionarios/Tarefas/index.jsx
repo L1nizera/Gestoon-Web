@@ -366,7 +366,7 @@ export default function Tarefas() {
         ) : (
           <>
             {/* DESKTOP: TABELA */}
-            <div className={styles.tableWrapper}>
+            <div className={`${styles.tableWrapper} ${styles.desktopOnly}`}>
               <table className={styles.table}>
                 <thead>
                   <tr>
@@ -432,17 +432,17 @@ export default function Tarefas() {
             </div>
 
             {/* MOBILE: CARDS */}
-            <div className={styles.mobileCardsContainer}>
+            <div className={`${styles.mobileCardsContainer} ${styles.mobileOnly}`}>
               {tarefasFiltradas.map((tarefa) => (
-                <div key={tarefa.id} className={styles.mobileCard}>
+                <div key={tarefa.id} className={`${styles.card} ${styles.mobileCard}`}>
                   {/* CABEÇALHO DO CARD */}
-                  <div className={styles.mobileCardHeader}>
+                  <div className={styles.cardHeader}>
                     <strong>{tarefa.titulo}</strong>
                     <PrioridadeBadge prioridade={tarefa.prioridade} />
                   </div>
 
                   {/* CORPO DO CARD */}
-                  <div className={styles.mobileCardBody}>
+                  <div className={styles.cardBody}>
                     <p>
                       <strong>Setor:</strong> {tarefa.setor}
                     </p>
@@ -455,12 +455,12 @@ export default function Tarefas() {
                   </div>
 
                   {/* RODAPÉ DO CARD */}
-                  <div className={styles.mobileCardFooter}>
+                  <div className={styles.cardFooter}>
                     <span>{tarefa.dataCriacao}</span>
                     <span>{tarefa.horaCriacao}</span>
                   </div>
 
-                  {/* AÇÕES DO CARD */}
+                  {/* AÇÕES DO CARTÃO */}
                   <div className={styles.mobileCardActions}>
                     <button
                       className={`${styles.btnAccept} ${
