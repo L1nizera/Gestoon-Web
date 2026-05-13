@@ -2,6 +2,7 @@ import styles from "./style.module.css";
 import { Navigate, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useAuth } from "../../context/AuthContext";
+import api from "../../services/api";
 
 function Login() {
   const navigate = useNavigate();
@@ -14,22 +15,37 @@ function Login() {
     return <Navigate to={user.tipo === "admin" ? "/home" : "/tarefas"} replace />;
   }
 
-  function handleLogin(e) {
+  async function handleLogin(e) {
     e.preventDefault();
 
-    if (email === "admin" && senha === "admin") {
-      login({ nome: "Administrador", tipo: "admin" });
-      navigate("/home");
+    if (!email.trim() || !senha.trim()) {
+      alert("Preencha usuário e senha.");
       return;
     }
 
-    if (email === "user" && senha === "user") {
-      login({ nome: "Funcionário", tipo: "funcionario" });
-      navigate("/tarefas");
-      return;
-    }
+    try {
+      const response = await api.post("/login", {
+        login: email,
+        senha,
+      });
 
-    alert("Usuário ou senha inválidos");
+      const { usuario, token } = response.data.dados;
+
+      login(usuario, token);
+
+      if (usuario.tipo === "admin") {
+        navigate("/home");
+      } else {
+        navigate("/tarefas");
+      }
+    } catch (err) {
+      console.error("Erro no login:", err.response?.data || err.message);
+
+      alert(
+        err.response?.data?.mensagem ||
+        "Usuário ou senha inválidos."
+      );
+    }
   }
 
   return (

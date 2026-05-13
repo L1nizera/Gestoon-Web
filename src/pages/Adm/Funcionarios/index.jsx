@@ -27,6 +27,10 @@ function Funcionarios() {
     setor: "Administrativo",
     cargo: "Gerente",
     ativo: true,
+
+    // dados de acesso ao sistema
+    login: "",
+    senha: "",
   });
 
   const setores = [
@@ -79,7 +83,7 @@ function Funcionarios() {
     Repositor: 4,
     "Auxiliar de Limpeza": 5,
   };
-  
+
   const cargos = [
     "Gerente",
     "Supervisor",
@@ -295,6 +299,21 @@ function Funcionarios() {
       return;
     }
 
+    if (!novoFuncionario.login.trim()) {
+      alert("O login de acesso é obrigatório.");
+      return;
+    }
+
+    if (!novoFuncionario.senha.trim()) {
+      alert("A senha de acesso é obrigatória.");
+      return;
+    }
+
+    if (novoFuncionario.senha.length < 4) {
+      alert("A senha deve ter pelo menos 4 caracteres.");
+      return;
+    }
+
     const setorId = setorToApiMap[novoFuncionario.setor];
     const cargoId = cargoToApiMap[novoFuncionario.cargo];
 
@@ -309,7 +328,7 @@ function Funcionarios() {
     }
 
     try {
-      const payload = {
+      const payloadFuncionario = {
         nome: novoFuncionario.nome,
         email: novoFuncionario.email,
         setor: setorId,
@@ -317,9 +336,31 @@ function Funcionarios() {
         ativo: novoFuncionario.ativo ? 1 : 0,
       };
 
-      console.log("Payload cadastro funcionário:", payload);
+      const responseFuncionario = await api.post(
+        "/funcionarios",
+        payloadFuncionario
+      );
 
-      await api.post("/funcionarios", payload);
+      const funcionarioCriado = responseFuncionario.data.dados;
+
+      const funcionarioId =
+        funcionarioCriado.id ||
+        funcionarioCriado.func_id ||
+        funcionarioCriado.funcionario;
+
+      if (!funcionarioId) {
+        alert("Funcionário criado, mas não foi possível obter o ID para criar o usuário.");
+        return;
+      }
+
+      const payloadUsuario = {
+        funcionario: funcionarioId,
+        login: novoFuncionario.login,
+        senha: novoFuncionario.senha,
+        ativo: novoFuncionario.ativo ? 1 : 0,
+      };
+
+      await api.post("/usuarios", payloadUsuario);
 
       await fetchDados();
 
@@ -329,19 +370,21 @@ function Funcionarios() {
         setor: "Administrativo",
         cargo: "Gerente",
         ativo: true,
+        login: "",
+        senha: "",
       });
 
       setCreateFuncionarioOpen(false);
     } catch (err) {
       console.error(
         "Erro ao cadastrar funcionário:",
-        err.response?.data || err.message,
+        err.response?.data || err.message
       );
 
       alert(
         err.response?.data?.dados ||
         err.response?.data?.mensagem ||
-        "Erro ao cadastrar funcionário. Verifique a API.",
+        "Erro ao cadastrar funcionário. Verifique a API."
       );
     }
   }
@@ -630,6 +673,8 @@ function Funcionarios() {
                       setor: "Administrativo",
                       cargo: "Gerente",
                       ativo: true,
+                      login: "",
+                      senha: "",
                     })
                   }
                 >
@@ -673,6 +718,36 @@ function Funcionarios() {
                     })
                   }
                   placeholder="Digite o email..."
+                />
+              </div>
+
+              <div className={styles.formGroup}>
+                <label>Login de acesso</label>
+                <input
+                  type="text"
+                  value={novoFuncionario.login}
+                  onChange={(e) =>
+                    setNovoFuncionario({
+                      ...novoFuncionario,
+                      login: e.target.value,
+                    })
+                  }
+                  placeholder="Ex: Carlos, paulo2..."
+                />
+              </div>
+
+              <div className={styles.formGroup}>
+                <label>Senha de acesso</label>
+                <input
+                  type="password"
+                  value={novoFuncionario.senha}
+                  onChange={(e) =>
+                    setNovoFuncionario({
+                      ...novoFuncionario,
+                      senha: e.target.value,
+                    })
+                  }
+                  placeholder="Digite uma senha..."
                 />
               </div>
 
