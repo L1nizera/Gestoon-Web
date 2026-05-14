@@ -1,5 +1,5 @@
-import { useMemo, useState } from "react";
-import { tasks } from "../../../data/Tasks";
+import { useEffect, useMemo, useState } from "react";
+import api from "../../../services/api";
 
 import PageLayout from "../../../components/ui/PageLayout";
 import PageCard from "../../../components/ui/PageCard";
@@ -9,27 +9,145 @@ import PageActions from "../../../components/ui/PageActions";
 import Button from "../../../components/ui/Button";
 import DataTable from "../../../components/ui/DataTable";
 
-const funcionariosMock = [
-  { id: 1, nome: "João Silva", cargo: "Supervisor", dataCriacao: "10/03/2026" },
-  { id: 2, nome: "Maria Souza", cargo: "Caixa", dataCriacao: "22/02/2026" },
-  { id: 3, nome: "Carlos Mendes", cargo: "Motorista", dataCriacao: "05/01/2026" },
-  { id: 4, nome: "Ana Oliveira", cargo: "Analista", dataCriacao: "18/03/2026" },
-  { id: 5, nome: "Bruno Rocha", cargo: "Auxiliar", dataCriacao: "30/01/2026" },
-  { id: 6, nome: "Fernanda Lima", cargo: "Gerente", dataCriacao: "12/02/2026" },
-  { id: 7, nome: "Ricardo Alves", cargo: "Repositor", dataCriacao: "25/03/2026" },
-  { id: 8, nome: "Juliana Costa", cargo: "Atendente", dataCriacao: "08/01/2026" },
-  { id: 9, nome: "Paulo Henrique", cargo: "Coordenador", dataCriacao: "14/02/2026" },
-  { id: 10, nome: "Camila Santos", cargo: "Auxiliar de Limpeza", dataCriacao: "27/03/2026" },
-];
-
 function Relatorios() {
   const [nomeFiltro, setNomeFiltro] = useState("");
   const [cargoFiltro, setCargoFiltro] = useState("");
+  const [setorFiltro, setSetorFiltro] = useState("");
   const [dataFiltro, setDataFiltro] = useState("");
+
   const [ordemNome, setOrdemNome] = useState(null);
   const [ordemData, setOrdemData] = useState(null);
 
-  const cargos = [...new Set(funcionariosMock.map((f) => f.cargo))];
+  const [funcionarios, setFuncionarios] = useState([]);
+  const [tarefas, setTarefas] = useState([]);
+
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const cargoApiMap = {
+    1: "Gerente",
+    2: "Supervisor",
+    3: "Caixa",
+    4: "Repositor",
+    5: "Auxiliar de Limpeza",
+  };
+
+  const setorApiMap = {
+    1: "Administrativo",
+    2: "Financeiro",
+    3: "Operacional",
+    4: "Atendimento",
+    5: "Limpeza",
+    6: "Estoque",
+    7: "Logística",
+  };
+
+  function parseDateValue(value) {
+    if (!value) {
+      return {
+        data: "-",
+        iso: "",
+      };
+    }
+
+    const date = new Date(value);
+
+    if (Number.isNaN(date.getTime())) {
+      return {
+        data: "-",
+        iso: "",
+      };
+    }
+
+    return {
+      data: date.toLocaleDateString("pt-BR"),
+      iso: date.toISOString(),
+    };
+  }
+
+  function normalizarStatus(status) {
+    const numero = Number(status);
+
+    if (numero === 0) return "Pendente";
+    if (numero === 1) return "Em andamento";
+    if (numero === 2) return "Concluída";
+    if (numero === 3) return "Cancelada";
+
+    return "Pendente";
+  }
+
+  useEffect(() => {
+    async function fetchDados() {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const [funcionariosResponse, tarefasResponse] = await Promise.all([
+          api.get("/funcionarios"),
+          api.get("/tarefas"),
+        ]);
+
+        const funcionariosFormatados = (
+          funcionariosResponse.data?.dados || []
+        ).map((funcionario) => {
+          const date = parseDateValue(funcionario.func_data_criacao);
+
+          return {
+            id: Number(funcionario.func_id),
+            nome: funcionario.func_nome || "-",
+
+            cargoId: Number(funcionario.func_crg_id),
+            cargo:
+              cargoApiMap[Number(funcionario.func_crg_id)] ||
+              `Cargo #${funcionario.func_crg_id}`,
+
+            setorId: Number(funcionario.func_setor_id),
+            setor:
+              setorApiMap[Number(funcionario.func_setor_id)] ||
+              `Setor #${funcionario.func_setor_id}`,
+
+            dataCriacao: date.data,
+            dataCriacaoISO: date.iso,
+          };
+        });
+
+        const tarefasFormatadas = (tarefasResponse.data?.dados || []).map(
+          (tarefa) => ({
+            id: Number(tarefa.tar_id),
+            funcionarioId: Number(tarefa.atr_funcionario_id),
+            setorId: Number(tarefa.tar_setor_id),
+            setor:
+              tarefa.set_nome ||
+              setorApiMap[Number(tarefa.tar_setor_id)] ||
+              `Setor #${tarefa.tar_setor_id}`,
+            status: normalizarStatus(tarefa.atr_status),
+          })
+        );
+
+        setFuncionarios(funcionariosFormatados);
+        setTarefas(tarefasFormatadas);
+      } catch (err) {
+        console.error("Erro ao carregar relatório:", err.response?.data || err);
+
+        setError(
+          err.response?.data?.mensagem ||
+            "Não foi possível carregar o relatório."
+        );
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchDados();
+  }, []);
+
+  const cargos = useMemo(() => {
+    return [...new Set(funcionarios.map((func) => func.cargo))];
+  }, [funcionarios]);
+
+  const setores = useMemo(() => {
+    return [...new Set(funcionarios.map((func) => func.setor))];
+  }, [funcionarios]);
 
   function handleSort(key) {
     if (key === "nome") {
@@ -40,6 +158,7 @@ function Relatorios() {
       });
 
       setOrdemData(null);
+      return;
     }
 
     if (key === "dataCriacao") {
@@ -54,26 +173,43 @@ function Relatorios() {
   }
 
   const listaFiltrada = useMemo(() => {
-    return funcionariosMock
+    return funcionarios
       .map((funcionario) => {
-        const primeiroNome = funcionario.nome.split(" ")[0];
-
-        const tarefasFuncionario = tasks.filter(
-          (tarefa) => tarefa.criadoPor === primeiroNome
+        let tarefasFuncionario = tarefas.filter(
+          (tarefa) => tarefa.funcionarioId === funcionario.id
         );
+
+        if (setorFiltro) {
+          tarefasFuncionario = tarefasFuncionario.filter(
+            (tarefa) => tarefa.setor === setorFiltro
+          );
+        }
+
+        const pendentes = tarefasFuncionario.filter(
+          (tarefa) => tarefa.status === "Pendente"
+        ).length;
+
+        const emAndamento = tarefasFuncionario.filter(
+          (tarefa) => tarefa.status === "Em andamento"
+        ).length;
 
         const concluidas = tarefasFuncionario.filter(
           (tarefa) => tarefa.status === "Concluída"
         ).length;
 
-        const naoConcluidas = tarefasFuncionario.filter(
-          (tarefa) => tarefa.status !== "Concluída"
+        const canceladas = tarefasFuncionario.filter(
+          (tarefa) => tarefa.status === "Cancelada"
         ).length;
+
+        const total = tarefasFuncionario.length;
 
         return {
           ...funcionario,
+          pendentes,
+          emAndamento,
           concluidas,
-          naoConcluidas,
+          canceladas,
+          total,
         };
       })
       .filter((funcionario) => {
@@ -85,17 +221,21 @@ function Relatorios() {
           ? funcionario.cargo === cargoFiltro
           : true;
 
+        const setorMatch = setorFiltro
+          ? funcionario.setor === setorFiltro || funcionario.total > 0
+          : true;
+
         let dataMatch = true;
 
         if (dataFiltro) {
-          const [dia, mes, ano] = funcionario.dataCriacao.split("/");
-          const dataFuncionario = new Date(`${ano}-${mes}-${dia}`);
-          const dataBusca = new Date(dataFiltro);
+          const dataFuncionario = funcionario.dataCriacaoISO
+            ? funcionario.dataCriacaoISO.slice(0, 10)
+            : "";
 
-          dataMatch = dataFuncionario.getTime() === dataBusca.getTime();
+          dataMatch = dataFuncionario === dataFiltro;
         }
 
-        return nomeMatch && cargoMatch && dataMatch;
+        return nomeMatch && cargoMatch && setorMatch && dataMatch;
       })
       .sort((a, b) => {
         let resultado = 0;
@@ -108,29 +248,36 @@ function Relatorios() {
         }
 
         if (resultado === 0 && ordemData) {
-          const [dA, mA, yA] = a.dataCriacao.split("/");
-          const [dB, mB, yB] = b.dataCriacao.split("/");
-
-          const dataA = new Date(`${yA}-${mA}-${dA}`);
-          const dataB = new Date(`${yB}-${mB}-${dB}`);
+          const dataA = new Date(a.dataCriacaoISO);
+          const dataB = new Date(b.dataCriacaoISO);
 
           resultado = ordemData === "recente" ? dataB - dataA : dataA - dataB;
         }
 
         return resultado;
       });
-  }, [nomeFiltro, cargoFiltro, dataFiltro, ordemNome, ordemData]);
+  }, [
+    funcionarios,
+    tarefas,
+    nomeFiltro,
+    cargoFiltro,
+    setorFiltro,
+    dataFiltro,
+    ordemNome,
+    ordemData,
+  ]);
 
   function limparFiltros() {
     setNomeFiltro("");
     setCargoFiltro("");
+    setSetorFiltro("");
     setDataFiltro("");
     setOrdemNome(null);
     setOrdemData(null);
   }
 
   function handleExport() {
-    alert("Exportar relatório: funcionalidade visual pronta para integração futura.");
+    alert("Exportação do relatório será ligada ao PDF depois.");
   }
 
   const columns = [
@@ -145,10 +292,25 @@ function Relatorios() {
       align: "center",
     },
     {
+      key: "setor",
+      label: "Setor",
+      align: "center",
+    },
+    {
       key: "dataCriacao",
       label: "Data",
       align: "center",
       sortable: true,
+    },
+    {
+      key: "pendentes",
+      label: "Pendentes",
+      align: "center",
+    },
+    {
+      key: "emAndamento",
+      label: "Em andamento",
+      align: "center",
     },
     {
       key: "concluidas",
@@ -156,8 +318,13 @@ function Relatorios() {
       align: "center",
     },
     {
-      key: "naoConcluidas",
-      label: "Pendentes",
+      key: "canceladas",
+      label: "Canceladas",
+      align: "center",
+    },
+    {
+      key: "total",
+      label: "Total",
       align: "center",
     },
   ];
@@ -191,6 +358,22 @@ function Relatorios() {
           </div>
 
           <div>
+            <small>Setor:</small>
+            <select
+              value={setorFiltro}
+              onChange={(e) => setSetorFiltro(e.target.value)}
+            >
+              <option value="">Todos</option>
+
+              {setores.map((setor) => (
+                <option key={setor} value={setor}>
+                  {setor}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
             <small>Data:</small>
             <input
               type="date"
@@ -202,21 +385,27 @@ function Relatorios() {
 
         <PageActions
           left={
-            <Button variant="danger" onClick={limparFiltros}>
+            <Button variant="secondary" onClick={limparFiltros}>
               Limpar Filtros
             </Button>
           }
           right={<span>{listaFiltrada.length} encontrados</span>}
         />
 
-        <DataTable
-          columns={columns}
-          data={listaFiltrada}
-          sortKey={ordemNome ? "nome" : ordemData ? "dataCriacao" : null}
-          sortDirection={ordemNome || ordemData}
-          onSort={handleSort}
-          emptyMessage="Nenhum resultado encontrado"
-        />
+        {loading && <p>Carregando relatório...</p>}
+
+        {error && <p style={{ color: "red" }}>{error}</p>}
+
+        {!loading && !error && (
+          <DataTable
+            columns={columns}
+            data={listaFiltrada}
+            sortKey={ordemNome ? "nome" : ordemData ? "dataCriacao" : null}
+            sortDirection={ordemNome || ordemData}
+            onSort={handleSort}
+            emptyMessage="Nenhum resultado encontrado"
+          />
+        )}
 
         <div
           style={{

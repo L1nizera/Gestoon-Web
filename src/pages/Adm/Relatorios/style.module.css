@@ -53,6 +53,28 @@
   cursor: pointer;
 }
 
+
+.limparBtn {
+  background: var(--button-secondary-bg);
+  color: var(--color-white);
+  border: none;
+  padding: 0.8rem 1.4rem;
+  border-radius: 0.6rem;
+  cursor: pointer;
+  font-weight: 500;
+  transition: 0.2s;
+  width: auto;
+}
+
+.limparBtn:active {
+  background: var(--button-danger-bg);
+  transform: scale(1.1);
+}
+
+.limparBtn:hover {
+  background: var(--button-danger-bg);
+}
+
 /* FILTROS */
 .filtros {
   display: grid;
@@ -154,5 +176,3 @@
 .textCenter {
   text-align: center;
 }
-
-

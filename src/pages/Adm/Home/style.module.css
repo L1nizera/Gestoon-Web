@@ -278,7 +278,6 @@ select {
   cursor: pointer;
   font-weight: 500;
   transition: 0.2s;
-  width: 13rem;
   width: auto;
 }
 
