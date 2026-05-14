@@ -56,10 +56,11 @@ body {
 }
 
 .subtitle {
-  font-size: 1.45rem;
+  font-size: 1.6rem;
   color: var(--text-secondary);
-  line-height: 1.6;
-  margin: 0;
+  line-height: 1.75;
+  margin: 0 0 1rem 0;
+  max-width: 72ch;
 }
 
 @media (max-width: 768px) {
@@ -189,9 +190,11 @@ body {
 }
 
 .filtroLabel {
-  font-size: 1.3rem;
-  color: var(--text-secondary);
-  font-weight: 500;
+  font-size: 1.35rem;
+  color: var(--text-primary);
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  margin-bottom: 0.4rem;
 }
 
 .filtroGroup select,
@@ -311,22 +314,29 @@ body {
   margin-bottom: 8px;
 }
 
+.cardHeader strong {
+  font-size: 1.75rem;
+  line-height: 1.15;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+/*titulo do card*/
 @media (max-width: 768px) {
   .cardHeader strong {
-    font-size: 1rem;
+    font-size: 2rem;
   }
 }
 
 .cardBody p {
   margin: 4px 0;
-  font-size: 13px;
+  font-size: 1.6rem;
 }
 
 .cardFooter {
   display: flex;
   justify-content: space-between;
-  margin-top: 8px;
-  font-size: 12px;
+  margin-top: 0.8rem;
+  font-size: 1.2rem;
   opacity: 0.7;
 }
 
@@ -411,12 +421,15 @@ body {
   text-overflow: ellipsis;
   overflow: hidden;
   vertical-align: middle;
-  font-size: 1.4rem;
+  font-size: 1.45rem;
 }
 
 .table td strong {
   white-space: normal;
   display: inline-block;
+  font-size: 1.55rem;
+  line-height: 1.25;
+  font-weight: 700;
 }
 .textCenter {
   text-align: center;
@@ -429,7 +442,7 @@ body {
   justify-content: center;
   padding: 0.45rem 1rem;
   border-radius: 999px;
-  font-size: 1.2rem;
+  font-size: 1.6rem;
   font-weight: 600;
   width: fit-content;
 }
@@ -1021,7 +1034,7 @@ body {
     justify-content: flex-start;
     align-items: center;
     gap: 1rem;
-    font-size: 1.25rem;
+    font-size: 1.6rem;
     color: var(--text-muted);
     margin: 0;
     padding: 0;
@@ -1059,11 +1072,11 @@ body {
   }
 
   .title {
-    font-size: 2rem;
+    font-size: 2.5rem;
   }
 
   .subtitle {
-    font-size: 1.1rem;
+    font-size: 1.6rem;
   }
 
   .summaryGrid {
@@ -1085,7 +1098,7 @@ body {
   }
 
   .filtroLabel {
-    font-size: 1.2rem;
+    font-size: 1.8rem;
   }
 
   .filtroGroup select,
@@ -1093,6 +1106,7 @@ body {
     font-size: 14px;
     padding: 0.7rem 0.8rem;
   }
+
 
   /* HIDE TABLE, SHOW MOBILE VIEW */
   .tableWrapper {
@@ -1140,7 +1154,7 @@ body {
     width: fit-content;
     min-width: auto;
     height: 3rem;
-    font-size: 1.1rem;
+    font-size: 1.6rem;
     padding: 0.45rem 1rem;
   }
 
@@ -1162,12 +1176,12 @@ body {
   }
 
   .sectionHeaderContent h2 {
-    font-size: 1.6rem;
+    font-size: 2rem;
     margin-bottom: 0.3rem;
   }
 
   .sectionHeaderContent p {
-    font-size: 1.1rem;
+    font-size: 1.8rem;
   }
 
   .sectionBadge {
