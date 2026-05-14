@@ -245,7 +245,7 @@ export default function Tarefas() {
         {/* FILTROS */}
         <div className={styles.filtrosContainer}>
           <div className={styles.filtroGroup}>
-            <label className={styles.filtroLabel}>🔍 Buscar por título</label>
+            <label className={styles.filtroLabel}> Buscar por título</label>
             <input
               type="text"
               placeholder="Digite o título da tarefa..."
@@ -255,7 +255,7 @@ export default function Tarefas() {
           </div>
 
           <div className={styles.filtroGroup}>
-            <label className={styles.filtroLabel}>🏢 Setor</label>
+            <label className={styles.filtroLabel}> Setor</label>
             <select value={filtroSetor} onChange={(e) => setFiltroSetor(e.target.value)}>
               <option value="">Todos os setores</option>
               {setoresUnicos.map((setor) => (
@@ -267,7 +267,7 @@ export default function Tarefas() {
           </div>
 
           <div className={styles.filtroGroup}>
-            <label className={styles.filtroLabel}>⚡ Prioridade</label>
+            <label className={styles.filtroLabel}> Prioridade</label>
             <select
               value={filtroPrioridade}
               onChange={(e) => setFiltroPrioridade(e.target.value)}
@@ -454,28 +454,28 @@ export default function Tarefas() {
                     </p>
                   </div>
 
-                  {/* RODAPÉ DO CARD */}
-                  <div className={styles.cardFooter}>
-                    <span>{tarefa.dataCriacao}</span>
-                    <span>{tarefa.horaCriacao}</span>
-                  </div>
+                  <div className={styles.mobileCardFooter}>
+                    <div className={styles.cardFooter}>
+                      <span>{tarefa.dataCriacao}</span>
+                      <span>{tarefa.horaCriacao}</span>
+                    </div>
 
-                  {/* AÇÕES DO CARTÃO */}
-                  <div className={styles.mobileCardActions}>
-                    <button
-                      className={`${styles.btnAccept} ${
-                        aceitandoId === tarefa.id ? styles.loading : ""
-                      }`}
-                      onClick={() => aceitarTarefa(tarefa.id)}
-                      disabled={aceitandoId !== null}
-                      title={
-                        aceitandoId === tarefa.id
-                          ? "Processando..."
-                          : "Clique para aceitar esta tarefa"
-                      }
-                    >
-                      {aceitandoId === tarefa.id ? "✓ Aceitando..." : "✓ Aceitar"}
-                    </button>
+                    <div className={styles.mobileCardActions}>
+                      <button
+                        className={`${styles.btnAccept} ${
+                          aceitandoId === tarefa.id ? styles.loading : ""
+                        }`}
+                        onClick={() => aceitarTarefa(tarefa.id)}
+                        disabled={aceitandoId !== null}
+                        title={
+                          aceitandoId === tarefa.id
+                            ? "Processando..."
+                            : "Clique para aceitar esta tarefa"
+                        }
+                      >
+                        {aceitandoId === tarefa.id ? "✓ Aceitando..." : "✓ Aceitar"}
+                      </button>
+                    </div>
                   </div>
                 </div>
               ))}
