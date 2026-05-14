@@ -56,14 +56,9 @@ function Funcionarios() {
   const cargoApiMap = {
     1: "Gerente",
     2: "Supervisor",
-    3: "Analista",
-    4: "Auxiliar",
-    5: "Caixa",
-    6: "Motorista",
-    7: "Repositor",
-    8: "Atendente",
-    9: "Coordenador",
-    10: "Auxiliar de Limpeza",
+    3: "Caixa",
+    4: "Repositor",
+    5: "Auxiliar de Limpeza",
   };
 
   const setorToApiMap = {
@@ -193,8 +188,9 @@ function Funcionarios() {
       align: "center",
       render: (row) => (
         <span
-          className={`${styles.badge} ${row.ativo ? styles.statusConcluida : styles.statusCancelada
-            }`}
+          className={`${styles.badge} ${
+            row.ativo ? styles.statusConcluida : styles.statusCancelada
+          }`}
         >
           {row.ativo ? "Ativo" : "Inativo"}
         </span>
@@ -254,12 +250,33 @@ function Funcionarios() {
       return;
     }
 
+    if (!validarEmail(editFuncionario.email)) {
+      alert("Email inválido.");
+      return;
+    }
+
+    const setorId =
+      setorToApiMap[editFuncionario.setor] || editFuncionario.setorId;
+
+    const cargoId =
+      cargoToApiMap[editFuncionario.cargo] || editFuncionario.cargoId;
+
+    if (!setorId) {
+      alert(`Setor inválido: ${editFuncionario.setor}`);
+      return;
+    }
+
+    if (!cargoId) {
+      alert(`Cargo inválido: ${editFuncionario.cargo}`);
+      return;
+    }
+
     try {
       const payload = {
         nome: editFuncionario.nome,
         email: editFuncionario.email,
-        setorId: setorToApiMap[editFuncionario.setor],
-        cargoId: cargoToApiMap[editFuncionario.cargo],
+        setorId,
+        cargoId,
         ativo: editFuncionario.ativo ? 1 : 0,
       };
 
@@ -271,15 +288,16 @@ function Funcionarios() {
 
       setEditFuncionario(null);
     } catch (err) {
-      console.error(
-        "Erro ao editar funcionário:",
-        err.response?.data || err.message,
-      );
+      const erroApi = err.response?.data;
+
+      console.error("Erro ao editar funcionário:", erroApi || err.message);
 
       alert(
-        err.response?.data?.dados ||
-        err.response?.data?.mensagem ||
-        "Erro ao editar funcionário. Verifique a API.",
+        erroApi?.mensagem ||
+          (typeof erroApi?.dados === "string"
+            ? erroApi.dados
+            : JSON.stringify(erroApi?.dados, null, 2)) ||
+          "Erro ao editar funcionário. Verifique a API.",
       );
     }
   }
@@ -338,7 +356,7 @@ function Funcionarios() {
 
       const responseFuncionario = await api.post(
         "/funcionarios",
-        payloadFuncionario
+        payloadFuncionario,
       );
 
       const funcionarioCriado = responseFuncionario.data.dados;
@@ -349,7 +367,9 @@ function Funcionarios() {
         funcionarioCriado.funcionario;
 
       if (!funcionarioId) {
-        alert("Funcionário criado, mas não foi possível obter o ID para criar o usuário.");
+        alert(
+          "Funcionário criado, mas não foi possível obter o ID para criar o usuário.",
+        );
         return;
       }
 
@@ -378,13 +398,13 @@ function Funcionarios() {
     } catch (err) {
       console.error(
         "Erro ao cadastrar funcionário:",
-        err.response?.data || err.message
+        err.response?.data || err.message,
       );
 
       alert(
         err.response?.data?.dados ||
-        err.response?.data?.mensagem ||
-        "Erro ao cadastrar funcionário. Verifique a API."
+          err.response?.data?.mensagem ||
+          "Erro ao cadastrar funcionário. Verifique a API.",
       );
     }
   }
@@ -408,6 +428,9 @@ function Funcionarios() {
             id: funcionario.func_id,
             nome: funcionario.func_nome || "-",
             email: funcionario.func_email || "-",
+
+            setorId: Number(funcionario.func_setor_id),
+            cargoId: Number(funcionario.func_crg_id),
 
             setor:
               setorApiMap[Number(funcionario.func_setor_id)] ||
@@ -633,10 +656,11 @@ function Funcionarios() {
                 <strong>Status:</strong>
 
                 <span
-                  className={`${styles.badge} ${selected.ativo
-                    ? styles.statusConcluida
-                    : styles.statusCancelada
-                    }`}
+                  className={`${styles.badge} ${
+                    selected.ativo
+                      ? styles.statusConcluida
+                      : styles.statusCancelada
+                  }`}
                 >
                   {selected.ativo ? "Ativo" : "Inativo"}
                 </span>

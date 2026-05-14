@@ -1,4 +1,5 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
+import api from "../services/api";
 
 const AuthContext = createContext();
 
@@ -27,6 +28,30 @@ export function AuthProvider({ children }) {
     localStorage.removeItem("gestoon:user");
     localStorage.removeItem("gestoon:token");
   }
+
+  useEffect(() => {
+    if (!user || !token) return;
+
+    const verificarSessao = async () => {
+      try {
+        await api.get("/auth/verificar-sessao");
+      } catch (err) {
+        if (err.response?.status === 401 || err.response?.status === 403) {
+          alert("Sua conta foi inativada. Você será desconectado.");
+
+          logout();
+
+          window.location.href = "/";
+        }
+      }
+    };
+
+    verificarSessao();
+
+    const interval = setInterval(verificarSessao, 5000);
+
+    return () => clearInterval(interval);
+  }, [user, token]);
 
   return (
     <AuthContext.Provider value={{ user, token, login, logout }}>
