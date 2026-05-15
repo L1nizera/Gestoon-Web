@@ -117,7 +117,7 @@ export default function Tarefas() {
               tarefa.set_nome ||
               setorApiMap[Number(tarefa.tar_setor_id)] ||
               `Setor #${tarefa.tar_setor_id}`,
-            criadoPor: tarefa.user_nome || `Usuário #${tarefa.tar_criado_por}`,
+            criadoPor: tarefa.usu_nome || `Usuário #${tarefa.tar_criado_por}`,
             descricao: tarefa.tar_descricao || "Sem descrição",
             dataCriacao,
             horaCriacao,
@@ -133,6 +133,7 @@ export default function Tarefas() {
       setLoading(false);
     }
   }
+
 
   /**
    * Aceita uma tarefa e atualiza o status para "Em andamento" (1)
@@ -208,15 +209,12 @@ export default function Tarefas() {
   // ═════════════════════════════════════════════════════════════════
 
   return (
-    <div className={styles.dashboard}>
+    <div className={styles.dashboardContainer}>
+      <div className={styles.dashboard}>
       {/* CABEÇALHO DA PÁGINA */}
       <div className={styles.pageHeader}>
         <div className={styles.pageHeaderContent}>
           <h1 className={styles.title}>Tarefas Disponíveis</h1>
-          <p className={styles.subtitle}>
-            Visualize e aceite as tarefas pendentes para começar a trabalhar. Após aceitar,
-            elas aparecerão em "Minhas Tarefas em Andamento".
-          </p>
         </div>
 
         {/* CARDS DE RESUMO */}
@@ -234,13 +232,6 @@ export default function Tarefas() {
 
       {/* SEÇÃO PRINCIPAL */}
       <section className={styles.section}>
-        {/* CABEÇALHO DA SEÇÃO COM FILTROS */}
-        <div className={styles.sectionHeader}>
-          <div className={styles.sectionHeaderContent}>
-            <h2>Filtros</h2>
-            <p>Procure tarefas por título, setor e nível de prioridade.</p>
-          </div>
-        </div>
 
         {/* FILTROS */}
         <div className={styles.filtrosContainer}>
@@ -483,6 +474,8 @@ export default function Tarefas() {
           </>
         )}
       </section>
+
+    </div>
 
       {/* MODAL: LER DESCRIÇÃO COMPLETA */}
       {tarefaSelecionada && (
