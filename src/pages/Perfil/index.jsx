@@ -151,11 +151,6 @@ export default function Perfil() {
               </div>
 
               <div className={styles.infoGroup}>
-                <span>Email</span>
-                <p>{usuario.email}</p>
-              </div>
-
-              <div className={styles.infoGroup}>
                 <span>Setor</span>
                 <p>{usuario.setor}</p>
               </div>
@@ -165,6 +160,10 @@ export default function Perfil() {
                 <p>{usuario.cargo}</p>
               </div>
 
+              <div className={styles.infoGroup}>
+                <span>Email</span>
+                <p>{usuario.email}</p>
+              </div>
               {usuario.telefone ? (
                 <div className={styles.infoGroup}>
                   <span>Telefone</span>
