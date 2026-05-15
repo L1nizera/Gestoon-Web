@@ -91,6 +91,28 @@
   font-weight: 500;
 }
 
+.loading,
+.error {
+  width: 100%;
+  padding: 2rem;
+  border-radius: 1rem;
+  text-align: center;
+  font-size: 1.4rem;
+  margin: 2rem 0;
+}
+
+.loading {
+  background: rgba(59, 130, 246, 0.1);
+  color: var(--text-primary);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.error {
+  background: rgba(220, 38, 38, 0.12);
+  color: var(--red-600);
+  border: 1px solid rgba(220, 38, 38, 0.25);
+}
+
 .btnFoto {
   margin-top: 1rem;
   padding: 1rem 1.5rem;
@@ -108,23 +130,13 @@
   box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15);
 }
 
-/* ========================= */
-/* RESPONSIVIDADE */
-/* ========================= */
-
-/* Tablets */
-@media (max-width: 1024px) {
-  .container {
-    padding: 3rem;
-  }
-
-  .card {
-    padding: 3rem;
-  }
-
-  .content {
-    gap: 3rem;
-  }
+.uploadError {
+  margin-top: 1rem;
+  color: var(--red-600);
+  background: rgba(220, 38, 38, 0.12);
+  padding: 0.8rem 1rem;
+  border-radius: 0.8rem;
+  font-size: 1rem;
 }
 
 /* Celulares (iPhone 14 e similares ~390px) */

@@ -21,6 +21,14 @@ export function AuthProvider({ children }) {
     localStorage.setItem("gestoon:token", tokenRecebido);
   }
 
+  function updateUser(updatedUser) {
+    setUser((currentUser) => {
+      const nextUser = { ...(currentUser || {}), ...updatedUser };
+      localStorage.setItem("gestoon:user", JSON.stringify(nextUser));
+      return nextUser;
+    });
+  }
+
   function logout() {
     setUser(null);
     setToken(null);
@@ -54,7 +62,7 @@ export function AuthProvider({ children }) {
   }, [user, token]);
 
   return (
-    <AuthContext.Provider value={{ user, token, login, logout }}>
+    <AuthContext.Provider value={{ user, token, login, logout, updateUser }}>
       {children}
     </AuthContext.Provider>
   );
