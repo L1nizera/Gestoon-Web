@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import styles from "./style.module.css";
 import api from "../../../services/api";
 
@@ -64,6 +64,8 @@ export default function Tarefas() {
   const [aceitandoId, setAceitandoId] = useState(null);
   const [tarefaSelecionada, setTarefaSelecionada] = useState(null);
 
+  const tarefasKeyRef = useRef("");
+
   // ───── FILTROS ─────
   const [busca, setBusca] = useState("");
   const [filtroSetor, setFiltroSetor] = useState("");
@@ -90,18 +92,37 @@ export default function Tarefas() {
     };
   }
 
+  function gerarChaveTarefas(lista) {
+    return lista
+      .map((tarefa) =>
+        [
+          tarefa.id,
+          tarefa.titulo,
+          tarefa.prioridade,
+          tarefa.setor,
+          tarefa.criadoPor,
+          tarefa.descricao,
+          tarefa.dataCriacao,
+          tarefa.horaCriacao,
+        ].join("-"),
+      )
+      .join("|");
+  }
+
   /**
    * Busca tarefas da API e filtra apenas as pendentes
    */
-  async function fetchTarefas() {
+  async function fetchTarefas(mostrarLoading = false) {
     try {
-      setLoading(true);
+      if (mostrarLoading) {
+        setLoading(true);
+      }
+
       setError(null);
 
       const response = await api.get("/tarefas");
       const todosTarefas = response.data.dados || [];
 
-      // Filtrar apenas tarefas com status Pendente (0)
       const tarefasFormatadas = todosTarefas
         .filter((t) => Number(t.atr_status) === 0)
         .map((tarefa) => {
@@ -112,12 +133,16 @@ export default function Tarefas() {
           return {
             id: tarefa.tar_id,
             titulo: tarefa.tar_titulo || "-",
-            prioridade: prioridadeApiMap[Number(tarefa.tar_prioridade)] || "Média",
+            prioridade:
+              prioridadeApiMap[Number(tarefa.tar_prioridade)] || "Média",
             setor:
               tarefa.set_nome ||
               setorApiMap[Number(tarefa.tar_setor_id)] ||
               `Setor #${tarefa.tar_setor_id}`,
-            criadoPor: tarefa.usu_nome || `Usuário #${tarefa.tar_criado_por}`,
+            criadoPor:
+              tarefa.usu_nome ||
+              tarefa.user_nome ||
+              `Usuário #${tarefa.tar_criado_por}`,
             descricao: tarefa.tar_descricao || "Sem descrição",
             dataCriacao,
             horaCriacao,
@@ -125,12 +150,22 @@ export default function Tarefas() {
           };
         });
 
-      setTarefasDisponiveis(tarefasFormatadas);
+      const novaChave = gerarChaveTarefas(tarefasFormatadas);
+
+      if (novaChave !== tarefasKeyRef.current) {
+        tarefasKeyRef.current = novaChave;
+        setTarefasDisponiveis(tarefasFormatadas);
+      }
     } catch (err) {
-      console.error("Erro ao buscar tarefas:", err.message);
+      console.error(
+        "Erro ao buscar tarefas:",
+        err.response?.data || err.message,
+      );
       setError("Não foi possível carregar as tarefas. Tente novamente.");
     } finally {
-      setLoading(false);
+      if (mostrarLoading) {
+        setLoading(false);
+      }
     }
   }
 
@@ -142,16 +177,25 @@ export default function Tarefas() {
     try {
       setAceitandoId(tarefaId);
 
-      // Enviar para API (PUT ou PATCH para atualizar status)
-      await api.put(`/tarefas/${tarefaId}`, {
-        status: 1, // 1 = Em andamento
-      });
+      await api.post(`/tarefas/${tarefaId}/aceitar`);
 
-      // Remover da lista local imediatamente
       setTarefasDisponiveis((prev) => prev.filter((t) => t.id !== tarefaId));
+
+      if (tarefaSelecionada?.id === tarefaId) {
+        setTarefaSelecionada(null);
+      }
     } catch (err) {
-      console.error("Erro ao aceitar tarefa:", err.message);
-      alert("Erro ao aceitar tarefa. Tente novamente.");
+      console.error(
+        "Erro ao aceitar tarefa:",
+        err.response?.data || err.message,
+      );
+
+      alert(
+        err.response?.data?.mensagem ||
+          "Erro ao aceitar tarefa. Ela pode ter sido pega por outro funcionário.",
+      );
+
+      await fetchTarefas();
     } finally {
       setAceitandoId(null);
     }
@@ -168,9 +212,14 @@ export default function Tarefas() {
 
   // ───── EFEITOS ─────
   useEffect(() => {
-    fetchTarefas();
-  }, []);
+    fetchTarefas(true);
 
+    const interval = setInterval(() => {
+      fetchTarefas(false);
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, []);
   // ───── COMPUTADOS ─────
 
   /**
@@ -178,7 +227,9 @@ export default function Tarefas() {
    */
   const tarefasFiltradas = useMemo(() => {
     return tarefasDisponiveis.filter((tarefa) => {
-      const matchBusca = tarefa.titulo.toLowerCase().includes(busca.toLowerCase());
+      const matchBusca = tarefa.titulo
+        .toLowerCase()
+        .includes(busca.toLowerCase());
       const matchSetor = filtroSetor === "" || tarefa.setor === filtroSetor;
       const matchPrioridade =
         filtroPrioridade === "" || tarefa.prioridade === filtroPrioridade;
@@ -215,6 +266,10 @@ export default function Tarefas() {
       <div className={styles.pageHeader}>
         <div className={styles.pageHeaderContent}>
           <h1 className={styles.title}>Tarefas Disponíveis</h1>
+          <p className={styles.subtitle}>
+            Visualize e aceite as tarefas pendentes para começar a trabalhar.
+            Após aceitar, elas aparecerão em "Minhas Tarefas em Andamento".
+          </p>
         </div>
 
         {/* CARDS DE RESUMO */}
@@ -247,7 +302,10 @@ export default function Tarefas() {
 
           <div className={styles.filtroGroup}>
             <label className={styles.filtroLabel}> Setor</label>
-            <select value={filtroSetor} onChange={(e) => setFiltroSetor(e.target.value)}>
+            <select
+              value={filtroSetor}
+              onChange={(e) => setFiltroSetor(e.target.value)}
+            >
               <option value="">Todos os setores</option>
               {setoresUnicos.map((setor) => (
                 <option key={setor} value={setor}>
@@ -382,8 +440,12 @@ export default function Tarefas() {
                       </td>
                       <td className={styles.textCenter}>{tarefa.setor}</td>
                       <td className={styles.textCenter}>{tarefa.criadoPor}</td>
-                      <td className={styles.textCenter}>{tarefa.dataCriacao}</td>
-                      <td className={styles.textCenter}>{tarefa.horaCriacao}</td>
+                      <td className={styles.textCenter}>
+                        {tarefa.dataCriacao}
+                      </td>
+                      <td className={styles.textCenter}>
+                        {tarefa.horaCriacao}
+                      </td>
                       <td>
                         <button
                           onClick={() => setTarefaSelecionada(tarefa)}
@@ -413,7 +475,9 @@ export default function Tarefas() {
                               : "Clique para aceitar esta tarefa"
                           }
                         >
-                          {aceitandoId === tarefa.id ? "✓ Aceitando..." : "✓ Aceitar"}
+                          {aceitandoId === tarefa.id
+                            ? "✓ Aceitando..."
+                            : "✓ Aceitar"}
                         </button>
                       </td>
                     </tr>
@@ -423,9 +487,14 @@ export default function Tarefas() {
             </div>
 
             {/* MOBILE: CARDS */}
-            <div className={`${styles.mobileCardsContainer} ${styles.mobileOnly}`}>
+            <div
+              className={`${styles.mobileCardsContainer} ${styles.mobileOnly}`}
+            >
               {tarefasFiltradas.map((tarefa) => (
-                <div key={tarefa.id} className={`${styles.card} ${styles.mobileCard}`}>
+                <div
+                  key={tarefa.id}
+                  className={`${styles.card} ${styles.mobileCard}`}
+                >
                   {/* CABEÇALHO DO CARD */}
                   <div className={styles.cardHeader}>
                     <strong>{tarefa.titulo}</strong>
@@ -464,7 +533,9 @@ export default function Tarefas() {
                             : "Clique para aceitar esta tarefa"
                         }
                       >
-                        {aceitandoId === tarefa.id ? "✓ Aceitando..." : "✓ Aceitar"}
+                        {aceitandoId === tarefa.id
+                          ? "✓ Aceitando..."
+                          : "✓ Aceitar"}
                       </button>
                     </div>
                   </div>
@@ -542,7 +613,9 @@ export default function Tarefas() {
                 }}
                 disabled={aceitandoId !== null}
               >
-                {aceitandoId === tarefaSelecionada.id ? "✓ Aceitando..." : "✓ Aceitar"}
+                {aceitandoId === tarefaSelecionada.id
+                  ? "✓ Aceitando..."
+                  : "✓ Aceitar"}
               </button>
             </div>
           </div>

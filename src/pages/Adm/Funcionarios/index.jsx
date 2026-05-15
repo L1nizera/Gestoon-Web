@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import styles from "../Home/style.module.css";
 import jsPDF from "jspdf";
 import Modal from "../../../components/Modal/Modal";
@@ -20,6 +20,8 @@ function Funcionarios() {
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const primeiraCargaRef = useRef(true);
+  const ultimaChaveFuncionariosRef = useRef("");
 
   const [novoFuncionario, setNovoFuncionario] = useState({
     nome: "",
@@ -409,19 +411,36 @@ function Funcionarios() {
     }
   }
 
+  function gerarChaveFuncionarios(lista) {
+    return lista
+      .map((func) =>
+        [
+          func.id,
+          func.nome,
+          func.email,
+          func.setorId,
+          func.cargoId,
+          func.ativo,
+          func.dataCriacao,
+          func.horaCriacao,
+        ].join("::"),
+      )
+      .join("||");
+  }
+
   const fetchDados = async () => {
     try {
-      setLoading(true);
+      if (primeiraCargaRef.current) {
+        setLoading(true);
+      }
+
       setError(null);
 
       const response = await api.get("/funcionarios");
 
-      console.log("Funcionários vindos da API:", response.data?.dados);
-
       const funcionariosFormatados = (response.data?.dados || []).map(
         (funcionario) => {
           const ativo = normalizeBoolean(funcionario.func_ativo);
-
           const date = parseDateValue(funcionario.func_data_criacao);
 
           return {
@@ -450,17 +469,41 @@ function Funcionarios() {
         },
       );
 
-      setFuncionarios(funcionariosFormatados);
+      const novaChave = gerarChaveFuncionarios(funcionariosFormatados);
+
+      if (novaChave !== ultimaChaveFuncionariosRef.current) {
+        ultimaChaveFuncionariosRef.current = novaChave;
+
+        const scrollAtual = window.scrollY;
+
+        setFuncionarios(funcionariosFormatados);
+
+        requestAnimationFrame(() => {
+          window.scrollTo(0, scrollAtual);
+        });
+      }
     } catch (err) {
-      console.error("Erro na requisição:", err);
-      setError("Não foi possível carregar os dados.");
+      console.error("Erro na requisição:", err.response?.data || err.message);
+
+      if (primeiraCargaRef.current) {
+        setError("Não foi possível carregar os dados.");
+      }
     } finally {
-      setLoading(false);
+      if (primeiraCargaRef.current) {
+        setLoading(false);
+        primeiraCargaRef.current = false;
+      }
     }
   };
 
   useEffect(() => {
     fetchDados();
+
+    const interval = setInterval(() => {
+      fetchDados();
+    }, 5000);
+
+    return () => clearInterval(interval);
   }, []);
 
   const lista = useMemo(() => {

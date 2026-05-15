@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import styles from "./style.module.css";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
 import jsPDF from "jspdf";
@@ -26,6 +26,9 @@ function Home() {
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const primeiraCargaRef = useRef(true);
+  const ultimaChaveTarefasRef = useRef("");
 
   const prioridadeApiMap = {
     1: "Baixa",
@@ -151,16 +154,40 @@ function Home() {
     return mapa;
   }
 
+  function gerarChaveTarefas(lista) {
+    return lista
+      .map((tarefa) =>
+        [
+          tarefa.id,
+          tarefa.tarefaId,
+          tarefa.titulo,
+          tarefa.status,
+          tarefa.prioridade,
+          tarefa.setor,
+          tarefa.criadoPor,
+          tarefa.estimativaMinutos,
+          tarefa.estimativaFormatada,
+          tarefa.dataCriacao,
+          tarefa.horaCriacao,
+          tarefa.descricao,
+        ].join("::"),
+      )
+      .join("||");
+  }
+
   const fetchDados = async () => {
     try {
-      setLoading(true);
+      if (primeiraCargaRef.current) {
+        setLoading(true);
+      }
+
       setError(null);
 
       const mapaFuncionarios = await buscarFuncionariosMap();
 
       const response = await api.get("/tarefas");
 
-      const tarefasFormatadas = response.data.dados.map((tarefa) => {
+      const tarefasFormatadas = (response.data?.dados || []).map((tarefa) => {
         const { dataCriacao, horaCriacao } = formatarDataHora(
           tarefa.tar_data_criacao,
         );
@@ -197,1115 +224,1146 @@ function Home() {
         };
       });
 
-      setTasksState(tarefasFormatadas);
+      const novaChave = gerarChaveTarefas(tarefasFormatadas);
+
+      if (novaChave !== ultimaChaveTarefasRef.current) {
+        ultimaChaveTarefasRef.current = novaChave;
+
+        const scrollAtual = window.scrollY;
+
+        setTasksState(tarefasFormatadas);
+
+        requestAnimationFrame(() => {
+          window.scrollTo(0, scrollAtual);
+        });
+      }
     } catch (err) {
-      console.error("Erro completo ao buscar dados:", err.response?.data || err);
-
-      setError(
-        err.response?.data?.mensagem ||
-        err.response?.data?.dados ||
-        err.message ||
-        "Não foi possível carregar as tarefas."
+      console.error(
+        "Erro completo ao buscar dados:",
+        err.response?.data || err,
       );
+
+      if (primeiraCargaRef.current) {
+        setError(
+          err.response?.data?.mensagem ||
+            err.response?.data?.dados ||
+            err.message ||
+            "Não foi possível carregar as tarefas.",
+        );
+      }
     } finally {
-    setLoading(false);
-  }
-};
+      if (primeiraCargaRef.current) {
+        setLoading(false);
+        primeiraCargaRef.current = false;
+      }
+    }
+  };
 
-useEffect(() => {
-  fetchDados();
-}, []);
+  useEffect(() => {
+    fetchDados();
 
-// if (loading && tarefas.length === 0) return <p>Carregando dados...</p>;
-// if (error) return <p style={{ color: 'red' }}>{error}</p>;
+    const interval = setInterval(() => {
+      fetchDados();
+    }, 5000);
 
-useEffect(() => {
-  const handleResize = () => setIsMobile(window.innerWidth < 768);
-  window.addEventListener("resize", handleResize);
-  return () => window.removeEventListener("resize", handleResize);
-}, []);
+    return () => clearInterval(interval);
+  }, []);
 
-// ===== MODAL CRIAR =====
-const [createTaskOpen, setCreateTaskOpen] = useState(false);
+  // if (loading && tarefas.length === 0) return <p>Carregando dados...</p>;
+  // if (error) return <p style={{ color: 'red' }}>{error}</p>;
 
-const [novaTask, setNovaTask] = useState({
-  titulo: "",
-  setor: "Administrativo",
-  prioridade: "Média",
-  status: "Pendente",
-  estimativaMinutos: "",
-  descricao: "",
-});
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
-// ===== Botão Limpar Filtro =====
+  // ===== MODAL CRIAR =====
+  const [createTaskOpen, setCreateTaskOpen] = useState(false);
 
-function limparFiltros() {
-  setFiltro("Todos");
-  setBusca("");
-  setDataInicio("");
-  setDataFim("");
-  setSetorFiltro("");
-  setMesFiltro("");
-  setOrdemData(null);
-  setOrdemTitulo(null);
-}
+  const [novaTask, setNovaTask] = useState({
+    titulo: "",
+    setor: "Administrativo",
+    prioridade: "Média",
+    status: "Pendente",
+    estimativaMinutos: "",
+    descricao: "",
+  });
 
-async function excluirTask(id) {
-  if (!confirm("Tem certeza que deseja excluir esta tarefa?")) return;
+  // ===== Botão Limpar Filtro =====
 
-  try {
-    await api.delete(`/tarefas/${id}`);
-
-    await fetchDados();
-
-    setSelectedTask(null);
-  } catch (err) {
-    console.error(
-      "Erro ao excluir tarefa:",
-      err.response?.data || err.message,
-    );
-
-    alert(
-      err.response?.data?.dados ||
-      err.response?.data?.mensagem ||
-      "Erro ao excluir tarefa. Verifique a API.",
-    );
-  }
-}
-
-function abrirEdicao(task) {
-  setSelectedTask(null); // fecha o modal atual
-  setEditTask({ ...task });
-}
-
-async function salvarEdicao() {
-  if (!editTask.titulo.trim()) {
-    alert("O título da tarefa é obrigatório.");
-    return;
+  function limparFiltros() {
+    setFiltro("Todos");
+    setBusca("");
+    setDataInicio("");
+    setDataFim("");
+    setSetorFiltro("");
+    setMesFiltro("");
+    setOrdemData(null);
+    setOrdemTitulo(null);
   }
 
-  const setorId = setorToApiMap[editTask.setor];
-  const prioridade = prioridadeToApiMap[editTask.prioridade];
-  const status = statusToApiMap[editTask.status];
+  async function excluirTask(id) {
+    if (!confirm("Tem certeza que deseja excluir esta tarefa?")) return;
 
-  if (!setorId) {
-    alert("Setor inválido.");
-    return;
+    try {
+      await api.delete(`/tarefas/${id}`);
+
+      await fetchDados();
+
+      setSelectedTask(null);
+    } catch (err) {
+      console.error(
+        "Erro ao excluir tarefa:",
+        err.response?.data || err.message,
+      );
+
+      alert(
+        err.response?.data?.dados ||
+          err.response?.data?.mensagem ||
+          "Erro ao excluir tarefa. Verifique a API.",
+      );
+    }
   }
 
-  if (!prioridade) {
-    alert("Prioridade inválida.");
-    return;
+  function abrirEdicao(task) {
+    setSelectedTask(null); // fecha o modal atual
+    setEditTask({ ...task });
   }
 
-  if (status === undefined) {
-    alert("Status inválido.");
-    return;
+  async function salvarEdicao() {
+    if (!editTask.titulo.trim()) {
+      alert("O título da tarefa é obrigatório.");
+      return;
+    }
+
+    const setorId = setorToApiMap[editTask.setor];
+    const prioridade = prioridadeToApiMap[editTask.prioridade];
+    const status = statusToApiMap[editTask.status];
+
+    if (!setorId) {
+      alert("Setor inválido.");
+      return;
+    }
+
+    if (!prioridade) {
+      alert("Prioridade inválida.");
+      return;
+    }
+
+    if (status === undefined) {
+      alert("Status inválido.");
+      return;
+    }
+
+    try {
+      const payload = {
+        titulo: editTask.titulo,
+        descricao: editTask.descricao,
+        prioridade,
+        setorId,
+        criadoPor: 1,
+        estimativaMinutos: Number(editTask.estimativaMinutos),
+        status,
+        funcionarioId: 1,
+      };
+
+      console.log("Payload edição tarefa:", payload);
+
+      await api.patch(`/tarefas/${editTask.tarefaId}`, payload);
+
+      await fetchDados();
+
+      setEditTask(null);
+    } catch (err) {
+      console.error(
+        "Erro ao editar tarefa:",
+        err.response?.data || err.message,
+      );
+
+      alert(
+        err.response?.data?.dados ||
+          err.response?.data?.mensagem ||
+          "Erro ao editar tarefa. Verifique a API.",
+      );
+    }
   }
 
-  try {
-    const payload = {
-      titulo: editTask.titulo,
-      descricao: editTask.descricao,
-      prioridade,
-      setorId,
-      criadoPor: 1,
-      estimativaMinutos: Number(editTask.estimativaMinutos),
-      status,
-      funcionarioId: 1,
-    };
+  async function criarTask() {
+    if (!novaTask.titulo.trim()) return;
 
-    console.log("Payload edição tarefa:", payload);
+    try {
+      const payload = {
+        titulo: novaTask.titulo,
+        descricao: novaTask.descricao,
+        prioridade: prioridadeToApiMap[novaTask.prioridade],
+        setorId: setorToApiMap[novaTask.setor],
+        criadoPor: 1,
+        estimativaMinutos: Number(novaTask.estimativaMinutos),
+        status: statusToApiMap[novaTask.status],
+        funcionarioId: 1,
+      };
 
-    await api.patch(`/tarefas/${editTask.tarefaId}`, payload);
+      console.log("Setor escolhido:", novaTask.setor);
+      console.log("Setor convertido:", setorToApiMap[novaTask.setor]);
+      console.log("Payload enviado:", payload);
 
-    await fetchDados();
+      await api.post("/tarefas", payload);
+      await fetchDados();
 
-    setEditTask(null);
-  } catch (err) {
-    console.error(
-      "Erro ao editar tarefa:",
-      err.response?.data || err.message,
-    );
+      setNovaTask({
+        titulo: "",
+        setor: "Administrativo",
+        prioridade: "Média",
+        status: "Pendente",
+        estimativaMinutos: "",
+        descricao: "",
+      });
 
-    alert(
-      err.response?.data?.dados ||
-      err.response?.data?.mensagem ||
-      "Erro ao editar tarefa. Verifique a API.",
-    );
+      setCreateTaskOpen(false);
+    } catch (err) {
+      console.error("Erro ao criar tarefa:", err.response?.data || err.message);
+
+      alert(
+        err.response?.data?.dados ||
+          err.response?.data?.mensagem ||
+          "Erro ao criar tarefa. Verifique a API.",
+      );
+    }
   }
-}
 
-async function criarTask() {
-  if (!novaTask.titulo.trim()) return;
+  // ===== Exportar PDF =====
+  function exportarPDF() {
+    const doc = new jsPDF();
+    const dadosExport = lista; // usa exatamente o que está filtrado
 
-  try {
-    const payload = {
-      titulo: novaTask.titulo,
-      descricao: novaTask.descricao,
-      prioridade: prioridadeToApiMap[novaTask.prioridade],
-      setorId: setorToApiMap[novaTask.setor],
-      criadoPor: 1,
-      estimativaMinutos: Number(novaTask.estimativaMinutos),
-      status: statusToApiMap[novaTask.status],
-      funcionarioId: 1,
-    };
+    // ===== TÍTULO =====
+    doc.setFontSize(18);
+    doc.text("Relatório de Tarefas - Gestoon", 14, 15);
 
-    console.log("Setor escolhido:", novaTask.setor);
-    console.log("Setor convertido:", setorToApiMap[novaTask.setor]);
-    console.log("Payload enviado:", payload);
+    // ===== DATA =====
+    const hoje = new Date().toLocaleDateString();
+    doc.setFontSize(10);
+    doc.text(`Gerado em: ${hoje}`, 14, 22);
 
-    await api.post("/tarefas", payload);
-    await fetchDados();
+    // ===== PREPARAR DADOS =====
+    const dados = dadosExport.map((t) => [
+      t.tarefaId,
+      t.titulo,
+      t.status,
+      t.prioridade,
+      t.setor,
+      t.criadoPor,
+      t.estimativaFormatada,
+      t.dataCriacao,
+      t.horaCriacao,
+      t.descricao || "-",
+    ]);
 
-    setNovaTask({
-      titulo: "",
-      setor: "Administrativo",
-      prioridade: "Média",
-      status: "Pendente",
-      estimativaMinutos: "",
-      descricao: "",
+    // ===== TABELA =====
+    autoTable(doc, {
+      startY: 30,
+      head: [
+        [
+          "ID",
+          "Título",
+          "Status",
+          "Prioridade",
+          "Setor",
+          "Criado por",
+          "Estimativa",
+          "Data",
+          "Hora",
+          "Descrição",
+        ],
+      ],
+      body: dados,
+
+      styles: {
+        fontSize: 8,
+        lineColor: [200, 200, 200], // cor da linha
+        lineWidth: 0.1, // espessura
+      },
+
+      headStyles: {
+        fillColor: [15, 23, 42],
+        textColor: 255,
+        lineWidth: 0.2,
+      },
+
+      theme: "grid",
     });
 
-    setCreateTaskOpen(false);
-  } catch (err) {
-    console.error("Erro ao criar tarefa:", err.response?.data || err.message);
-
-    alert(
-      err.response?.data?.dados ||
-      err.response?.data?.mensagem ||
-      "Erro ao criar tarefa. Verifique a API.",
-    );
+    // ===== SALVAR =====
+    doc.save("relatorio_tarefas.pdf");
   }
-}
 
-// ===== Exportar PDF =====
-function exportarPDF() {
-  const doc = new jsPDF();
-  const dadosExport = lista; // usa exatamente o que está filtrado
+  // ===== MAPS =====
+  const statusMap = {
+    Pendente: "statusPendente",
+    "Em andamento": "statusAndamento",
+    Concluída: "statusConcluida",
+    Cancelada: "statusCancelada",
+  };
 
-  // ===== TÍTULO =====
-  doc.setFontSize(18);
-  doc.text("Relatório de Tarefas - Gestoon", 14, 15);
+  const setores = [
+    "Administrativo",
+    "Financeiro",
+    "Operacional",
+    "Atendimento",
+    "Limpeza",
+    "Estoque",
+    "Logística",
+  ];
 
-  // ===== DATA =====
-  const hoje = new Date().toLocaleDateString();
-  doc.setFontSize(10);
-  doc.text(`Gerado em: ${hoje}`, 14, 22);
+  const prioridadeMap = {
+    Alta: "prioridadeAlta",
+    Média: "prioridadeMedia",
+    Baixa: "prioridadeBaixa",
+  };
 
-  // ===== PREPARAR DADOS =====
-  const dados = dadosExport.map((t) => [
-    t.tarefaId,
-    t.titulo,
-    t.status,
-    t.prioridade,
-    t.setor,
-    t.criadoPor,
-    t.estimativaFormatada,
-    t.dataCriacao,
-    t.horaCriacao,
-    t.descricao || "-",
+  // ===== FILTRO + BUSCA =====
+
+  // eslint-disable-next-line react-hooks/preserve-manual-memoization
+  const lista = useMemo(() => {
+    let lista = [...tasksState];
+
+    // filtro status
+    if (filtro !== "Todos") {
+      lista = lista.filter((t) => t.status === filtro);
+    }
+
+    // busca
+    if (busca) {
+      lista = lista.filter((t) =>
+        t.titulo.toLowerCase().includes(busca.toLowerCase()),
+      );
+    }
+
+    // data
+    if (dataInicio || dataFim) {
+      lista = lista.filter((t) => {
+        const [dia, mes, ano] = t.dataCriacao.split("/");
+        const dataTask = new Date(`${ano}-${mes}-${dia}`);
+
+        const inicio = dataInicio ? new Date(dataInicio) : null;
+        const fim = dataFim ? new Date(dataFim) : null;
+
+        if (inicio && fim) return dataTask >= inicio && dataTask <= fim;
+        if (inicio && !fim) return dataTask.getTime() === inicio.getTime();
+        if (!inicio && fim) return dataTask <= fim;
+
+        return true;
+      });
+    }
+
+    // setor
+    if (setorFiltro) {
+      lista = lista.filter((t) => t.setor === setorFiltro);
+    }
+
+    // mês
+    if (mesFiltro) {
+      lista = lista.filter((t) => {
+        const [, mes] = t.dataCriacao.split("/");
+        return mes === mesFiltro;
+      });
+    }
+
+    // ordenação
+    lista.sort((a, b) => {
+      let resultado = 0;
+
+      if (ordemData) {
+        const [dA, mA, yA] = a.dataCriacao.split("/");
+        const [dB, mB, yB] = b.dataCriacao.split("/");
+
+        const dataA = new Date(`${yA}-${mA}-${dA}`);
+        const dataB = new Date(`${yB}-${mB}-${dB}`);
+
+        resultado = ordemData === "recente" ? dataB - dataA : dataA - dataB;
+      }
+
+      if (resultado === 0 && ordemTitulo) {
+        resultado =
+          ordemTitulo === "az"
+            ? a.titulo.localeCompare(b.titulo)
+            : b.titulo.localeCompare(a.titulo);
+      }
+
+      return resultado;
+    });
+
+    return lista;
+  }, [
+    tasksState,
+    filtro,
+    busca,
+    dataInicio,
+    dataFim,
+    setorFiltro,
+    mesFiltro,
+    ordemData,
+    ordemTitulo,
   ]);
 
-  // ===== TABELA =====
-  autoTable(doc, {
-    startY: 30,
-    head: [
-      [
-        "ID",
-        "Título",
-        "Status",
-        "Prioridade",
-        "Setor",
-        "Criado por",
-        "Estimativa",
-        "Data",
-        "Hora",
-        "Descrição",
-      ],
+  // ===== RESUMO =====
+  const total = tasksState.length;
+
+  const pendentes = tasksState.filter((t) => t.status === "Pendente").length;
+  const andamento = tasksState.filter(
+    (t) => t.status === "Em andamento",
+  ).length;
+  const concluidas = tasksState.filter((t) => t.status === "Concluída").length;
+  const canceladas = tasksState.filter((t) => t.status === "Cancelada").length;
+
+  const dataGrafico = useMemo(
+    () => [
+      { name: "Pendentes", value: pendentes },
+      { name: "Em andamento", value: andamento },
+      { name: "Concluídas", value: concluidas },
+      { name: "Canceladas", value: canceladas },
     ],
-    body: dados,
+    [pendentes, andamento, concluidas, canceladas],
+  );
 
-    styles: {
-      fontSize: 8,
-      lineColor: [200, 200, 200], // cor da linha
-      lineWidth: 0.1, // espessura
-    },
+  const dataGraficoFiltrado = useMemo(
+    () => dataGrafico.filter((item) => item.value > 0),
+    [dataGrafico],
+  );
 
-    headStyles: {
-      fillColor: [15, 23, 42],
-      textColor: 255,
-      lineWidth: 0.2,
-    },
-
-    theme: "grid",
-  });
-
-  // ===== SALVAR =====
-  doc.save("relatorio_tarefas.pdf");
-}
-
-// ===== MAPS =====
-const statusMap = {
-  Pendente: "statusPendente",
-  "Em andamento": "statusAndamento",
-  Concluída: "statusConcluida",
-  Cancelada: "statusCancelada",
-};
-
-const setores = [
-  "Administrativo",
-  "Financeiro",
-  "Operacional",
-  "Atendimento",
-  "Limpeza",
-  "Estoque",
-  "Logística",
-];
-
-const prioridadeMap = {
-  Alta: "prioridadeAlta",
-  Média: "prioridadeMedia",
-  Baixa: "prioridadeBaixa",
-};
-
-// ===== FILTRO + BUSCA =====
-
-// eslint-disable-next-line react-hooks/preserve-manual-memoization
-const lista = useMemo(() => {
-  let lista = [...tasksState];
-
-  // filtro status
-  if (filtro !== "Todos") {
-    lista = lista.filter((t) => t.status === filtro);
-  }
-
-  // busca
-  if (busca) {
-    lista = lista.filter((t) =>
-      t.titulo.toLowerCase().includes(busca.toLowerCase()),
+  if (loading) {
+    return (
+      <div className={styles.dashboard}>
+        <div className={styles.cardContainer}>
+          <p>Carregando tarefas...</p>
+        </div>
+      </div>
     );
   }
 
-  // data
-  if (dataInicio || dataFim) {
-    lista = lista.filter((t) => {
-      const [dia, mes, ano] = t.dataCriacao.split("/");
-      const dataTask = new Date(`${ano}-${mes}-${dia}`);
-
-      const inicio = dataInicio ? new Date(dataInicio) : null;
-      const fim = dataFim ? new Date(dataFim) : null;
-
-      if (inicio && fim) return dataTask >= inicio && dataTask <= fim;
-      if (inicio && !fim) return dataTask.getTime() === inicio.getTime();
-      if (!inicio && fim) return dataTask <= fim;
-
-      return true;
-    });
+  if (error) {
+    return (
+      <div className={styles.dashboard}>
+        <div className={styles.cardContainer}>
+          <p style={{ color: "red" }}>{error}</p>
+        </div>
+      </div>
+    );
   }
 
-  // setor
-  if (setorFiltro) {
-    lista = lista.filter((t) => t.setor === setorFiltro);
-  }
-
-  // mês
-  if (mesFiltro) {
-    lista = lista.filter((t) => {
-      const [, mes] = t.dataCriacao.split("/");
-      return mes === mesFiltro;
-    });
-  }
-
-  // ordenação
-  lista.sort((a, b) => {
-    let resultado = 0;
-
-    if (ordemData) {
-      const [dA, mA, yA] = a.dataCriacao.split("/");
-      const [dB, mB, yB] = b.dataCriacao.split("/");
-
-      const dataA = new Date(`${yA}-${mA}-${dA}`);
-      const dataB = new Date(`${yB}-${mB}-${dB}`);
-
-      resultado = ordemData === "recente" ? dataB - dataA : dataA - dataB;
-    }
-
-    if (resultado === 0 && ordemTitulo) {
-      resultado =
-        ordemTitulo === "az"
-          ? a.titulo.localeCompare(b.titulo)
-          : b.titulo.localeCompare(a.titulo);
-    }
-
-    return resultado;
-  });
-
-  return lista;
-}, [
-  tasksState,
-  filtro,
-  busca,
-  dataInicio,
-  dataFim,
-  setorFiltro,
-  mesFiltro,
-  ordemData,
-  ordemTitulo,
-]);
-
-// ===== RESUMO =====
-const total = tasksState.length;
-
-const pendentes = tasksState.filter((t) => t.status === "Pendente").length;
-const andamento = tasksState.filter(
-  (t) => t.status === "Em andamento",
-).length;
-const concluidas = tasksState.filter((t) => t.status === "Concluída").length;
-const canceladas = tasksState.filter((t) => t.status === "Cancelada").length;
-
-const dataGrafico = useMemo(
-  () => [
-    { name: "Pendentes", value: pendentes },
-    { name: "Em andamento", value: andamento },
-    { name: "Concluídas", value: concluidas },
-    { name: "Canceladas", value: canceladas },
-  ],
-  [pendentes, andamento, concluidas, canceladas],
-);
-
-const dataGraficoFiltrado = useMemo(
-  () => dataGrafico.filter((item) => item.value > 0),
-  [dataGrafico],
-);
-
-if (loading) {
   return (
     <div className={styles.dashboard}>
       <div className={styles.cardContainer}>
-        <p>Carregando tarefas...</p>
-      </div>
-    </div>
-  );
-}
+        {/* ===== MENU TOPO ===== */}
 
-if (error) {
-  return (
-    <div className={styles.dashboard}>
-      <div className={styles.cardContainer}>
-        <p style={{ color: "red" }}>{error}</p>
-      </div>
-    </div>
-  );
-}
+        <h1>Tarefas</h1>
 
-return (
-  <div className={styles.dashboard}>
-    <div className={styles.cardContainer}>
-      {/* ===== MENU TOPO ===== */}
+        {/* ===== RESUMO ===== */}
+        <div className={styles.resumo}>
+          <div>Total: {total}</div>
+          <div>Pendentes: {pendentes}</div>
+          <div>Em andamento: {andamento}</div>
+          <div>Concluídas: {concluidas}</div>
+          <div>Canceladas: {canceladas}</div>
+        </div>
 
-      <h1>Tarefas</h1>
+        {/* ===== BUSCA ===== */}
+        <div className={styles.topActions}>
+          <input
+            placeholder="Buscar tarefa..."
+            className={styles.busca}
+            onChange={(e) => setBusca(e.target.value)}
+          />
+        </div>
 
-      {/* ===== RESUMO ===== */}
-      <div className={styles.resumo}>
-        <div>Total: {total}</div>
-        <div>Pendentes: {pendentes}</div>
-        <div>Em andamento: {andamento}</div>
-        <div>Concluídas: {concluidas}</div>
-        <div>Canceladas: {canceladas}</div>
-      </div>
-
-      {/* ===== BUSCA ===== */}
-      <div className={styles.topActions}>
-        <input
-          placeholder="Buscar tarefa..."
-          className={styles.busca}
-          onChange={(e) => setBusca(e.target.value)}
-        />
-      </div>
-
-      {/* ==== DATA ==== */}
-      <div className={styles.filtrosAvancados}>
-        <div>
+        {/* ==== DATA ==== */}
+        <div className={styles.filtrosAvancados}>
           <div>
-            <label>Período: </label>
+            <div>
+              <label>Período: </label>
 
-            <div className={styles.periodoInputs}>
-              <div>
-                <small>De: </small>
-                <input
-                  type="date"
-                  value={dataInicio}
-                  onChange={(e) => setDataInicio(e.target.value)}
-                />
-              </div>
+              <div className={styles.periodoInputs}>
+                <div>
+                  <small>De: </small>
+                  <input
+                    type="date"
+                    value={dataInicio}
+                    onChange={(e) => setDataInicio(e.target.value)}
+                  />
+                </div>
 
-              <div>
-                <small>Até: </small>
-                <input
-                  type="date"
-                  value={dataFim}
-                  onChange={(e) => setDataFim(e.target.value)}
-                />
+                <div>
+                  <small>Até: </small>
+                  <input
+                    type="date"
+                    value={dataFim}
+                    onChange={(e) => setDataFim(e.target.value)}
+                  />
+                </div>
               </div>
             </div>
+
+            <small className={styles.meses}>Meses: </small>
+            <select
+              className={styles.filtroSelect}
+              value={mesFiltro}
+              onChange={(e) => setMesFiltro(e.target.value)}
+            >
+              <option value="">Todos os meses</option>
+              <option value="01">Janeiro</option>
+              <option value="02">Fevereiro</option>
+              <option value="03">Março</option>
+              <option value="04">Abril</option>
+              <option value="05">Maio</option>
+              <option value="06">Junho</option>
+              <option value="07">Julho</option>
+              <option value="08">Agosto</option>
+              <option value="09">Setembro</option>
+              <option value="10">Outubro</option>
+              <option value="11">Novembro</option>
+              <option value="12">Dezembro</option>
+            </select>
           </div>
 
-          <small className={styles.meses}>Meses: </small>
-          <select
-            className={styles.filtroSelect}
-            value={mesFiltro}
-            onChange={(e) => setMesFiltro(e.target.value)}
-          >
-            <option value="">Todos os meses</option>
-            <option value="01">Janeiro</option>
-            <option value="02">Fevereiro</option>
-            <option value="03">Março</option>
-            <option value="04">Abril</option>
-            <option value="05">Maio</option>
-            <option value="06">Junho</option>
-            <option value="07">Julho</option>
-            <option value="08">Agosto</option>
-            <option value="09">Setembro</option>
-            <option value="10">Outubro</option>
-            <option value="11">Novembro</option>
-            <option value="12">Dezembro</option>
-          </select>
+          {/* SETOR */}
+          <div>
+            <small>Setor:</small>
+            <select
+              value={setorFiltro}
+              onChange={(e) => setSetorFiltro(e.target.value)}
+            >
+              <option value="">Todos</option>
+
+              {setores.map((s) => (
+                <option key={s} value={s}>
+                  {s}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
 
-        {/* SETOR */}
-        <div>
-          <small>Setor:</small>
-          <select
-            value={setorFiltro}
-            onChange={(e) => setSetorFiltro(e.target.value)}
+        {/* ===== FILTROS ===== */}
+        <div className={styles.filtros}>
+          <button
+            className={filtro === "Todos" ? styles.ativo : ""}
+            onClick={() => setFiltro("Todos")}
           >
-            <option value="">Todos</option>
+            Todos
+          </button>
 
-            {setores.map((s) => (
-              <option key={s} value={s}>
-                {s}
-              </option>
-            ))}
-          </select>
+          <button
+            className={filtro === "Pendente" ? styles.ativo : ""}
+            onClick={() => setFiltro("Pendente")}
+          >
+            Pendentes
+          </button>
+
+          <button
+            className={filtro === "Em andamento" ? styles.ativo : ""}
+            onClick={() => setFiltro("Em andamento")}
+          >
+            Em andamento
+          </button>
+
+          <button
+            className={filtro === "Concluída" ? styles.ativo : ""}
+            onClick={() => setFiltro("Concluída")}
+          >
+            Concluídas
+          </button>
+
+          <button
+            className={filtro === "Cancelada" ? styles.ativo : ""}
+            onClick={() => setFiltro("Cancelada")}
+          >
+            Canceladas
+          </button>
         </div>
-      </div>
 
-      {/* ===== FILTROS ===== */}
-      <div className={styles.filtros}>
-        <button
-          className={filtro === "Todos" ? styles.ativo : ""}
-          onClick={() => setFiltro("Todos")}
-        >
-          Todos
-        </button>
+        <div className={styles.acoes}>
+          <button className={styles.limparBtn} onClick={limparFiltros}>
+            Limpar Filtros
+          </button>
 
-        <button
-          className={filtro === "Pendente" ? styles.ativo : ""}
-          onClick={() => setFiltro("Pendente")}
-        >
-          Pendentes
-        </button>
+          <button
+            className={styles.criarBtn}
+            onClick={() => setCreateTaskOpen(true)}
+          >
+            Criar Tarefa
+          </button>
+        </div>
 
-        <button
-          className={filtro === "Em andamento" ? styles.ativo : ""}
-          onClick={() => setFiltro("Em andamento")}
-        >
-          Em andamento
-        </button>
+        {/* ===== DESKTOP (TABELA) ===== */}
+        <div className={`${styles.tabelaContainer} ${styles.desktopOnly}`}>
+          <table className={styles.tabela}>
+            <thead>
+              <tr>
+                <th>ID</th>
 
-        <button
-          className={filtro === "Concluída" ? styles.ativo : ""}
-          onClick={() => setFiltro("Concluída")}
-        >
-          Concluídas
-        </button>
+                <th
+                  className={`${styles.thSortable} ${ordemTitulo ? styles.colunaAtiva : ""}`}
+                  onClick={() =>
+                    setOrdemTitulo((prev) => {
+                      if (prev === null) return "az";
+                      if (prev === "az") return "za";
+                      return null;
+                    })
+                  }
+                >
+                  Título{" "}
+                  {ordemTitulo === "az" ? "↑" : ordemTitulo === "za" ? "↓" : ""}
+                </th>
 
-        <button
-          className={filtro === "Cancelada" ? styles.ativo : ""}
-          onClick={() => setFiltro("Cancelada")}
-        >
-          Canceladas
-        </button>
-      </div>
+                <th>Status</th>
+                <th>Prioridade</th>
+                <th>Setor</th>
+                <th>Criado por</th>
+                <th>Estimativa</th>
+                <th>Hora</th>
 
-      <div className={styles.acoes}>
-        <button className={styles.limparBtn} onClick={limparFiltros}>
-          Limpar Filtros
-        </button>
-
-        <button
-          className={styles.criarBtn}
-          onClick={() => setCreateTaskOpen(true)}
-        >
-          Criar Tarefa
-        </button>
-      </div>
-
-      {/* ===== DESKTOP (TABELA) ===== */}
-      <div className={`${styles.tabelaContainer} ${styles.desktopOnly}`}>
-        <table className={styles.tabela}>
-          <thead>
-            <tr>
-              <th>ID</th>
-
-              <th
-                className={`${styles.thSortable} ${ordemTitulo ? styles.colunaAtiva : ""}`}
-                onClick={() =>
-                  setOrdemTitulo((prev) => {
-                    if (prev === null) return "az";
-                    if (prev === "az") return "za";
-                    return null;
-                  })
-                }
-              >
-                Título{" "}
-                {ordemTitulo === "az" ? "↑" : ordemTitulo === "za" ? "↓" : ""}
-              </th>
-
-              <th>Status</th>
-              <th>Prioridade</th>
-              <th>Setor</th>
-              <th>Criado por</th>
-              <th>Estimativa</th>
-              <th>Hora</th>
-
-              <th
-                className={`${styles.thSortable} ${styles.textCenter} ${ordemData ? styles.colunaAtiva : ""
+                <th
+                  className={`${styles.thSortable} ${styles.textCenter} ${
+                    ordemData ? styles.colunaAtiva : ""
                   }`}
-                onClick={() =>
-                  setOrdemData((prev) => {
-                    if (prev === null) return "recente";
-                    if (prev === "recente") return "antigo";
-                    return null;
-                  })
-                }
-              >
-                Data{" "}
-                {ordemData === "recente"
-                  ? "↑"
-                  : ordemData === "antigo"
-                    ? "↓"
-                    : ""}
-              </th>
-            </tr>
-          </thead>
+                  onClick={() =>
+                    setOrdemData((prev) => {
+                      if (prev === null) return "recente";
+                      if (prev === "recente") return "antigo";
+                      return null;
+                    })
+                  }
+                >
+                  Data{" "}
+                  {ordemData === "recente"
+                    ? "↑"
+                    : ordemData === "antigo"
+                      ? "↓"
+                      : ""}
+                </th>
+              </tr>
+            </thead>
 
-          <tbody>
-            {lista.map((task) => (
-              <tr
-                key={task.id}
-                onClick={(e) => {
-                  if (e.target.tagName === "BUTTON") return;
-                  setSelectedTask(task);
-                }}
-              >
-                <td>{task.tarefaId}</td>
+            <tbody>
+              {lista.map((task) => (
+                <tr
+                  key={task.id}
+                  onClick={(e) => {
+                    if (e.target.tagName === "BUTTON") return;
+                    setSelectedTask(task);
+                  }}
+                >
+                  <td>{task.tarefaId}</td>
 
-                <td>{task.titulo}</td>
+                  <td>{task.titulo}</td>
 
-                <td>
-                  <span
-                    className={`${styles.badge} ${styles[statusMap[task.status]] || styles.statusPendente
+                  <td>
+                    <span
+                      className={`${styles.badge} ${
+                        styles[statusMap[task.status]] || styles.statusPendente
                       }`}
-                  >
-                    {task.status}
-                  </span>
-                </td>
+                    >
+                      {task.status}
+                    </span>
+                  </td>
 
-                <td>
-                  <span
-                    className={`${styles.badge} ${styles[prioridadeMap[task.prioridade]]
+                  <td>
+                    <span
+                      className={`${styles.badge} ${
+                        styles[prioridadeMap[task.prioridade]]
                       }`}
+                    >
+                      {task.prioridade}
+                    </span>
+                  </td>
+
+                  <td>{task.setor}</td>
+                  <td>{task.criadoPor}</td>
+                  <td>{task.estimativaFormatada}</td>
+                  <td>{task.horaCriacao}</td>
+                  <td>{task.dataCriacao}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {/* ===== MOBILE (CARDS) ===== */}
+        <div className={styles.mobileOnly}>
+          {lista.map((task) => (
+            <div
+              key={task.id}
+              className={styles.card}
+              onClick={() => setSelectedTask(task)}
+            >
+              {/* HEADER */}
+              <div className={styles.cardHeader}>
+                <h1>{task.titulo}</h1>
+
+                <span
+                  className={`${styles.badge} ${styles[statusMap[task.status]]}`}
+                >
+                  {task.status}
+                </span>
+              </div>
+
+              {/* BODY */}
+              <div className={styles.cardBody}>
+                <p>
+                  <strong>Prioridade:</strong>{" "}
+                  <span
+                    className={`${styles.badge} ${styles[prioridadeMap[task.prioridade]]}`}
                   >
                     {task.prioridade}
                   </span>
-                </td>
+                </p>
 
-                <td>{task.setor}</td>
-                <td>{task.criadoPor}</td>
-                <td>{task.estimativaFormatada}</td>
-                <td>{task.horaCriacao}</td>
-                <td>{task.dataCriacao}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+                <p>
+                  <strong>Setor:</strong> {task.setor}
+                </p>
+                <p>
+                  <strong>Criado por:</strong> {task.criadoPor}
+                </p>
 
-      {/* ===== MOBILE (CARDS) ===== */}
-      <div className={styles.mobileOnly}>
-        {lista.map((task) => (
-          <div
-            key={task.id}
-            className={styles.card}
-            onClick={() => setSelectedTask(task)}
-          >
-            {/* HEADER */}
-            <div className={styles.cardHeader}>
-              <h1>{task.titulo}</h1>
+                <p>
+                  <strong>Estimativa:</strong> {task.estimativaFormatada}
+                </p>
 
-              <span
-                className={`${styles.badge} ${styles[statusMap[task.status]]}`}
-              >
-                {task.status}
-              </span>
+                <div className={styles.cardFooter}>
+                  <span>{task.horaCriacao}</span>
+                  <span>{task.dataCriacao}</span>
+                </div>
+              </div>
             </div>
+          ))}
+        </div>
 
-            {/* BODY */}
-            <div className={styles.cardBody}>
-              <p>
-                <strong>Prioridade:</strong>{" "}
-                <span
-                  className={`${styles.badge} ${styles[prioridadeMap[task.prioridade]]}`}
+        {/* ===== MODAL ===== */}
+        {selectedTask && (
+          <Modal
+            title={selectedTask.titulo}
+            variant="between"
+            onClose={() => setSelectedTask(null)}
+            actions={
+              <>
+                <button
+                  className={styles.btnClose}
+                  onClick={() => setSelectedTask(null)}
                 >
-                  {task.prioridade}
-                </span>
-              </p>
+                  Fechar
+                </button>
 
-              <p>
-                <strong>Setor:</strong> {task.setor}
-              </p>
-              <p>
-                <strong>Criado por:</strong> {task.criadoPor}
-              </p>
+                <button
+                  className={styles.btnPrimary}
+                  onClick={() => abrirEdicao(selectedTask)}
+                >
+                  Editar
+                </button>
 
-              <p>
-                <strong>Estimativa:</strong> {task.estimativaFormatada}
-              </p>
-
-              <div className={styles.cardFooter}>
-                <span>{task.horaCriacao}</span>
-                <span>{task.dataCriacao}</span>
+                <button
+                  className={styles.btnDanger}
+                  onClick={() => excluirTask(selectedTask.id)}
+                >
+                  Excluir
+                </button>
+              </>
+            }
+          >
+            <div className={styles.modalGrid}>
+              <div>
+                <strong>ID:</strong>
+                <p>{selectedTask.tarefaId}</p>
               </div>
-            </div>
-          </div>
-        ))}
-      </div>
 
-      {/* ===== MODAL ===== */}
-      {selectedTask && (
-        <Modal
-          title={selectedTask.titulo}
-          variant="between"
-          onClose={() => setSelectedTask(null)}
-          actions={
-            <>
-              <button
-                className={styles.btnClose}
-                onClick={() => setSelectedTask(null)}
-              >
-                Fechar
-              </button>
-
-              <button
-                className={styles.btnPrimary}
-                onClick={() => abrirEdicao(selectedTask)}
-              >
-                Editar
-              </button>
-
-              <button
-                className={styles.btnDanger}
-                onClick={() => excluirTask(selectedTask.id)}
-              >
-                Excluir
-              </button>
-            </>
-          }
-        >
-          <div className={styles.modalGrid}>
-            <div>
-              <strong>ID:</strong>
-              <p>{selectedTask.tarefaId}</p>
-            </div>
-
-            <div>
-              <strong>Prioridade:</strong>
-              <span
-                className={`${styles.badge} ${styles[prioridadeMap[selectedTask.prioridade]]
-                  }`}
-              >
-                {selectedTask.prioridade}
-              </span>
-            </div>
-
-            <div>
-              <strong>Status:</strong>
-              <span
-                className={`${styles.badge} ${styles[statusMap[selectedTask.status]] ||
-                  styles.statusPendente
-                  }`}
-              >
-                {selectedTask.status}
-              </span>
-            </div>
-
-            <div>
-              <strong>Setor:</strong>
-              <p>{selectedTask.setor}</p>
-            </div>
-
-            <div>
-              <strong>Criado por:</strong>
-              <p>{selectedTask.criadoPor}</p>
-            </div>
-
-            <div>
-              <strong>Estimativa:</strong>
-              <p>{selectedTask.estimativaFormatada}</p>
-            </div>
-
-            <div>
-              <strong>Data:</strong>
-              <p>{selectedTask.dataCriacao}</p>
-            </div>
-
-            <div>
-              <strong>Hora:</strong>
-              <p>{selectedTask.horaCriacao}</p>
-            </div>
-          </div>
-
-          <div className={styles.descricaoArea}>
-            <strong>Descrição:</strong>
-
-            <div className={styles.descricaoBox}>
-              <p>{selectedTask.descricao || "Sem descrição"}</p>
-            </div>
-          </div>
-        </Modal>
-      )}
-
-      {/* ===== MODAL EDITAR ===== */}
-      {editTask && (
-        <Modal
-          title="Editar Tarefa"
-          onClose={() => setEditTask(null)}
-          variant="between"
-          actions={
-            <>
-              <button
-                className={styles.btnSecondary}
-                onClick={() => setEditTask(null)}
-              >
-                Cancelar
-              </button>
-
-              <button
-                className={styles.btnPrimary}
-                onClick={salvarEdicao}
-                disabled={!editTask.titulo}
-              >
-                Salvar
-              </button>
-            </>
-          }
-        >
-          <div className={styles.formGrid}>
-            <div className={`${styles.formGroup} ${styles.full}`}>
-              <label>Título</label>
-              <input
-                type="text"
-                value={editTask.titulo}
-                onChange={(e) =>
-                  setEditTask({ ...editTask, titulo: e.target.value })
-                }
-              />
-            </div>
-
-            <div className={styles.formGroup}>
-              <label>Setor</label>
-              <select
-                value={editTask.setor}
-                onChange={(e) =>
-                  setEditTask({ ...editTask, setor: e.target.value })
-                }
-              >
-                {setores.map((s) => (
-                  <option key={s}>{s}</option>
-                ))}
-              </select>
-            </div>
-
-            <div className={styles.formGroup}>
-              <label>Status</label>
-              <select
-                value={editTask.status}
-                onChange={(e) =>
-                  setEditTask({ ...editTask, status: e.target.value })
-                }
-              >
-                <option>Pendente</option>
-                <option>Em andamento</option>
-                <option>Concluída</option>
-                <option>Cancelada</option>
-              </select>
-            </div>
-
-            <div className={styles.formGroup}>
-              <label>Prioridade</label>
-              <select
-                value={editTask.prioridade}
-                onChange={(e) =>
-                  setEditTask({ ...editTask, prioridade: e.target.value })
-                }
-              >
-                <option>Alta</option>
-                <option>Média</option>
-                <option>Baixa</option>
-              </select>
-            </div>
-
-            <div className={styles.formGroup}>
-              <label>Criado por</label>
-              <input type="text" value={editTask.criadoPor} disabled />
-            </div>
-
-            <div className={styles.formGroup}>
-              <label>Estimativa em minutos</label>
-              <input
-                type="number"
-                min="1"
-                value={editTask.estimativaMinutos}
-                onChange={(e) =>
-                  setEditTask({
-                    ...editTask,
-                    estimativaMinutos: e.target.value,
-                    estimativaFormatada: formatarEstimativa(e.target.value),
-                  })
-                }
-              />
-            </div>
-
-            <div className={`${styles.formGroup} ${styles.full}`}>
-              <label>Descrição</label>
-              <textarea
-                rows={4}
-                value={editTask.descricao}
-                onChange={(e) =>
-                  setEditTask({ ...editTask, descricao: e.target.value })
-                }
-              />
-            </div>
-          </div>
-        </Modal>
-      )}
-
-      {/* ===== MODAL CRIAR ===== */}
-      {createTaskOpen && (
-        <Modal
-          title="Criar Tarefa"
-          onClose={() => setCreateTaskOpen(false)}
-          variant="between"
-          actions={
-            <>
-              <button
-                className={styles.btnDanger}
-                onClick={() => {
-                  setCreateTaskOpen(false);
-                  setNovaTask({
-                    titulo: "",
-                    setor: "Administrativo",
-                    prioridade: "Média",
-                    status: "Pendente",
-                    estimativaMinutos: "",
-                    descricao: "",
-                  });
-                }}
-              >
-                Fechar
-              </button>
-
-              <button
-                className={styles.btnSecondary}
-                onClick={() =>
-                  setNovaTask({
-                    titulo: "",
-                    setor: "Administrativo",
-                    prioridade: "Média",
-                    status: "Pendente",
-                    estimativaMinutos: "",
-                    descricao: "",
-                  })
-                }
-              >
-                Limpar
-              </button>
-
-              <button
-                className={styles.btnPrimary}
-                onClick={criarTask}
-                disabled={!novaTask.titulo}
-              >
-                Criar
-              </button>
-            </>
-          }
-        >
-          <div className={styles.formGrid}>
-            {/* TÍTULO */}
-            <div className={`${styles.formGroup} ${styles.full}`}>
-              <label>Título</label>
-              <input
-                type="text"
-                value={novaTask.titulo}
-                onChange={(e) =>
-                  setNovaTask({ ...novaTask, titulo: e.target.value })
-                }
-                placeholder="Digite o título..."
-              />
-            </div>
-
-            {/* SETOR */}
-            <div className={styles.formGroup}>
-              <label>Setor</label>
-              <select
-                value={novaTask.setor}
-                onChange={(e) =>
-                  setNovaTask({ ...novaTask, setor: e.target.value })
-                }
-              >
-                {setores.map((s) => (
-                  <option key={s}>{s}</option>
-                ))}
-              </select>
-            </div>
-
-            {/* STATUS */}
-            <div className={styles.formGroup}>
-              <label>Status</label>
-              <select
-                value={novaTask.status}
-                onChange={(e) =>
-                  setNovaTask({ ...novaTask, status: e.target.value })
-                }
-              >
-                <option>Pendente</option>
-                <option>Em andamento</option>
-                <option>Concluída</option>
-                <option>Cancelada</option>
-              </select>
-            </div>
-
-            {/* PRIORIDADE */}
-            <div className={styles.formGroup}>
-              <label>Prioridade</label>
-              <select
-                value={novaTask.prioridade}
-                onChange={(e) =>
-                  setNovaTask({ ...novaTask, prioridade: e.target.value })
-                }
-              >
-                <option>Alta</option>
-                <option>Média</option>
-                <option>Baixa</option>
-              </select>
-            </div>
-
-            {/* Estimativa Minutos */}
-            <div className={styles.formGroup}>
-              <label>Estimativa em minutos</label>
-              <input
-                type="number"
-                min="1"
-                value={novaTask.estimativaMinutos}
-                onChange={(e) =>
-                  setNovaTask({
-                    ...novaTask,
-                    estimativaMinutos: e.target.value,
-                  })
-                }
-                placeholder="Ex: 90"
-              />
-            </div>
-
-            {/* DESCRIÇÃO */}
-            <div className={`${styles.formGroup} ${styles.full}`}>
-              <label>Descrição</label>
-              <textarea
-                rows={4}
-                value={novaTask.descricao}
-                onChange={(e) =>
-                  setNovaTask({ ...novaTask, descricao: e.target.value })
-                }
-              />
-            </div>
-          </div>
-        </Modal>
-      )}
-
-      <div className={styles.footerActions}>
-        <button className={styles.exportBtn} onClick={exportarPDF}>
-          Exportar PDF
-        </button>
-      </div>
-
-      {/* ==== Gráfico ==== */}
-      <div className={styles.grafico}>
-        <h2>Status das tarefas</h2>
-
-        <ResponsiveContainer width="100%" height={isMobile ? 220 : 400}>
-          <PieChart>
-            <Pie
-              data={dataGraficoFiltrado}
-              dataKey="value"
-              nameKey="name"
-              outerRadius={isMobile ? 70 : 120}
-              innerRadius={isMobile ? 30 : 50}
-              activeShape={null}
-              isAnimationActive={false}
-              stroke="none"
-              label={
-                isMobile
-                  ? false
-                  : ({ name, percent }) =>
-                    `${name}: ${(percent * 100).toFixed(0)}%`
-              }
-              labelLine={false}
-              fontSize={isMobile ? 12 : 20}
-            >
-              {dataGraficoFiltrado.map((entry) => {
-                const colorMap = {
-                  Pendentes: "#ef4444",
-                  "Em andamento": "#f59e0b",
-                  Concluídas: "#22c55e",
-                  Canceladas: "#6b7280",
-                };
-
-                return <Cell key={entry.name} fill={colorMap[entry.name]} />;
-              })}
-            </Pie>
-
-            <Tooltip />
-          </PieChart>
-        </ResponsiveContainer>
-
-        {/* legenda manual */}
-        <div className={styles.legenda}>
-          {dataGraficoFiltrado.map((item) => {
-            const colorMap = {
-              Pendentes: "#ef4444",
-              "Em andamento": "#f59e0b",
-              Concluídas: "#22c55e",
-              Canceladas: "#6b7280",
-            };
-
-            return (
-              <div key={item.name}>
+              <div>
+                <strong>Prioridade:</strong>
                 <span
-                  className={styles.cor}
-                  style={{ background: colorMap[item.name] }}
-                ></span>
-                {item.name} ({item.value})
+                  className={`${styles.badge} ${
+                    styles[prioridadeMap[selectedTask.prioridade]]
+                  }`}
+                >
+                  {selectedTask.prioridade}
+                </span>
               </div>
-            );
-          })}
+
+              <div>
+                <strong>Status:</strong>
+                <span
+                  className={`${styles.badge} ${
+                    styles[statusMap[selectedTask.status]] ||
+                    styles.statusPendente
+                  }`}
+                >
+                  {selectedTask.status}
+                </span>
+              </div>
+
+              <div>
+                <strong>Setor:</strong>
+                <p>{selectedTask.setor}</p>
+              </div>
+
+              <div>
+                <strong>Criado por:</strong>
+                <p>{selectedTask.criadoPor}</p>
+              </div>
+
+              <div>
+                <strong>Estimativa:</strong>
+                <p>{selectedTask.estimativaFormatada}</p>
+              </div>
+
+              <div>
+                <strong>Data:</strong>
+                <p>{selectedTask.dataCriacao}</p>
+              </div>
+
+              <div>
+                <strong>Hora:</strong>
+                <p>{selectedTask.horaCriacao}</p>
+              </div>
+            </div>
+
+            <div className={styles.descricaoArea}>
+              <strong>Descrição:</strong>
+
+              <div className={styles.descricaoBox}>
+                <p>{selectedTask.descricao || "Sem descrição"}</p>
+              </div>
+            </div>
+          </Modal>
+        )}
+
+        {/* ===== MODAL EDITAR ===== */}
+        {editTask && (
+          <Modal
+            title="Editar Tarefa"
+            onClose={() => setEditTask(null)}
+            variant="between"
+            actions={
+              <>
+                <button
+                  className={styles.btnSecondary}
+                  onClick={() => setEditTask(null)}
+                >
+                  Cancelar
+                </button>
+
+                <button
+                  className={styles.btnPrimary}
+                  onClick={salvarEdicao}
+                  disabled={!editTask.titulo}
+                >
+                  Salvar
+                </button>
+              </>
+            }
+          >
+            <div className={styles.formGrid}>
+              <div className={`${styles.formGroup} ${styles.full}`}>
+                <label>Título</label>
+                <input
+                  type="text"
+                  value={editTask.titulo}
+                  onChange={(e) =>
+                    setEditTask({ ...editTask, titulo: e.target.value })
+                  }
+                />
+              </div>
+
+              <div className={styles.formGroup}>
+                <label>Setor</label>
+                <select
+                  value={editTask.setor}
+                  onChange={(e) =>
+                    setEditTask({ ...editTask, setor: e.target.value })
+                  }
+                >
+                  {setores.map((s) => (
+                    <option key={s}>{s}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className={styles.formGroup}>
+                <label>Status</label>
+                <select
+                  value={editTask.status}
+                  onChange={(e) =>
+                    setEditTask({ ...editTask, status: e.target.value })
+                  }
+                >
+                  <option>Pendente</option>
+                  <option>Em andamento</option>
+                  <option>Concluída</option>
+                  <option>Cancelada</option>
+                </select>
+              </div>
+
+              <div className={styles.formGroup}>
+                <label>Prioridade</label>
+                <select
+                  value={editTask.prioridade}
+                  onChange={(e) =>
+                    setEditTask({ ...editTask, prioridade: e.target.value })
+                  }
+                >
+                  <option>Alta</option>
+                  <option>Média</option>
+                  <option>Baixa</option>
+                </select>
+              </div>
+
+              <div className={styles.formGroup}>
+                <label>Criado por</label>
+                <input type="text" value={editTask.criadoPor} disabled />
+              </div>
+
+              <div className={styles.formGroup}>
+                <label>Estimativa em minutos</label>
+                <input
+                  type="number"
+                  min="1"
+                  value={editTask.estimativaMinutos}
+                  onChange={(e) =>
+                    setEditTask({
+                      ...editTask,
+                      estimativaMinutos: e.target.value,
+                      estimativaFormatada: formatarEstimativa(e.target.value),
+                    })
+                  }
+                />
+              </div>
+
+              <div className={`${styles.formGroup} ${styles.full}`}>
+                <label>Descrição</label>
+                <textarea
+                  rows={4}
+                  value={editTask.descricao}
+                  onChange={(e) =>
+                    setEditTask({ ...editTask, descricao: e.target.value })
+                  }
+                />
+              </div>
+            </div>
+          </Modal>
+        )}
+
+        {/* ===== MODAL CRIAR ===== */}
+        {createTaskOpen && (
+          <Modal
+            title="Criar Tarefa"
+            onClose={() => setCreateTaskOpen(false)}
+            variant="between"
+            actions={
+              <>
+                <button
+                  className={styles.btnDanger}
+                  onClick={() => {
+                    setCreateTaskOpen(false);
+                    setNovaTask({
+                      titulo: "",
+                      setor: "Administrativo",
+                      prioridade: "Média",
+                      status: "Pendente",
+                      estimativaMinutos: "",
+                      descricao: "",
+                    });
+                  }}
+                >
+                  Fechar
+                </button>
+
+                <button
+                  className={styles.btnSecondary}
+                  onClick={() =>
+                    setNovaTask({
+                      titulo: "",
+                      setor: "Administrativo",
+                      prioridade: "Média",
+                      status: "Pendente",
+                      estimativaMinutos: "",
+                      descricao: "",
+                    })
+                  }
+                >
+                  Limpar
+                </button>
+
+                <button
+                  className={styles.btnPrimary}
+                  onClick={criarTask}
+                  disabled={!novaTask.titulo}
+                >
+                  Criar
+                </button>
+              </>
+            }
+          >
+            <div className={styles.formGrid}>
+              {/* TÍTULO */}
+              <div className={`${styles.formGroup} ${styles.full}`}>
+                <label>Título</label>
+                <input
+                  type="text"
+                  value={novaTask.titulo}
+                  onChange={(e) =>
+                    setNovaTask({ ...novaTask, titulo: e.target.value })
+                  }
+                  placeholder="Digite o título..."
+                />
+              </div>
+
+              {/* SETOR */}
+              <div className={styles.formGroup}>
+                <label>Setor</label>
+                <select
+                  value={novaTask.setor}
+                  onChange={(e) =>
+                    setNovaTask({ ...novaTask, setor: e.target.value })
+                  }
+                >
+                  {setores.map((s) => (
+                    <option key={s}>{s}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* STATUS */}
+              <div className={styles.formGroup}>
+                <label>Status</label>
+                <select
+                  value={novaTask.status}
+                  onChange={(e) =>
+                    setNovaTask({ ...novaTask, status: e.target.value })
+                  }
+                >
+                  <option>Pendente</option>
+                  <option>Em andamento</option>
+                  <option>Concluída</option>
+                  <option>Cancelada</option>
+                </select>
+              </div>
+
+              {/* PRIORIDADE */}
+              <div className={styles.formGroup}>
+                <label>Prioridade</label>
+                <select
+                  value={novaTask.prioridade}
+                  onChange={(e) =>
+                    setNovaTask({ ...novaTask, prioridade: e.target.value })
+                  }
+                >
+                  <option>Alta</option>
+                  <option>Média</option>
+                  <option>Baixa</option>
+                </select>
+              </div>
+
+              {/* Estimativa Minutos */}
+              <div className={styles.formGroup}>
+                <label>Estimativa em minutos</label>
+                <input
+                  type="number"
+                  min="1"
+                  value={novaTask.estimativaMinutos}
+                  onChange={(e) =>
+                    setNovaTask({
+                      ...novaTask,
+                      estimativaMinutos: e.target.value,
+                    })
+                  }
+                  placeholder="Ex: 90"
+                />
+              </div>
+
+              {/* DESCRIÇÃO */}
+              <div className={`${styles.formGroup} ${styles.full}`}>
+                <label>Descrição</label>
+                <textarea
+                  rows={4}
+                  value={novaTask.descricao}
+                  onChange={(e) =>
+                    setNovaTask({ ...novaTask, descricao: e.target.value })
+                  }
+                />
+              </div>
+            </div>
+          </Modal>
+        )}
+
+        <div className={styles.footerActions}>
+          <button className={styles.exportBtn} onClick={exportarPDF}>
+            Exportar PDF
+          </button>
+        </div>
+
+        {/* ==== Gráfico ==== */}
+        <div className={styles.grafico}>
+          <h2>Status das tarefas</h2>
+
+          <ResponsiveContainer width="100%" height={isMobile ? 220 : 400}>
+            <PieChart>
+              <Pie
+                data={dataGraficoFiltrado}
+                dataKey="value"
+                nameKey="name"
+                outerRadius={isMobile ? 70 : 120}
+                innerRadius={isMobile ? 30 : 50}
+                activeShape={null}
+                isAnimationActive={false}
+                stroke="none"
+                label={
+                  isMobile
+                    ? false
+                    : ({ name, percent }) =>
+                        `${name}: ${(percent * 100).toFixed(0)}%`
+                }
+                labelLine={false}
+                fontSize={isMobile ? 12 : 20}
+              >
+                {dataGraficoFiltrado.map((entry) => {
+                  const colorMap = {
+                    Pendentes: "#ef4444",
+                    "Em andamento": "#f59e0b",
+                    Concluídas: "#22c55e",
+                    Canceladas: "#6b7280",
+                  };
+
+                  return <Cell key={entry.name} fill={colorMap[entry.name]} />;
+                })}
+              </Pie>
+
+              <Tooltip />
+            </PieChart>
+          </ResponsiveContainer>
+
+          {/* legenda manual */}
+          <div className={styles.legenda}>
+            {dataGraficoFiltrado.map((item) => {
+              const colorMap = {
+                Pendentes: "#ef4444",
+                "Em andamento": "#f59e0b",
+                Concluídas: "#22c55e",
+                Canceladas: "#6b7280",
+              };
+
+              return (
+                <div key={item.name}>
+                  <span
+                    className={styles.cor}
+                    style={{ background: colorMap[item.name] }}
+                  ></span>
+                  {item.name} ({item.value})
+                </div>
+              );
+            })}
+          </div>
         </div>
       </div>
     </div>
-  </div>
-);
+  );
 }
 
 export default Home;
