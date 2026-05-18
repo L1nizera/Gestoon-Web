@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect, useRef } from "react";
+import { useAuth } from "../../../context/AuthContext";
 import styles from "./style.module.css";
 import api from "../../../services/api";
 
@@ -64,6 +65,7 @@ export default function Tarefas() {
   const [aceitandoId, setAceitandoId] = useState(null);
   const [tarefaSelecionada, setTarefaSelecionada] = useState(null);
 
+  const { user } = useAuth();
   const tarefasKeyRef = useRef("");
 
   // ───── FILTROS ─────
@@ -174,16 +176,29 @@ export default function Tarefas() {
    * Aceita uma tarefa e atualiza o status para "Em andamento" (1)
    */
   async function aceitarTarefa(tarefaId) {
+    const funcionarioId =
+      user?.id || user?.funcionario_id || user?.usuario_id || user?.id_funcionario;
+
+    if (!funcionarioId) {
+      alert("Não foi possível identificar o usuário logado. Faça login novamente.");
+      return;
+    }
+
     try {
       setAceitandoId(tarefaId);
 
-      await api.post(`/tarefas/${tarefaId}/aceitar`);
+      await api.put(`/tarefas/aceitar/${tarefaId}`, {
+        funcionario_id: funcionarioId,
+      });
 
       setTarefasDisponiveis((prev) => prev.filter((t) => t.id !== tarefaId));
 
       if (tarefaSelecionada?.id === tarefaId) {
         setTarefaSelecionada(null);
       }
+
+      alert("Tarefa aceita com sucesso.");
+      await fetchTarefas(false);
     } catch (err) {
       console.error(
         "Erro ao aceitar tarefa:",
@@ -192,10 +207,10 @@ export default function Tarefas() {
 
       alert(
         err.response?.data?.mensagem ||
-          "Erro ao aceitar tarefa. Ela pode ter sido pega por outro funcionário.",
+          "Erro ao aceitar tarefa. Tente novamente mais tarde.",
       );
 
-      await fetchTarefas();
+      await fetchTarefas(false);
     } finally {
       setAceitandoId(null);
     }
@@ -300,32 +315,34 @@ export default function Tarefas() {
             />
           </div>
 
-          <div className={styles.filtroGroup}>
-            <label className={styles.filtroLabel}> Setor</label>
-            <select
-              value={filtroSetor}
-              onChange={(e) => setFiltroSetor(e.target.value)}
-            >
-              <option value="">Todos os setores</option>
-              {setoresUnicos.map((setor) => (
-                <option key={setor} value={setor}>
-                  {setor}
-                </option>
-              ))}
-            </select>
-          </div>
+          <div className={styles.filtroLinha}>
+            <div className={styles.filtroGroup}>
+              <label className={styles.filtroLabel}> Setor</label>
+              <select
+                value={filtroSetor}
+                onChange={(e) => setFiltroSetor(e.target.value)}
+              >
+                <option value="">Todos os setores</option>
+                {setoresUnicos.map((setor) => (
+                  <option key={setor} value={setor}>
+                    {setor}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-          <div className={styles.filtroGroup}>
-            <label className={styles.filtroLabel}> Prioridade</label>
-            <select
-              value={filtroPrioridade}
-              onChange={(e) => setFiltroPrioridade(e.target.value)}
-            >
-              <option value="">Todas as prioridades</option>
-              <option value="Baixa">Baixa</option>
-              <option value="Média">Média</option>
-              <option value="Alta">Alta</option>
-            </select>
+            <div className={styles.filtroGroup}>
+              <label className={styles.filtroLabel}> Prioridade</label>
+              <select
+                value={filtroPrioridade}
+                onChange={(e) => setFiltroPrioridade(e.target.value)}
+              >
+                <option value="">Todas as prioridades</option>
+                <option value="Baixa">Baixa</option>
+                <option value="Média">Média</option>
+                <option value="Alta">Alta</option>
+              </select>
+            </div>
           </div>
 
           {(busca || filtroSetor || filtroPrioridade) && (
