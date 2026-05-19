@@ -1,6 +1,13 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
+import { useAuth } from "../../../context/AuthContext";
+import api from "../../../services/api";
 import styles from "./style.module.css";
-import { tasks } from "../../../data/Tasks";
+
+const prioridadeApiMap = {
+  1: "Baixa",
+  2: "Média",
+  3: "Alta",
+};
 
 const statusClasses = {
   Pendente: styles.statusPendente,
@@ -18,11 +25,70 @@ function StatusBadge({ status }) {
 }
 
 export default function MinhasTarefas() {
-  const [taskList, setTaskList] = useState(tasks);
+  const [taskList, setTaskList] = useState([]);
+  const { user } = useAuth();
+
+  useEffect(() => {
+    carregarMinhasTarefas();
+  }, []);
+
+  const carregarMinhasTarefas = async () => {
+    try {
+      const response = await api.get("/tarefas");
+      const todas = response.data.dados || [];
+
+      const minhas = todas
+      
+        .filter(
+          (t) =>
+            Number(t.atr_funcionario_id) === Number(user.funcionarioId) &&
+            Number(t.atr_status) !== 0
+        )
+        .map((tarefa) => {
+          console.log("USER:", user);
+console.log("TAREFAS:", todas);
+
+          const data = new Date(tarefa.tar_data_criacao);
+
+          return {
+            
+            id: tarefa.tar_id,
+            titulo: tarefa.tar_titulo,
+            status:
+              Number(tarefa.atr_status) === 1
+                ? "Em andamento"
+                : Number(tarefa.atr_status) === 2
+                ? "Concluída"
+                : "Cancelada",
+            prioridade:
+              prioridadeApiMap[Number(tarefa.tar_prioridade)] || "Média",
+            setor: tarefa.set_nome,
+            criadoPor: tarefa.usu_nome,
+            descricao: tarefa.tar_descricao,
+            dataCriacao: data.toLocaleDateString("pt-BR"),
+            horaCriacao: data.toLocaleTimeString("pt-BR", {
+              hour: "2-digit",
+              minute: "2-digit",
+              
+            }),
+            
+          };
+        });
+
+      setTaskList(minhas);
+    } catch (error) {
+      console.error("Erro ao buscar tarefas:", error);
+    }
+  };
 
   const historyTasks = useMemo(
-    () => taskList.filter((task) => task.status === "Concluída" || task.status === "Cancelada"),
-    [taskList],
+    () =>
+      taskList.filter(
+        (task) =>
+          task.status === "Em andamento" ||
+          task.status === "Cancelada"
+      ),
+    [taskList]
   );
 
   const counts = useMemo(() => {
@@ -32,7 +98,7 @@ export default function MinhasTarefas() {
         if (task.status === "Cancelada") acc.cancelada += 1;
         return acc;
       },
-      { concluida: 0, cancelada: 0 },
+      { concluida: 0, cancelada: 0 }
     );
   }, [taskList]);
 
