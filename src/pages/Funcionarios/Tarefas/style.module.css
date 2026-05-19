@@ -34,6 +34,7 @@ body {
     opacity: 0;
     transform: translateY(1rem);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -73,7 +74,7 @@ body {
   .title {
     font-size: 2.4rem;
   }
-  
+
 
 }
 
@@ -126,7 +127,7 @@ body {
   .pageHeader {
     flex-direction: column;
   }
-  
+
   .summaryGrid {
     grid-template-columns: repeat(2, minmax(12rem, 1fr));
     width: 100%;
@@ -365,6 +366,7 @@ body {
     opacity: 0;
     transform: translateY(0.5rem);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -522,8 +524,8 @@ body {
 }
 
 .actionCell {
-  display: flex;
-  align-items: center;
+  text-align: center;
+  vertical-align: middle;
   justify-content: center;
   gap: 0.5rem;
 }
@@ -585,6 +587,7 @@ body {
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -614,6 +617,7 @@ body {
     opacity: 0;
     transform: translate(-50%, -40%);
   }
+
   to {
     opacity: 1;
     transform: translate(-50%, -50%);
@@ -880,40 +884,44 @@ body {
     padding: 1.5rem;
   }
 }
-  .pageHeader {
-    flex-direction: column;
-    gap: 1.5rem;
-  }
 
-  .summaryGrid {
-    grid-template-columns: repeat(2, 1fr);
-    width: 100%;
-  }
+.pageHeader {
+  flex-direction: column;
+  gap: 1.5rem;
+}
 
-  .title {
-    font-size: 2.2rem;
-  }
+.summaryGrid {
+  grid-template-columns: repeat(2, 1fr);
+  width: 100%;
+}
 
-  .pageHeaderContent {
-    width: 100%;
-  }
+.title {
+  font-size: 2.2rem;
+}
 
-  .filtrosContainer {
-    flex-direction: column;
-    gap: 1rem;
-  }
+.pageHeaderContent {
+  width: 100%;
+}
 
-  .filtroGroup select,
-  .filtroGroup input {
-    width: 100%;
-    min-width: auto;
-  }
+.filtrosContainer {
+  flex-direction: column;
+  gap: 1rem;
+}
 
-  .btnAccept {
-    min-width: 11rem;
-    padding: 0.7rem 1rem;
-    font-size: 1.2rem;
-  }
+.filtroGroup select,
+.filtroGroup input {
+  width: 100%;
+  min-width: auto;
+}
+
+.btnAccept {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 11rem;
+  padding: 0.7rem 1rem;
+  font-size: 1.2rem;
+}
 
 @media (max-width: 768px) {
   .desktopOnly {

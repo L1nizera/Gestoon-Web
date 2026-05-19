@@ -93,6 +93,41 @@ export default function Tarefas() {
       }),
     };
   }
+  function formatarDataHora(dataISO) {
+    if (!dataISO) {
+      return { dataCriacao: "-", horaCriacao: "-" };
+    }
+
+    const data = new Date(dataISO);
+
+    return {
+      dataCriacao: data.toLocaleDateString("pt-BR"),
+      horaCriacao: data.toLocaleTimeString("pt-BR", {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+    };
+  }
+
+  // 👇 COLE A NOVA FUNÇÃO AQUI
+  function formatarEstimativa(minutos) {
+    if (!minutos || minutos <= 0) {
+      return "Não informada";
+    }
+
+    const horas = Math.floor(minutos / 60);
+    const minutosRestantes = minutos % 60;
+
+    if (horas > 0 && minutosRestantes > 0) {
+      return `${horas}h ${minutosRestantes}min`;
+    }
+
+    if (horas > 0) {
+      return `${horas}h`;
+    }
+
+    return `${minutos} minutos`;
+  }
 
   function gerarChaveTarefas(lista) {
     return lista
@@ -106,6 +141,7 @@ export default function Tarefas() {
           tarefa.descricao,
           tarefa.dataCriacao,
           tarefa.horaCriacao,
+          tarefa.estimativaMinutos,
         ].join("-"),
       )
       .join("|");
@@ -126,7 +162,7 @@ export default function Tarefas() {
       const todosTarefas = response.data.dados || [];
 
       const tarefasFormatadas = todosTarefas
-        .filter((t) => Number(t.atr_status) === 0)
+        .filter((t) => Number(t.atr_status ?? 0) === 0)
         .map((tarefa) => {
           const { dataCriacao, horaCriacao } = formatarDataHora(
             tarefa.tar_data_criacao,
@@ -149,8 +185,10 @@ export default function Tarefas() {
             dataCriacao,
             horaCriacao,
             tar_id: tarefa.tar_id,
+            tar_estimativa_minutos: tarefa.tar_estimativa_minutos,
           };
         });
+
 
       const novaChave = gerarChaveTarefas(tarefasFormatadas);
 
@@ -207,7 +245,7 @@ export default function Tarefas() {
 
       alert(
         err.response?.data?.mensagem ||
-          "Erro ao aceitar tarefa. Tente novamente mais tarde.",
+        "Erro ao aceitar tarefa. Tente novamente mais tarde.",
       );
 
       await fetchTarefas(false);
@@ -277,142 +315,115 @@ export default function Tarefas() {
   return (
     <div className={styles.dashboardContainer}>
       <div className={styles.dashboard}>
-      {/* CABEÇALHO DA PÁGINA */}
-      <div className={styles.pageHeader}>
-        <div className={styles.pageHeaderContent}>
-          <h1 className={styles.title}>Tarefas Disponíveis</h1>
-          <p className={styles.subtitle}>
-            Visualize e aceite as tarefas pendentes para começar a trabalhar.
-            Após aceitar, elas aparecerão em "Minhas Tarefas em Andamento".
-          </p>
-        </div>
-
-        {/* CARDS DE RESUMO */}
-        <div className={styles.summaryGrid}>
-          <article className={styles.summaryCard}>
-            <span>Disponíveis</span>
-            <strong>{contagem.total}</strong>
-          </article>
-          <article className={styles.summaryCard}>
-            <span>Mostradas</span>
-            <strong>{contagem.filtradas}</strong>
-          </article>
-        </div>
-      </div>
-
-      {/* SEÇÃO PRINCIPAL */}
-      <section className={styles.section}>
-
-        {/* FILTROS */}
-        <div className={styles.filtrosContainer}>
-          <div className={styles.filtroGroup}>
-            <label className={styles.filtroLabel}> Buscar por título</label>
-            <input
-              type="text"
-              placeholder="Digite o título da tarefa..."
-              value={busca}
-              onChange={(e) => setBusca(e.target.value)}
-            />
-          </div>
-
-          <div className={styles.filtroLinha}>
-            <div className={styles.filtroGroup}>
-              <label className={styles.filtroLabel}> Setor</label>
-              <select
-                value={filtroSetor}
-                onChange={(e) => setFiltroSetor(e.target.value)}
-              >
-                <option value="">Todos os setores</option>
-                {setoresUnicos.map((setor) => (
-                  <option key={setor} value={setor}>
-                    {setor}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className={styles.filtroGroup}>
-              <label className={styles.filtroLabel}> Prioridade</label>
-              <select
-                value={filtroPrioridade}
-                onChange={(e) => setFiltroPrioridade(e.target.value)}
-              >
-                <option value="">Todas as prioridades</option>
-                <option value="Baixa">Baixa</option>
-                <option value="Média">Média</option>
-                <option value="Alta">Alta</option>
-              </select>
-            </div>
-          </div>
-
-          {(busca || filtroSetor || filtroPrioridade) && (
-            <button
-              onClick={limparFiltros}
-              style={{
-                marginTop: "auto",
-                padding: "0.8rem 1.2rem",
-                borderRadius: "0.8rem",
-                border: "none",
-                background: "var(--bg-surface)",
-                color: "var(--text-primary)",
-                cursor: "pointer",
-                fontWeight: "600",
-                fontSize: "1.35rem",
-                transition: "all 0.3s ease",
-              }}
-              onMouseEnter={(e) => {
-                e.target.style.background = "var(--border-default)";
-              }}
-              onMouseLeave={(e) => {
-                e.target.style.background = "var(--bg-surface)";
-              }}
-            >
-              ✕ Limpar filtros
-            </button>
-          )}
-        </div>
-
-        {/* TABELA OU MENSAGENS */}
-        {loading ? (
-          // LOADING
-          <div className={styles.loadingContainer}>
-            <div className={styles.loadingSpinner} />
-            <p style={{ marginTop: "1rem" }}>Carregando tarefas...</p>
-          </div>
-        ) : error ? (
-          // ERRO
-          <div className={styles.emptyState}>
-            <div className={styles.emptyStateIcon}>⚠️</div>
-            <p>{error}</p>
-            <button
-              onClick={fetchTarefas}
-              style={{
-                marginTop: "1rem",
-                padding: "0.8rem 1.6rem",
-                borderRadius: "0.8rem",
-                border: "none",
-                background: "var(--primary)",
-                color: "var(--color-white)",
-                cursor: "pointer",
-                fontWeight: "600",
-                fontSize: "1.35rem",
-              }}
-            >
-              Tentar novamente
-            </button>
-          </div>
-        ) : tarefasFiltradas.length === 0 ? (
-          // VAZIO
-          <div className={styles.emptyState}>
-            <div className={styles.emptyStateIcon}>📭</div>
-            <p>
-              {busca || filtroSetor || filtroPrioridade
-                ? "Nenhuma tarefa encontrada com estes filtros."
-                : "Nenhuma tarefa disponível no momento."}
+        {/* CABEÇALHO DA PÁGINA */}
+        <div className={styles.pageHeader}>
+          <div className={styles.pageHeaderContent}>
+            <h1 className={styles.title}>Tarefas Disponíveis</h1>
+            <p className={styles.subtitle}>
+              Visualize e aceite as tarefas pendentes para começar a trabalhar.
+              Após aceitar, elas aparecerão em "Minhas Tarefas em Andamento".
             </p>
+          </div>
+
+          {/* CARDS DE RESUMO */}
+          <div className={styles.summaryGrid}>
+            <article className={styles.summaryCard}>
+              <span>Disponíveis</span>
+              <strong>{contagem.total}</strong>
+            </article>
+            <article className={styles.summaryCard}>
+              <span>Mostradas</span>
+              <strong>{contagem.filtradas}</strong>
+            </article>
+          </div>
+        </div>
+
+        {/* SEÇÃO PRINCIPAL */}
+        <section className={styles.section}>
+
+          {/* FILTROS */}
+          <div className={styles.filtrosContainer}>
+            <div className={styles.filtroGroup}>
+              <label className={styles.filtroLabel}> Buscar por título</label>
+              <input
+                type="text"
+                placeholder="Digite o título da tarefa..."
+                value={busca}
+                onChange={(e) => setBusca(e.target.value)}
+              />
+            </div>
+
+            <div className={styles.filtroLinha}>
+              <div className={styles.filtroGroup}>
+                <label className={styles.filtroLabel}> Setor</label>
+                <select
+                  value={filtroSetor}
+                  onChange={(e) => setFiltroSetor(e.target.value)}
+                >
+                  <option value="">Todos os setores</option>
+                  {setoresUnicos.map((setor) => (
+                    <option key={setor} value={setor}>
+                      {setor}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className={styles.filtroGroup}>
+                <label className={styles.filtroLabel}> Prioridade</label>
+                <select
+                  value={filtroPrioridade}
+                  onChange={(e) => setFiltroPrioridade(e.target.value)}
+                >
+                  <option value="">Todas as prioridades</option>
+                  <option value="Baixa">Baixa</option>
+                  <option value="Média">Média</option>
+                  <option value="Alta">Alta</option>
+                </select>
+              </div>
+            </div>
+
             {(busca || filtroSetor || filtroPrioridade) && (
               <button
                 onClick={limparFiltros}
+                style={{
+                  marginTop: "auto",
+                  padding: "0.8rem 1.2rem",
+                  borderRadius: "0.8rem",
+                  border: "none",
+                  background: "var(--bg-surface)",
+                  color: "var(--text-primary)",
+                  cursor: "pointer",
+                  fontWeight: "600",
+                  fontSize: "1.35rem",
+                  transition: "all 0.3s ease",
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.background = "var(--border-default)";
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.background = "var(--bg-surface)";
+                }}
+              >
+                ✕ Limpar filtros
+              </button>
+            )}
+          </div>
+
+          {/* TABELA OU MENSAGENS */}
+          {loading ? (
+            // LOADING
+            <div className={styles.loadingContainer}>
+              <div className={styles.loadingSpinner} />
+              <p style={{ marginTop: "1rem" }}>Carregando tarefas...</p>
+            </div>
+          ) : error ? (
+            // ERRO
+            <div className={styles.emptyState}>
+              <div className={styles.emptyStateIcon}>⚠️</div>
+              <p>{error}</p>
+              <button
+                onClick={fetchTarefas}
                 style={{
                   marginTop: "1rem",
                   padding: "0.8rem 1.6rem",
@@ -425,65 +436,148 @@ export default function Tarefas() {
                   fontSize: "1.35rem",
                 }}
               >
-                Limpar filtros
+                Tentar novamente
               </button>
-            )}
-          </div>
-        ) : (
-          <>
-            {/* DESKTOP: TABELA */}
-            <div className={`${styles.tableWrapper} ${styles.desktopOnly}`}>
-              <table className={styles.table}>
-                <thead>
-                  <tr>
-                    <th>Título</th>
-                    <th className={styles.textCenter}>Prioridade</th>
-                    <th className={styles.textCenter}>Setor</th>
-                    <th className={styles.textCenter}>Criado por</th>
-                    <th className={styles.textCenter}>Data</th>
-                    <th className={styles.textCenter}>Hora</th>
-                    <th className={styles.textCenter}>Descrição</th>
-                    <th className={styles.textCenter}>Ação</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {tarefasFiltradas.map((tarefa) => (
-                    <tr key={tarefa.id}>
-                      <td title={tarefa.titulo}>
-                        <strong>{tarefa.titulo}</strong>
-                      </td>
-                      <td className={styles.textCenter}>
-                        <PrioridadeBadge prioridade={tarefa.prioridade} />
-                      </td>
-                      <td className={styles.textCenter}>{tarefa.setor}</td>
-                      <td className={styles.textCenter}>{tarefa.criadoPor}</td>
-                      <td className={styles.textCenter}>
-                        {tarefa.dataCriacao}
-                      </td>
-                      <td className={styles.textCenter}>
-                        {tarefa.horaCriacao}
-                      </td>
-                      <td>
+            </div>
+          ) : tarefasFiltradas.length === 0 ? (
+            // VAZIO
+            <div className={styles.emptyState}>
+              <div className={styles.emptyStateIcon}>📭</div>
+              <p>
+                {busca || filtroSetor || filtroPrioridade
+                  ? "Nenhuma tarefa encontrada com estes filtros."
+                  : "Nenhuma tarefa disponível no momento."}
+              </p>
+              {(busca || filtroSetor || filtroPrioridade) && (
+                <button
+                  onClick={limparFiltros}
+                  style={{
+                    marginTop: "1rem",
+                    padding: "0.8rem 1.6rem",
+                    borderRadius: "0.8rem",
+                    border: "none",
+                    background: "var(--primary)",
+                    color: "var(--color-white)",
+                    cursor: "pointer",
+                    fontWeight: "600",
+                    fontSize: "1.35rem",
+                  }}
+                >
+                  Limpar filtros
+                </button>
+              )}
+            </div>
+          ) : (
+            <>
+              {/* DESKTOP: TABELA */}
+              <div className={`${styles.tableWrapper} ${styles.desktopOnly}`}>
+                <table className={styles.table}>
+                  <thead>
+                    <tr>
+                      <th>Título</th>
+                      <th className={styles.textCenter}>Prioridade</th>
+                      <th className={styles.textCenter}>Setor</th>
+                      <th className={styles.textCenter}>Criado por</th>
+                      <th className={styles.textCenter}>Data</th>
+                      <th className={styles.textCenter}>Hora</th>
+                      <th className={styles.textCenter}>Descrição</th>
+                      <th className={styles.textCenter}>Ação</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {tarefasFiltradas.map((tarefa) => (
+                      <tr key={tarefa.id}>
+                        <td title={tarefa.titulo}>
+                          <strong>{tarefa.titulo}</strong>
+                        </td>
+                        <td className={styles.textCenter}>
+                          <PrioridadeBadge prioridade={tarefa.prioridade} />
+                        </td>
+                        <td className={styles.textCenter}>{tarefa.setor}</td>
+                        <td className={styles.textCenter}>{tarefa.criadoPor}</td>
+                        <td className={styles.textCenter}>
+                          {tarefa.dataCriacao}
+                        </td>
+                        <td className={styles.textCenter}>
+                          {tarefa.horaCriacao}
+                        </td>
+                        <td>
+                          <button
+                            onClick={() => setTarefaSelecionada(tarefa)}
+                            style={{
+                              background: "transparent",
+                              border: "none",
+                              color: "var(--primary)",
+                              cursor: "pointer",
+                              fontWeight: "600",
+                              textDecoration: "underline",
+                              fontSize: "1.35rem",
+                            }}
+                          >
+                            Ler mais →
+                          </button>
+                        </td>
+                        <td className={styles.actionCell}>
+                          <button
+                            className={`${styles.btnAccept} ${aceitandoId === tarefa.id ? styles.loading : ""
+                              }`}
+                            onClick={() => aceitarTarefa(tarefa.id)}
+                            disabled={aceitandoId !== null}
+                            title={
+                              aceitandoId === tarefa.id
+                                ? "Processando..."
+                                : "Clique para aceitar esta tarefa"
+                            }
+                          >
+                            {aceitandoId === tarefa.id
+                              ? "✓ Aceitando..."
+                              : "✓ Aceitar"}
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* MOBILE: CARDS */}
+              <div
+                className={`${styles.mobileCardsContainer} ${styles.mobileOnly}`}
+              >
+                {tarefasFiltradas.map((tarefa) => (
+                  <div
+                    key={tarefa.id}
+                    className={`${styles.card} ${styles.mobileCard}`}
+                  >
+                    {/* CABEÇALHO DO CARD */}
+                    <div className={styles.cardHeader}>
+                      <strong>{tarefa.titulo}</strong>
+                      <PrioridadeBadge prioridade={tarefa.prioridade} />
+                    </div>
+
+                    {/* CORPO DO CARD */}
+                    <div className={styles.cardBody}>
+                      <p>
+                        <strong>Setor:</strong> {tarefa.setor}
+                      </p>
+                      <p>
+                        <strong>Criado por:</strong> {tarefa.criadoPor}
+                      </p>
+                      <p>
+                        <strong>Descrição:</strong> {tarefa.descricao}
+                      </p>
+                    </div>
+
+                    <div className={styles.mobileCardFooter}>
+                      <div className={styles.cardFooter}>
+                        <span>{tarefa.dataCriacao}</span>
+                        <span>{tarefa.horaCriacao}</span>
+                      </div>
+
+                      <div className={styles.mobileCardActions}>
                         <button
-                          onClick={() => setTarefaSelecionada(tarefa)}
-                          style={{
-                            background: "transparent",
-                            border: "none",
-                            color: "var(--primary)",
-                            cursor: "pointer",
-                            fontWeight: "600",
-                            textDecoration: "underline",
-                            fontSize: "1.35rem",
-                          }}
-                        >
-                          Ler mais →
-                        </button>
-                      </td>
-                      <td className={styles.actionCell}>
-                        <button
-                          className={`${styles.btnAccept} ${
-                            aceitandoId === tarefa.id ? styles.loading : ""
-                          }`}
+                          className={`${styles.btnAccept} ${aceitandoId === tarefa.id ? styles.loading : ""
+                            }`}
                           onClick={() => aceitarTarefa(tarefa.id)}
                           disabled={aceitandoId !== null}
                           title={
@@ -496,74 +590,16 @@ export default function Tarefas() {
                             ? "✓ Aceitando..."
                             : "✓ Aceitar"}
                         </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            {/* MOBILE: CARDS */}
-            <div
-              className={`${styles.mobileCardsContainer} ${styles.mobileOnly}`}
-            >
-              {tarefasFiltradas.map((tarefa) => (
-                <div
-                  key={tarefa.id}
-                  className={`${styles.card} ${styles.mobileCard}`}
-                >
-                  {/* CABEÇALHO DO CARD */}
-                  <div className={styles.cardHeader}>
-                    <strong>{tarefa.titulo}</strong>
-                    <PrioridadeBadge prioridade={tarefa.prioridade} />
-                  </div>
-
-                  {/* CORPO DO CARD */}
-                  <div className={styles.cardBody}>
-                    <p>
-                      <strong>Setor:</strong> {tarefa.setor}
-                    </p>
-                    <p>
-                      <strong>Criado por:</strong> {tarefa.criadoPor}
-                    </p>
-                    <p>
-                      <strong>Descrição:</strong> {tarefa.descricao}
-                    </p>
-                  </div>
-
-                  <div className={styles.mobileCardFooter}>
-                    <div className={styles.cardFooter}>
-                      <span>{tarefa.dataCriacao}</span>
-                      <span>{tarefa.horaCriacao}</span>
-                    </div>
-
-                    <div className={styles.mobileCardActions}>
-                      <button
-                        className={`${styles.btnAccept} ${
-                          aceitandoId === tarefa.id ? styles.loading : ""
-                        }`}
-                        onClick={() => aceitarTarefa(tarefa.id)}
-                        disabled={aceitandoId !== null}
-                        title={
-                          aceitandoId === tarefa.id
-                            ? "Processando..."
-                            : "Clique para aceitar esta tarefa"
-                        }
-                      >
-                        {aceitandoId === tarefa.id
-                          ? "✓ Aceitando..."
-                          : "✓ Aceitar"}
-                      </button>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          </>
-        )}
-      </section>
+                ))}
+              </div>
+            </>
+          )}
+        </section>
 
-    </div>
+      </div>
 
       {/* MODAL: LER DESCRIÇÃO COMPLETA */}
       {tarefaSelecionada && (
@@ -610,6 +646,14 @@ export default function Tarefas() {
                   <label>Hora:</label>
                   <p>{tarefaSelecionada.horaCriacao}</p>
                 </div>
+                <div className={styles.modalField}>
+                  <label>Estimativa</label>
+                  <p>
+                    {formatarEstimativa(
+                      tarefaSelecionada.tar_estimativa_minutos
+                    )}
+                  </p>
+                </div>
               </div>
             </div>
 
@@ -621,9 +665,8 @@ export default function Tarefas() {
                 Fechar
               </button>
               <button
-                className={`${styles.btnAccept} ${
-                  aceitandoId === tarefaSelecionada.id ? styles.loading : ""
-                }`}
+                className={`${styles.btnAccept} ${aceitandoId === tarefaSelecionada.id ? styles.loading : ""
+                  }`}
                 onClick={() => {
                   aceitarTarefa(tarefaSelecionada.id);
                   setTarefaSelecionada(null);
