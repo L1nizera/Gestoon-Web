@@ -1,6 +1,6 @@
 import styles from "./style.module.css";
 import { Navigate, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import api from "../../services/api";
 
@@ -10,6 +10,32 @@ function Login() {
 
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
+  const [message, setMessage] = useState("");
+  const [messageType, setMessageType] = useState("");
+  const messageTimer = useRef(null);
+
+  const showMessage = (text, type) => {
+    if (messageTimer.current) {
+      clearTimeout(messageTimer.current);
+    }
+
+    setMessage(text);
+    setMessageType(type);
+
+    messageTimer.current = setTimeout(() => {
+      setMessage("");
+      setMessageType("");
+      messageTimer.current = null;
+    }, 2500);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (messageTimer.current) {
+        clearTimeout(messageTimer.current);
+      }
+    };
+  }, []);
 
   if (user) {
     return <Navigate to={user.tipo === "admin" ? "/home" : "/tarefas"} replace />;
@@ -19,7 +45,7 @@ function Login() {
     e.preventDefault();
 
     if (!email.trim() || !senha.trim()) {
-      alert("Preencha usuário e senha.");
+      showMessage("Preencha usuário e senha", "error");
       return;
     }
 
@@ -31,19 +57,22 @@ function Login() {
 
       const { usuario, token } = response.data.dados;
 
-      login(usuario, token);
+      showMessage("Login realizado com sucesso", "success");
 
-      if (usuario.tipo === "admin") {
-        navigate("/home");
-      } else {
-        navigate("/tarefas");
-      }
+      setTimeout(() => {
+        login(usuario, token);
+        if (usuario.tipo === "admin") {
+          navigate("/home");
+        } else {
+          navigate("/tarefas");
+        }
+      }, 500);
     } catch (err) {
       console.error("Erro no login:", err.response?.data || err.message);
 
-      alert(
-        err.response?.data?.mensagem ||
-        "Usuário ou senha inválidos."
+      showMessage(
+        err.response?.data?.mensagem || "Usuário ou senha inválidos.",
+        "error"
       );
     }
   }
@@ -67,6 +96,12 @@ function Login() {
           value={senha}
           onChange={(e) => setSenha(e.target.value)}
         />
+
+        {message && (
+          <p className={`${styles.message} ${styles[messageType]}`}>
+            {message}
+          </p>
+        )}
 
         <button type="submit" className={styles.button}>
           Entrar
