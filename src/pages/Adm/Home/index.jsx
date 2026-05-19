@@ -6,6 +6,7 @@ import autoTable from "jspdf-autotable";
 import Modal from "../../../components/Modal/Modal";
 import DataTable from "../../../components/ui/DataTable";
 import api from "../../../services/api";
+import { useToast } from "../../../components/ui/Toast";
 
 function Home() {
   const [funcionariosMap, setFuncionariosMap] = useState({});
@@ -27,6 +28,7 @@ function Home() {
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { showToast } = useToast();
 
   const primeiraCargaRef = useRef(true);
   const ultimaChaveTarefasRef = useRef("");
@@ -503,14 +505,19 @@ function Home() {
 
   async function criarTask() {
     if (!novaTask.titulo.trim()) {
-      alert("O título da tarefa é obrigatório.");
+      showToast("O título da tarefa é obrigatório.", "warning");
       return;
     }
 
     const setorId = setorToApiMap[novaTask.setor];
 
     if (!setorId) {
-      alert("Setor inválido.");
+      showToast("Setor inválido.", "warning");
+      return;
+    }
+
+    if (!novaTask.estimativaMinutos || Number(novaTask.estimativaMinutos) <= 0) {
+      showToast("Informe uma estimativa válida em minutos.", "warning");
       return;
     }
 
@@ -539,13 +546,14 @@ function Home() {
       });
 
       setCreateTaskOpen(false);
-    } catch (err) {
-      console.error("Erro ao criar tarefa:", err.response?.data || err.message);
 
-      alert(
-        err.response?.data?.dados ||
+      showToast("Tarefa criada com sucesso.", "success");
+    } catch (err) {
+      showToast(
         err.response?.data?.mensagem ||
-        "Erro ao criar tarefa. Verifique a API.",
+        err.response?.data?.dados ||
+        "Erro ao criar tarefa.",
+        "error"
       );
     }
   }

@@ -6,6 +6,7 @@ import autoTable from "jspdf-autotable";
 import DataTable from "../../../components/ui/DataTable";
 import api from "../../../services/api";
 import { useAuth } from "../../../context/AuthContext";
+import { useToast } from "../../../components/ui/Toast";
 
 function Funcionarios() {
   const { user } = useAuth();
@@ -29,6 +30,7 @@ function Funcionarios() {
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { showToast } = useToast();
 
   const primeiraCargaRef = useRef(true);
   const ultimaChaveFuncionariosRef = useRef("");
@@ -352,7 +354,7 @@ function Funcionarios() {
 
   function abrirEdicaoFuncionario(funcionario) {
     if (funcionario.cargoId === 1) {
-      alert("Gerentes não podem ser editados pelo painel.");
+      showToast("Gerentes não podem ser editados pelo painel.", "warning");
       return;
     }
 
@@ -362,12 +364,12 @@ function Funcionarios() {
 
   async function salvarEdicaoFuncionario() {
     if (!editFuncionario.nome.trim()) {
-      alert("O nome do funcionário é obrigatório.");
+      showToast("O nome do funcionário é obrigatório.", "warning");
       return;
     }
 
     if (!validarEmail(editFuncionario.email)) {
-      alert("Email inválido.");
+      showToast("Email inválido.", "warning");
       return;
     }
 
@@ -380,27 +382,27 @@ function Funcionarios() {
     const cargosPermitidos = getCargosPermitidosPorSetor(editFuncionario.setor);
 
     if (!cargosPermitidos.includes(editFuncionario.cargo)) {
-      alert("Cargo inválido para o setor selecionado.");
+      showToast("Cargo inválido para o setor selecionado.", "warning");
       return;
     }
 
     if (cargoId === 1) {
-      alert("Não é permitido alterar funcionário para Gerente pelo painel.");
+      showToast("Não é permitido alterar funcionário para Gerente pelo painel.", "warning");
       return;
     }
 
     if (usuarioEhSupervisor && cargoId === 2) {
-      alert("Supervisores não podem alterar funcionário para Supervisor.");
+      showToast("Supervisores não podem alterar funcionário para Supervisor.", "warning");
       return;
     }
 
     if (!setorId) {
-      alert(`Setor inválido: ${editFuncionario.setor}`);
+      showToast(`Setor inválido: ${editFuncionario.setor}`, "warning");
       return;
     }
 
     if (!cargoId) {
-      alert(`Cargo inválido: ${editFuncionario.cargo}`);
+      showToast(`Cargo inválido: ${editFuncionario.cargo}`, "warning");
       return;
     }
 
@@ -420,17 +422,21 @@ function Funcionarios() {
       await fetchDados();
 
       setEditFuncionario(null);
+
+      showToast("Funcionário atualizado com sucesso.", "success");
+
     } catch (err) {
       const erroApi = err.response?.data;
 
       console.error("Erro ao editar funcionário:", erroApi || err.message);
 
-      alert(
+      showToast(
         erroApi?.mensagem ||
         (typeof erroApi?.dados === "string"
           ? erroApi.dados
-          : JSON.stringify(erroApi?.dados, null, 2)) ||
+          : "Erro ao editar funcionário. Verifique a API.") ||
         "Erro ao editar funcionário. Verifique a API.",
+        "error",
       );
     }
   }
@@ -441,27 +447,27 @@ function Funcionarios() {
 
   async function criarFuncionario() {
     if (!novoFuncionario.nome.trim()) {
-      alert("O nome do funcionário é obrigatório.");
+      showToast("O nome do funcionário é obrigatório.", "warning");
       return;
     }
 
     if (!validarEmail(novoFuncionario.email)) {
-      alert("Email inválido.");
+      showToast("Email inválido.", "warning");
       return;
     }
 
     if (!novoFuncionario.login.trim()) {
-      alert("O login de acesso é obrigatório.");
+      showToast("O login de acesso é obrigatório.", "warning");
       return;
     }
 
     if (!novoFuncionario.senha.trim()) {
-      alert("A senha de acesso é obrigatória.");
+      showToast("A senha de acesso é obrigatória.", "warning");
       return;
     }
 
     if (novoFuncionario.senha.length < 4) {
-      alert("A senha deve ter pelo menos 4 caracteres.");
+      showToast("A senha deve ter pelo menos 4 caracteres.", "warning");
       return;
     }
 
@@ -471,27 +477,27 @@ function Funcionarios() {
     const cargosPermitidos = getCargosPermitidosPorSetor(novoFuncionario.setor);
 
     if (!cargosPermitidos.includes(novoFuncionario.cargo)) {
-      alert("Cargo inválido para o setor selecionado.");
+      showToast("Cargo inválido para o setor selecionado.", "warning");
       return;
     }
 
     if (cargoId === 1) {
-      alert("Não é permitido criar perfil de Gerente pelo painel.");
+      showToast("Não é permitido criar perfil de Gerente pelo painel.", "warning");
       return;
     }
 
     if (usuarioEhSupervisor && cargoId === 2) {
-      alert("Supervisores não podem criar outros supervisores.");
+      showToast("Supervisores não podem criar outros supervisores.", "warning");
       return;
     }
 
     if (!setorId) {
-      alert("Setor inválido.");
+      showToast("Setor inválido.", "warning");
       return;
     }
 
     if (!cargoId) {
-      alert("Cargo inválido.");
+      showToast("Cargo inválido.", "warning");
       return;
     }
 
@@ -517,8 +523,8 @@ function Funcionarios() {
         funcionarioCriado.funcionario;
 
       if (!funcionarioId) {
-        alert(
-          "Funcionário criado, mas não foi possível obter o ID para criar o usuário.",
+        showToast(
+          "Funcionário criado, mas não foi possível obter o ID para criar o usuário.", "warning"
         );
         return;
       }
@@ -545,16 +551,20 @@ function Funcionarios() {
       });
 
       setCreateFuncionarioOpen(false);
+
+      showToast("Funcionário cadastrado com sucesso.", "success");
+      
     } catch (err) {
       console.error(
         "Erro ao cadastrar funcionário:",
         err.response?.data || err.message,
       );
 
-      alert(
+      showToast(
         err.response?.data?.dados ||
         err.response?.data?.mensagem ||
         "Erro ao cadastrar funcionário. Verifique a API.",
+        "error",
       );
     }
   }
@@ -849,8 +859,8 @@ function Funcionarios() {
 
                 <span
                   className={`${styles.badge} ${selected.ativo
-                      ? styles.statusConcluida
-                      : styles.statusCancelada
+                    ? styles.statusConcluida
+                    : styles.statusCancelada
                     }`}
                 >
                   {selected.ativo ? "Ativo" : "Inativo"}
