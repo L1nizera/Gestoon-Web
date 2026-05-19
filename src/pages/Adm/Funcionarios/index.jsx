@@ -300,9 +300,8 @@ function Funcionarios() {
       align: "center",
       render: (row) => (
         <span
-          className={`${styles.badge} ${
-            row.ativo ? styles.statusConcluida : styles.statusCancelada
-          }`}
+          className={`${styles.badge} ${row.ativo ? styles.statusConcluida : styles.statusCancelada
+            }`}
         >
           {row.ativo ? "Ativo" : "Inativo"}
         </span>
@@ -428,10 +427,10 @@ function Funcionarios() {
 
       alert(
         erroApi?.mensagem ||
-          (typeof erroApi?.dados === "string"
-            ? erroApi.dados
-            : JSON.stringify(erroApi?.dados, null, 2)) ||
-          "Erro ao editar funcionário. Verifique a API.",
+        (typeof erroApi?.dados === "string"
+          ? erroApi.dados
+          : JSON.stringify(erroApi?.dados, null, 2)) ||
+        "Erro ao editar funcionário. Verifique a API.",
       );
     }
   }
@@ -554,8 +553,8 @@ function Funcionarios() {
 
       alert(
         err.response?.data?.dados ||
-          err.response?.data?.mensagem ||
-          "Erro ao cadastrar funcionário. Verifique a API.",
+        err.response?.data?.mensagem ||
+        "Erro ao cadastrar funcionário. Verifique a API.",
       );
     }
   }
@@ -802,6 +801,7 @@ function Funcionarios() {
             sortDirection={getSortDirection(ordemNome ? "nome" : "dataCriacao")}
             onSort={handleSort}
             emptyMessage="Nenhum funcionário encontrado"
+            variant="funcionarios"
           />
         )}
 
@@ -848,11 +848,10 @@ function Funcionarios() {
                 <strong>Status:</strong>
 
                 <span
-                  className={`${styles.badge} ${
-                    selected.ativo
+                  className={`${styles.badge} ${selected.ativo
                       ? styles.statusConcluida
                       : styles.statusCancelada
-                  }`}
+                    }`}
                 >
                   {selected.ativo ? "Ativo" : "Inativo"}
                 </span>

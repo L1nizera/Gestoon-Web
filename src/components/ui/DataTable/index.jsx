@@ -10,12 +10,14 @@ function DataTable({
   onSort,
   emptyMessage = "Nenhum resultado encontrado",
   mobile = "scroll", // "scroll" | "hidden"
+  variant = "", // "tarefas" | "funcionarios" | "relatorios"
 }) {
   function renderSortIcon(column) {
     if (!column.sortable || sortKey !== column.key) return "";
 
     if (sortDirection === "az" || sortDirection === "antigo") return "↑";
     if (sortDirection === "za" || sortDirection === "recente") return "↓";
+    if (sortDirection === "maior") return "↓";
 
     return "";
   }
@@ -26,7 +28,9 @@ function DataTable({
         mobile === "hidden" ? styles.hideMobile : ""
       }`}
     >
-      <table className={styles.tabela}>
+      <table
+        className={`${styles.tabela} ${variant ? styles[variant] : ""}`}
+      >
         <thead>
           <tr>
             {columns.map((column) => (
@@ -34,7 +38,12 @@ function DataTable({
                 key={column.key}
                 className={`
                   ${column.align === "center" ? styles.textCenter : ""}
-                  ${column.sortable && sortKey === column.key ? styles.colunaAtiva : ""}
+                  ${column.sortable ? styles.thSortable : ""}
+                  ${
+                    column.sortable && sortKey === column.key
+                      ? styles.colunaAtiva
+                      : ""
+                  }
                 `}
                 onClick={() => {
                   if (column.sortable && onSort) {
@@ -60,7 +69,14 @@ function DataTable({
                 {columns.map((column) => (
                   <td
                     key={column.key}
-                    className={column.align === "center" ? styles.textCenter : ""}
+                    className={
+                      column.align === "center" ? styles.textCenter : ""
+                    }
+                    title={
+                      typeof row[column.key] === "string"
+                        ? row[column.key]
+                        : undefined
+                    }
                   >
                     {column.render ? column.render(row) : row[column.key]}
                   </td>

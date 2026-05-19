@@ -5,11 +5,13 @@
   background: var(--bg-card);
   margin-top: 1.5rem;
   scrollbar-gutter: stable;
+  border-radius: 1.2rem;
   border: 0.1rem solid var(--border-default);
 }
 
 .tabela {
   width: 100%;
+  min-width: 100rem;
   border-collapse: separate;
   border-spacing: 0;
   background: var(--bg-card);
@@ -27,11 +29,15 @@
   color: var(--text-on-dark);
   padding: 1.2rem;
   white-space: nowrap;
-  cursor: pointer;
   user-select: none;
   position: relative;
   transition: all 0.2s ease;
   font-size: 1.8rem;
+  cursor: default;
+}
+
+.thSortable {
+  cursor: pointer !important;
 }
 
 .tabela th:hover {
@@ -64,8 +70,8 @@
 .tabela tr:hover {
   background: var(--color-gray-200);
   box-shadow:
-    inset 0.4rem 0 0 var(--color-primary-500),
-    inset -0.4rem 0 0 var(--color-primary-500);
+    inset 0.4rem 0 0 var(--color-primary),
+    inset -0.4rem 0 0 var(--color-primary);
 }
 
 .tabela th,
@@ -91,6 +97,8 @@
   color: var(--color-white);
 }
 
+/* ===== SCROLLBAR ===== */
+
 .tabelaContainer::-webkit-scrollbar {
   height: 0.9rem;
   width: 0.9rem;
@@ -110,6 +118,149 @@
   background: var(--color-slate-700);
 }
 
+/* ===== VARIAÇÃO: TAREFAS/HOME ===== */
+
+.tarefas {
+  min-width: 110rem;
+}
+
+.tarefas th:nth-child(1),
+.tarefas td:nth-child(1) {
+  width: 5rem;
+  text-align: center;
+}
+
+.tarefas th:nth-child(2),
+.tarefas td:nth-child(2) {
+  width: 23rem;
+}
+
+.tarefas th:nth-child(3),
+.tarefas td:nth-child(3) {
+  width: 13rem;
+}
+
+.tarefas th:nth-child(4),
+.tarefas td:nth-child(4) {
+  width: 13rem;
+}
+
+.tarefas th:nth-child(5),
+.tarefas td:nth-child(5) {
+  width: 14rem;
+}
+
+.tarefas th:nth-child(6),
+.tarefas td:nth-child(6) {
+  width: 14rem;
+}
+
+.tarefas th:nth-child(7),
+.tarefas td:nth-child(7) {
+  width: 12rem;
+}
+
+.tarefas th:nth-child(8),
+.tarefas td:nth-child(8) {
+  width: 9rem;
+}
+
+.tarefas th:nth-child(9),
+.tarefas td:nth-child(9) {
+  width: 11rem;
+}
+
+/* ===== VARIAÇÃO: FUNCIONÁRIOS ===== */
+
+.funcionarios {
+  min-width: 105rem;
+}
+
+.funcionarios th:nth-child(1),
+.funcionarios td:nth-child(1) {
+  width: 6rem;
+  text-align: center;
+}
+
+.funcionarios th:nth-child(2),
+.funcionarios td:nth-child(2) {
+  width: 18rem;
+}
+
+.funcionarios th:nth-child(3),
+.funcionarios td:nth-child(3) {
+  width: 22rem;
+}
+
+.funcionarios th:nth-child(4),
+.funcionarios td:nth-child(4) {
+  width: 14rem;
+}
+
+.funcionarios th:nth-child(5),
+.funcionarios td:nth-child(5) {
+  width: 18rem;
+}
+
+.funcionarios th:nth-child(6),
+.funcionarios td:nth-child(6) {
+  width: 11rem;
+  text-align: center;
+}
+
+.funcionarios th:nth-child(7),
+.funcionarios td:nth-child(7) {
+  width: 9rem;
+  text-align: center;
+}
+
+.funcionarios th:nth-child(8),
+.funcionarios td:nth-child(8) {
+  width: 11rem;
+  text-align: center;
+}
+
+/* ===== VARIAÇÃO: RELATÓRIOS ===== */
+
+.relatorios {
+  min-width: 95rem;
+}
+
+.relatorios th:nth-child(1),
+.relatorios td:nth-child(1) {
+  width: 18rem;
+}
+
+.relatorios th:nth-child(2),
+.relatorios td:nth-child(2) {
+  width: 20rem;
+}
+
+.relatorios th:nth-child(3),
+.relatorios td:nth-child(3) {
+  width: 14rem;
+}
+
+.relatorios th:nth-child(4),
+.relatorios td:nth-child(4) {
+  width: 12rem;
+  text-align: center;
+}
+
+.relatorios th:nth-child(5),
+.relatorios td:nth-child(5),
+.relatorios th:nth-child(6),
+.relatorios td:nth-child(6),
+.relatorios th:nth-child(7),
+.relatorios td:nth-child(7),
+.relatorios th:nth-child(8),
+.relatorios td:nth-child(8) {
+  width: 13rem;
+  text-align: center;
+}
+
+/* ===== MOBILE ===== */
+
 .hideMobile {
   display: block;
 }
@@ -124,7 +275,7 @@
   }
 
   .tabela {
-    min-width: 650px;
+    min-width: 70rem;
   }
 
   .hideMobile {

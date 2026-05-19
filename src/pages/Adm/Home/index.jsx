@@ -4,6 +4,7 @@ import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import Modal from "../../../components/Modal/Modal";
+import DataTable from "../../../components/ui/DataTable";
 import api from "../../../services/api";
 
 function Home() {
@@ -89,6 +90,72 @@ function Home() {
     Concluída: 2,
     Cancelada: 3,
   };
+
+  const columns = [
+    {
+      key: "tarefaId",
+      label: "ID",
+      align: "center",
+    },
+    {
+      key: "titulo",
+      label: "Título",
+      sortable: true,
+      render: (row) => <span title={row.titulo}>{row.titulo}</span>,
+    },
+    {
+      key: "status",
+      label: "Status",
+      align: "center",
+      render: (row) => (
+        <span
+          className={`${styles.badge} ${styles[statusMap[row.status]] || styles.statusPendente
+            }`}
+        >
+          {row.status}
+        </span>
+      ),
+    },
+    {
+      key: "prioridade",
+      label: "Prioridade",
+      align: "center",
+      render: (row) => (
+        <span
+          className={`${styles.badge} ${styles[prioridadeMap[row.prioridade]]
+            }`}
+        >
+          {row.prioridade}
+        </span>
+      ),
+    },
+    {
+      key: "setor",
+      label: "Setor",
+      align: "center",
+    },
+    {
+      key: "criadoPor",
+      label: "Criado por",
+      align: "center",
+    },
+    {
+      key: "estimativaFormatada",
+      label: "Estimativa",
+      align: "center",
+    },
+    {
+      key: "horaCriacao",
+      label: "Hora",
+      align: "center",
+    },
+    {
+      key: "dataCriacao",
+      label: "Data",
+      align: "center",
+      sortable: true,
+    },
+  ];
 
   function formatarStatus(status) {
     const statusNumero = Number(status);
@@ -206,6 +273,7 @@ function Home() {
           tarefa.tar_data_criacao,
         );
 
+
         return {
           id: tarefa.tar_id,
           tarefaId: tarefa.tar_id,
@@ -260,9 +328,9 @@ function Home() {
       if (primeiraCargaRef.current) {
         setError(
           err.response?.data?.mensagem ||
-            err.response?.data?.dados ||
-            err.message ||
-            "Não foi possível carregar as tarefas.",
+          err.response?.data?.dados ||
+          err.message ||
+          "Não foi possível carregar as tarefas.",
         );
       }
     } finally {
@@ -317,6 +385,36 @@ function Home() {
     setOrdemTitulo(null);
   }
 
+  function handleSort(key) {
+    if (key === "titulo") {
+      setOrdemTitulo((prev) => {
+        if (prev === null) return "az";
+        if (prev === "az") return "za";
+        return null;
+      });
+
+      setOrdemData(null);
+      return;
+    }
+
+    if (key === "dataCriacao") {
+      setOrdemData((prev) => {
+        if (prev === null) return "recente";
+        if (prev === "recente") return "antigo";
+        return null;
+      });
+
+      setOrdemTitulo(null);
+    }
+  }
+
+  function getSortDirection(key) {
+    if (key === "titulo") return ordemTitulo;
+    if (key === "dataCriacao") return ordemData;
+
+    return null;
+  }
+
   async function excluirTask(id) {
     if (!confirm("Tem certeza que deseja excluir esta tarefa?")) return;
 
@@ -334,8 +432,8 @@ function Home() {
 
       alert(
         err.response?.data?.dados ||
-          err.response?.data?.mensagem ||
-          "Erro ao excluir tarefa. Verifique a API.",
+        err.response?.data?.mensagem ||
+        "Erro ao excluir tarefa. Verifique a API.",
       );
     }
   }
@@ -397,8 +495,8 @@ function Home() {
 
       alert(
         err.response?.data?.dados ||
-          err.response?.data?.mensagem ||
-          "Erro ao editar tarefa. Verifique a API.",
+        err.response?.data?.mensagem ||
+        "Erro ao editar tarefa. Verifique a API.",
       );
     }
   }
@@ -446,8 +544,8 @@ function Home() {
 
       alert(
         err.response?.data?.dados ||
-          err.response?.data?.mensagem ||
-          "Erro ao criar tarefa. Verifique a API.",
+        err.response?.data?.mensagem ||
+        "Erro ao criar tarefa. Verifique a API.",
       );
     }
   }
@@ -822,97 +920,26 @@ function Home() {
         </div>
 
         {/* ===== DESKTOP (TABELA) ===== */}
-        <div className={`${styles.tabelaContainer} ${styles.desktopOnly}`}>
-          <table className={styles.tabela}>
-            <thead>
-              <tr>
-                <th>ID</th>
-
-                <th
-                  className={`${styles.thSortable} ${ordemTitulo ? styles.colunaAtiva : ""}`}
-                  onClick={() =>
-                    setOrdemTitulo((prev) => {
-                      if (prev === null) return "az";
-                      if (prev === "az") return "za";
-                      return null;
-                    })
-                  }
-                >
-                  Título{" "}
-                  {ordemTitulo === "az" ? "↑" : ordemTitulo === "za" ? "↓" : ""}
-                </th>
-
-                <th>Status</th>
-                <th>Prioridade</th>
-                <th>Setor</th>
-                <th>Criado por</th>
-                <th>Estimativa</th>
-                <th>Hora</th>
-
-                <th
-                  className={`${styles.thSortable} ${styles.textCenter} ${
-                    ordemData ? styles.colunaAtiva : ""
-                  }`}
-                  onClick={() =>
-                    setOrdemData((prev) => {
-                      if (prev === null) return "recente";
-                      if (prev === "recente") return "antigo";
-                      return null;
-                    })
-                  }
-                >
-                  Data{" "}
-                  {ordemData === "recente"
-                    ? "↑"
-                    : ordemData === "antigo"
-                      ? "↓"
-                      : ""}
-                </th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {lista.map((task) => (
-                <tr
-                  key={task.id}
-                  onClick={(e) => {
-                    if (e.target.tagName === "BUTTON") return;
-                    setSelectedTask(task);
-                  }}
-                >
-                  <td>{task.tarefaId}</td>
-
-                  <td>{task.titulo}</td>
-
-                  <td>
-                    <span
-                      className={`${styles.badge} ${
-                        styles[statusMap[task.status]] || styles.statusPendente
-                      }`}
-                    >
-                      {task.status}
-                    </span>
-                  </td>
-
-                  <td>
-                    <span
-                      className={`${styles.badge} ${
-                        styles[prioridadeMap[task.prioridade]]
-                      }`}
-                    >
-                      {task.prioridade}
-                    </span>
-                  </td>
-
-                  <td>{task.setor}</td>
-                  <td>{task.criadoPor}</td>
-                  <td>{task.estimativaFormatada}</td>
-                  <td>{task.horaCriacao}</td>
-                  <td>{task.dataCriacao}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className={styles.desktopOnly}>
+          <DataTable
+            columns={columns}
+            data={lista}
+            rowKey="id"
+            onRowClick={setSelectedTask}
+            sortKey={
+              ordemTitulo
+                ? "titulo"
+                : ordemData
+                  ? "dataCriacao"
+                  : null
+            }
+            sortDirection={
+              ordemTitulo || ordemData
+            }
+            onSort={handleSort}
+            emptyMessage="Nenhuma tarefa encontrada"
+            variant="tarefas"
+          />
         </div>
 
         {/* ===== MOBILE (CARDS) ===== */}
@@ -1005,9 +1032,8 @@ function Home() {
               <div>
                 <strong>Prioridade:</strong>
                 <span
-                  className={`${styles.badge} ${
-                    styles[prioridadeMap[selectedTask.prioridade]]
-                  }`}
+                  className={`${styles.badge} ${styles[prioridadeMap[selectedTask.prioridade]]
+                    }`}
                 >
                   {selectedTask.prioridade}
                 </span>
@@ -1016,10 +1042,9 @@ function Home() {
               <div>
                 <strong>Status:</strong>
                 <span
-                  className={`${styles.badge} ${
-                    styles[statusMap[selectedTask.status]] ||
+                  className={`${styles.badge} ${styles[statusMap[selectedTask.status]] ||
                     styles.statusPendente
-                  }`}
+                    }`}
                 >
                   {selectedTask.status}
                 </span>
@@ -1344,7 +1369,7 @@ function Home() {
                   isMobile
                     ? false
                     : ({ name, percent }) =>
-                        `${name}: ${(percent * 100).toFixed(0)}%`
+                      `${name}: ${(percent * 100).toFixed(0)}%`
                 }
                 labelLine={false}
                 fontSize={isMobile ? 12 : 20}

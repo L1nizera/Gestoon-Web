@@ -1129,3 +1129,15 @@ th:focus {
   color: var(--text-secondary);
   align-self: center;
 }
+
+.tabelaContainer table {
+  width: 100%;
+  table-layout: fixed;
+}
+
+.tabelaContainer th,
+.tabelaContainer td {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

@@ -5,10 +5,7 @@ import api from "../../../services/api";
 
 import PageLayout from "../../../components/ui/PageLayout";
 import PageCard from "../../../components/ui/PageCard";
-import SearchInput from "../../../components/ui/SearchInput";
-import FilterPanel from "../../../components/ui/FilterPanel";
-import PageActions from "../../../components/ui/PageActions";
-import Button from "../../../components/ui/Button";
+import styles from "../Home/style.module.css";
 import DataTable from "../../../components/ui/DataTable";
 
 function Relatorios() {
@@ -19,7 +16,7 @@ function Relatorios() {
 
   const [ordemNome, setOrdemNome] = useState(null);
   const [ordemData, setOrdemData] = useState(null);
-  const [ordemRelatorio, setOrdemRelatorio] = useState("");
+  const [ordemMetrica, setOrdemMetrica] = useState("");
 
   const [funcionarios, setFuncionarios] = useState([]);
   const [tarefas, setTarefas] = useState([]);
@@ -164,7 +161,7 @@ function Relatorios() {
 
         setError(
           err.response?.data?.mensagem ||
-            "Não foi possível carregar o relatório.",
+          "Não foi possível carregar o relatório.",
         );
       } finally {
         setLoading(false);
@@ -175,12 +172,26 @@ function Relatorios() {
   }, []);
 
   const cargos = useMemo(() => {
-    return [...new Set(funcionarios.map((func) => func.cargo))];
-  }, [funcionarios]);
+    return Object.values(cargoApiMap);
+  }, []);
 
   const setores = useMemo(() => {
-    return [...new Set(funcionarios.map((func) => func.setor))];
-  }, [funcionarios]);
+    return [
+      "Administrativo",
+      "Financeiro",
+      "RH",
+      "Recepção",
+      "Atendimento",
+      "Caixa",
+      "Estoque",
+      "HortiFruti",
+      "Açougue",
+      "Padaria",
+      "Frios",
+      "Mercearia",
+      "Limpeza",
+    ];
+  }, []);
 
   function handleSort(key) {
     if (key === "nome") {
@@ -191,6 +202,7 @@ function Relatorios() {
       });
 
       setOrdemData(null);
+      setOrdemMetrica("");
       return;
     }
 
@@ -202,6 +214,20 @@ function Relatorios() {
       });
 
       setOrdemNome(null);
+      setOrdemMetrica("");
+      return;
+    }
+
+    if (
+      key === "emAndamento" ||
+      key === "concluidas" ||
+      key === "canceladas" ||
+      key === "total"
+    ) {
+      setOrdemMetrica((prev) => (prev === key ? "" : key));
+
+      setOrdemNome(null);
+      setOrdemData(null);
     }
   }
 
@@ -266,28 +292,21 @@ function Relatorios() {
 
         return nomeMatch && cargoMatch && setorMatch && dataMatch;
       })
+
       .sort((a, b) => {
-        if (ordemRelatorio === "nome-az") {
-          return a.nome.localeCompare(b.nome);
-        }
-
-        if (ordemRelatorio === "nome-za") {
-          return b.nome.localeCompare(a.nome);
-        }
-
-        if (ordemRelatorio === "concluidas-maior") {
-          return b.concluidas - a.concluidas;
-        }
-
-        if (ordemRelatorio === "canceladas-maior") {
-          return b.canceladas - a.canceladas;
-        }
-
-        if (ordemRelatorio === "andamento-maior") {
+        if (ordemMetrica === "emAndamento") {
           return b.emAndamento - a.emAndamento;
         }
 
-        if (ordemRelatorio === "total-maior") {
+        if (ordemMetrica === "concluidas") {
+          return b.concluidas - a.concluidas;
+        }
+
+        if (ordemMetrica === "canceladas") {
+          return b.canceladas - a.canceladas;
+        }
+
+        if (ordemMetrica === "total") {
           return b.total - a.total;
         }
 
@@ -309,6 +328,7 @@ function Relatorios() {
 
         return resultado;
       });
+
   }, [
     funcionarios,
     tarefas,
@@ -318,7 +338,7 @@ function Relatorios() {
     dataFiltro,
     ordemNome,
     ordemData,
-    ordemRelatorio,
+    ordemMetrica,
   ]);
 
   function limparFiltros() {
@@ -328,7 +348,7 @@ function Relatorios() {
     setDataFiltro("");
     setOrdemNome(null);
     setOrdemData(null);
-    setOrdemRelatorio("");
+    setOrdemMetrica("");
   }
 
   function handleExport() {
@@ -386,7 +406,6 @@ function Relatorios() {
       label: "Nome",
       sortable: true,
     },
-
     {
       key: "cargo",
       label: "Cargo",
@@ -397,36 +416,35 @@ function Relatorios() {
       label: "Setor",
       align: "center",
     },
-
     {
       key: "dataCriacao",
       label: "Data",
       align: "center",
       sortable: true,
     },
-
     {
       key: "emAndamento",
       label: "Em andamento",
       align: "center",
+      sortable: true,
     },
-
     {
       key: "concluidas",
       label: "Concluídas",
       align: "center",
+      sortable: true,
     },
-
     {
       key: "canceladas",
       label: "Canceladas",
       align: "center",
+      sortable: true,
     },
-
     {
       key: "total",
       label: "Total",
       align: "center",
+      sortable: true,
     },
   ];
 
@@ -435,15 +453,19 @@ function Relatorios() {
       <PageCard>
         <h1>Relatório de Funcionários</h1>
 
-        <SearchInput
-          placeholder="Buscar funcionário..."
-          value={nomeFiltro}
-          onChange={setNomeFiltro}
-        />
+        <div className={styles.topActions}>
+          <input
+            className={styles.busca}
+            placeholder="Buscar funcionário..."
+            value={nomeFiltro}
+            onChange={(e) => setNomeFiltro(e.target.value)}
+          />
+        </div>
 
-        <FilterPanel>
+        <div className={styles.filtrosAvancados}>
           <div>
             <small>Cargo:</small>
+
             <select
               value={cargoFiltro}
               onChange={(e) => setCargoFiltro(e.target.value)}
@@ -460,6 +482,7 @@ function Relatorios() {
 
           <div>
             <small>Setor:</small>
+
             <select
               value={setorFiltro}
               onChange={(e) => setSetorFiltro(e.target.value)}
@@ -476,43 +499,74 @@ function Relatorios() {
 
           <div>
             <small>Data:</small>
+
             <input
               type="date"
               value={dataFiltro}
               onChange={(e) => setDataFiltro(e.target.value)}
             />
           </div>
+        </div>
 
-          <div>
-            <small>Ordenar:</small>
-            <select
-              value={ordemRelatorio}
-              onChange={(e) => {
-                setOrdemRelatorio(e.target.value);
-                setOrdemNome(null);
-                setOrdemData(null);
-              }}
-            >
-              <option value="">Padrão</option>
-              <option value="nome-az">Nome A-Z</option>
-              <option value="nome-za">Nome Z-A</option>
-              <option value="concluidas-maior">Mais concluídas</option>
-              <option value="canceladas-maior">Mais canceladas</option>
-              <option value="andamento-maior">Mais em andamento</option>
-              <option value="total-maior">Mais tarefas no total</option>
-            </select>
-          </div>
-          
-        </FilterPanel>
+        <div className={styles.filtros}>
+          <button
+            className={ordemMetrica === "emAndamento" ? styles.ativo : ""}
+            onClick={() => {
+              setOrdemMetrica((prev) =>
+                prev === "emAndamento" ? "" : "emAndamento"
+              );
+              setOrdemNome(null);
+              setOrdemData(null);
+            }}
+          >
+            Mais em andamento
+          </button>
 
-        <PageActions
-          left={
-            <Button variant="secondary" onClick={limparFiltros}>
-              Limpar Filtros
-            </Button>
-          }
-          right={<span>{listaFiltrada.length} encontrados</span>}
-        />
+          <button
+            className={ordemMetrica === "concluidas" ? styles.ativo : ""}
+            onClick={() => {
+              setOrdemMetrica((prev) =>
+                prev === "concluidas" ? "" : "concluidas"
+              );
+              setOrdemNome(null);
+              setOrdemData(null);
+            }}
+          >
+            Mais concluídas
+          </button>
+
+          <button
+            className={ordemMetrica === "canceladas" ? styles.ativo : ""}
+            onClick={() => {
+              setOrdemMetrica((prev) =>
+                prev === "canceladas" ? "" : "canceladas"
+              );
+              setOrdemNome(null);
+              setOrdemData(null);
+            }}
+          >
+            Mais canceladas
+          </button>
+
+          <button
+            className={ordemMetrica === "total" ? styles.ativo : ""}
+            onClick={() => {
+              setOrdemMetrica((prev) => (prev === "total" ? "" : "total"));
+              setOrdemNome(null);
+              setOrdemData(null);
+            }}
+          >
+            Mais tarefas
+          </button>
+        </div>
+
+        <div className={styles.acoes}>
+          <button className={styles.limparBtn} onClick={limparFiltros}>
+            Limpar Filtros
+          </button>
+
+          <span>{listaFiltrada.length} encontrados</span>
+        </div>
 
         {loading && <p>Carregando relatório...</p>}
 
@@ -522,27 +576,30 @@ function Relatorios() {
           <DataTable
             columns={columns}
             data={listaFiltrada}
-            sortKey={ordemNome ? "nome" : ordemData ? "dataCriacao" : null}
-            sortDirection={ordemNome || ordemData}
+            sortKey={
+              ordemNome
+                ? "nome"
+                : ordemData
+                  ? "dataCriacao"
+                  : ordemMetrica || null
+            }
+            sortDirection={ordemNome || ordemData || (ordemMetrica ? "maior" : null)}
             onSort={handleSort}
             emptyMessage="Nenhum resultado encontrado"
+            variant="relatorios"
           />
         )}
 
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "flex-end",
-            marginTop: "1.5rem",
-          }}
-        >
-          <Button variant="primary" onClick={handleExport}>
-            Exportar Relatório
-          </Button>
+        <div className={styles.footerActions}>
+          <button className={styles.exportBtn} onClick={handleExport}>
+            Exportar PDF
+          </button>
         </div>
       </PageCard>
     </PageLayout>
   );
 }
+
+
 
 export default Relatorios;
