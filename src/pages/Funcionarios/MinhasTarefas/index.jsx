@@ -17,7 +17,7 @@ function StatusBadge({ status }) {
   );
 }
 
-export default function Historico() {
+export default function MinhasTarefas() {
   const [taskList, setTaskList] = useState(tasks);
 
   const historyTasks = useMemo(
