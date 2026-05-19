@@ -43,7 +43,14 @@ function Home() {
     4: "Atendimento",
     5: "Limpeza",
     6: "Estoque",
-    7: "Logística",
+    7: "RH",
+    8: "Recepção",
+    9: "Caixa",
+    10: "HortiFruti",
+    11: "Açougue",
+    12: "Padaria",
+    13: "Frios",
+    14: "Mercearia",
   };
 
   const prioridadeToApiMap = {
@@ -59,7 +66,14 @@ function Home() {
     Atendimento: 4,
     Limpeza: 5,
     Estoque: 6,
-    Logística: 7,
+    RH: 7,
+    Recepção: 8,
+    Caixa: 9,
+    HortiFruti: 10,
+    Açougue: 11,
+    Padaria: 12,
+    Frios: 13,
+    Mercearia: 14,
   };
 
   const statusApiMap = {
@@ -390,23 +404,29 @@ function Home() {
   }
 
   async function criarTask() {
-    if (!novaTask.titulo.trim()) return;
+    if (!novaTask.titulo.trim()) {
+      alert("O título da tarefa é obrigatório.");
+      return;
+    }
+
+    const setorId = setorToApiMap[novaTask.setor];
+
+    if (!setorId) {
+      alert("Setor inválido.");
+      return;
+    }
 
     try {
       const payload = {
         titulo: novaTask.titulo,
         descricao: novaTask.descricao,
         prioridade: prioridadeToApiMap[novaTask.prioridade],
-        setorId: setorToApiMap[novaTask.setor],
+        setorId,
         criadoPor: 1,
         estimativaMinutos: Number(novaTask.estimativaMinutos),
         status: statusToApiMap[novaTask.status],
         funcionarioId: 1,
       };
-
-      console.log("Setor escolhido:", novaTask.setor);
-      console.log("Setor convertido:", setorToApiMap[novaTask.setor]);
-      console.log("Payload enviado:", payload);
 
       await api.post("/tarefas", payload);
       await fetchDados();
@@ -509,11 +529,17 @@ function Home() {
   const setores = [
     "Administrativo",
     "Financeiro",
-    "Operacional",
+    "RH",
+    "Recepção",
     "Atendimento",
-    "Limpeza",
+    "Caixa",
     "Estoque",
-    "Logística",
+    "HortiFruti",
+    "Açougue",
+    "Padaria",
+    "Frios",
+    "Mercearia",
+    "Limpeza",
   ];
 
   const prioridadeMap = {

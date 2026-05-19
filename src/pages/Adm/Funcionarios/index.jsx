@@ -5,8 +5,17 @@ import Modal from "../../../components/Modal/Modal";
 import autoTable from "jspdf-autotable";
 import DataTable from "../../../components/ui/DataTable";
 import api from "../../../services/api";
+import { useAuth } from "../../../context/AuthContext";
 
 function Funcionarios() {
+  const { user } = useAuth();
+
+  const usuarioEhGerente = Number(user?.cargoId) === 1;
+  const usuarioEhSupervisor = Number(user?.cargoId) === 2;
+  const cargoInicialCriacao = usuarioEhGerente
+    ? "Supervisor"
+    : "Auxiliar Administrativo";
+
   const [busca, setBusca] = useState("");
   const [setorFiltro, setSetorFiltro] = useState("");
   const [ativoFiltro, setAtivoFiltro] = useState("");
@@ -20,6 +29,7 @@ function Funcionarios() {
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
   const primeiraCargaRef = useRef(true);
   const ultimaChaveFuncionariosRef = useRef("");
 
@@ -27,10 +37,8 @@ function Funcionarios() {
     nome: "",
     email: "",
     setor: "Administrativo",
-    cargo: "Gerente",
+    cargo: cargoInicialCriacao,
     ativo: true,
-
-    // dados de acesso ao sistema
     login: "",
     senha: "",
   });
@@ -38,12 +46,86 @@ function Funcionarios() {
   const setores = [
     "Administrativo",
     "Financeiro",
-    "Operacional",
+    "RH",
+    "Recepção",
     "Atendimento",
-    "Limpeza",
+    "Caixa",
     "Estoque",
-    "Logística",
+    "HortiFruti",
+    "Açougue",
+    "Padaria",
+    "Frios",
+    "Mercearia",
+    "Limpeza",
   ];
+
+  const cargoApiMap = {
+    1: "Gerente",
+    2: "Supervisor",
+    3: "Caixa",
+    4: "Repositor",
+    5: "Auxiliar de Limpeza",
+
+    6: "Auxiliar Administrativo",
+    7: "Assistente Financeiro",
+    8: "Analista Financeiro",
+    9: "Auxiliar de RH",
+    10: "Analista de RH",
+    11: "Recepcionista",
+    12: "Atendente de Recepção",
+    13: "Atendente",
+    14: "Operador de Atendimento",
+    15: "Operador de Caixa",
+    16: "Fiscal de Caixa",
+    17: "Estoquista",
+    18: "Conferente de Estoque",
+    19: "Repositor de HortiFruti",
+    20: "Auxiliar de HortiFruti",
+    21: "Açougueiro",
+    22: "Auxiliar de Açougue",
+    23: "Padeiro",
+    24: "Auxiliar de Padaria",
+    25: "Balconista de Frios",
+    26: "Auxiliar de Frios",
+    27: "Repositor de Mercearia",
+    28: "Auxiliar de Mercearia",
+  };
+
+  const cargosPorSetor = {
+    Administrativo: ["Auxiliar Administrativo"],
+    Financeiro: ["Assistente Financeiro", "Analista Financeiro"],
+    RH: ["Auxiliar de RH", "Analista de RH"],
+    Recepção: ["Recepcionista", "Atendente de Recepção"],
+    Atendimento: ["Atendente", "Operador de Atendimento"],
+    Caixa: ["Operador de Caixa", "Fiscal de Caixa"],
+    Estoque: ["Estoquista", "Conferente de Estoque"],
+    HortiFruti: ["Repositor de HortiFruti", "Auxiliar de HortiFruti"],
+    Açougue: ["Açougueiro", "Auxiliar de Açougue"],
+    Padaria: ["Padeiro", "Auxiliar de Padaria"],
+    Frios: ["Balconista de Frios", "Auxiliar de Frios"],
+    Mercearia: ["Repositor de Mercearia", "Auxiliar de Mercearia"],
+    Limpeza: ["Auxiliar de Limpeza"],
+  };
+
+  function getCargosPermitidosPorSetor(setorSelecionado) {
+    const cargosDoSetor = cargosPorSetor[setorSelecionado] || [];
+
+    if (usuarioEhGerente) {
+      if (setorSelecionado === "Administrativo") {
+        return ["Supervisor", ...cargosDoSetor];
+      }
+
+      return cargosDoSetor;
+    }
+
+    return cargosDoSetor.filter((cargo) => cargo !== "Supervisor");
+  }
+
+  function getCargoInicial(setorSelecionado) {
+    const cargosPermitidos = getCargosPermitidosPorSetor(setorSelecionado);
+
+    return cargosPermitidos[0] || "";
+  }
 
   const setorApiMap = {
     1: "Administrativo",
@@ -52,15 +134,14 @@ function Funcionarios() {
     4: "Atendimento",
     5: "Limpeza",
     6: "Estoque",
-    7: "Logística",
-  };
-
-  const cargoApiMap = {
-    1: "Gerente",
-    2: "Supervisor",
-    3: "Caixa",
-    4: "Repositor",
-    5: "Auxiliar de Limpeza",
+    7: "RH",
+    8: "Recepção",
+    9: "Caixa",
+    10: "HortiFruti",
+    11: "Açougue",
+    12: "Padaria",
+    13: "Frios",
+    14: "Mercearia",
   };
 
   const setorToApiMap = {
@@ -70,7 +151,14 @@ function Funcionarios() {
     Atendimento: 4,
     Limpeza: 5,
     Estoque: 6,
-    Logística: 7,
+    RH: 7,
+    Recepção: 8,
+    Caixa: 9,
+    HortiFruti: 10,
+    Açougue: 11,
+    Padaria: 12,
+    Frios: 13,
+    Mercearia: 14,
   };
 
   const cargoToApiMap = {
@@ -79,15 +167,31 @@ function Funcionarios() {
     Caixa: 3,
     Repositor: 4,
     "Auxiliar de Limpeza": 5,
-  };
 
-  const cargos = [
-    "Gerente",
-    "Supervisor",
-    "Caixa",
-    "Repositor",
-    "Auxiliar de Limpeza",
-  ];
+    "Auxiliar Administrativo": 6,
+    "Assistente Financeiro": 7,
+    "Analista Financeiro": 8,
+    "Auxiliar de RH": 9,
+    "Analista de RH": 10,
+    Recepcionista: 11,
+    "Atendente de Recepção": 12,
+    Atendente: 13,
+    "Operador de Atendimento": 14,
+    "Operador de Caixa": 15,
+    "Fiscal de Caixa": 16,
+    Estoquista: 17,
+    "Conferente de Estoque": 18,
+    "Repositor de HortiFruti": 19,
+    "Auxiliar de HortiFruti": 20,
+    Açougueiro: 21,
+    "Auxiliar de Açougue": 22,
+    Padeiro: 23,
+    "Auxiliar de Padaria": 24,
+    "Balconista de Frios": 25,
+    "Auxiliar de Frios": 26,
+    "Repositor de Mercearia": 27,
+    "Auxiliar de Mercearia": 28,
+  };
 
   const statusBadgeMap = {
     ativo: "statusConcluida",
@@ -162,6 +266,12 @@ function Funcionarios() {
   }
 
   const columns = [
+    {
+      key: "id",
+      label: "ID",
+      align: "center",
+      sortable: true,
+    },
     {
       key: "nome",
       label: "Nome",
@@ -242,6 +352,11 @@ function Funcionarios() {
   }
 
   function abrirEdicaoFuncionario(funcionario) {
+    if (funcionario.cargoId === 1) {
+      alert("Gerentes não podem ser editados pelo painel.");
+      return;
+    }
+
     setSelected(null);
     setEditFuncionario({ ...funcionario });
   }
@@ -262,6 +377,23 @@ function Funcionarios() {
 
     const cargoId =
       cargoToApiMap[editFuncionario.cargo] || editFuncionario.cargoId;
+
+    const cargosPermitidos = getCargosPermitidosPorSetor(editFuncionario.setor);
+
+    if (!cargosPermitidos.includes(editFuncionario.cargo)) {
+      alert("Cargo inválido para o setor selecionado.");
+      return;
+    }
+
+    if (cargoId === 1) {
+      alert("Não é permitido alterar funcionário para Gerente pelo painel.");
+      return;
+    }
+
+    if (usuarioEhSupervisor && cargoId === 2) {
+      alert("Supervisores não podem alterar funcionário para Supervisor.");
+      return;
+    }
 
     if (!setorId) {
       alert(`Setor inválido: ${editFuncionario.setor}`);
@@ -337,6 +469,23 @@ function Funcionarios() {
     const setorId = setorToApiMap[novoFuncionario.setor];
     const cargoId = cargoToApiMap[novoFuncionario.cargo];
 
+    const cargosPermitidos = getCargosPermitidosPorSetor(novoFuncionario.setor);
+
+    if (!cargosPermitidos.includes(novoFuncionario.cargo)) {
+      alert("Cargo inválido para o setor selecionado.");
+      return;
+    }
+
+    if (cargoId === 1) {
+      alert("Não é permitido criar perfil de Gerente pelo painel.");
+      return;
+    }
+
+    if (usuarioEhSupervisor && cargoId === 2) {
+      alert("Supervisores não podem criar outros supervisores.");
+      return;
+    }
+
     if (!setorId) {
       alert("Setor inválido.");
       return;
@@ -390,7 +539,7 @@ function Funcionarios() {
         nome: "",
         email: "",
         setor: "Administrativo",
-        cargo: "Gerente",
+        cargo: cargoInicialCriacao,
         ativo: true,
         login: "",
         senha: "",
@@ -738,7 +887,7 @@ function Funcionarios() {
                       nome: "",
                       email: "",
                       setor: "Administrativo",
-                      cargo: "Gerente",
+                      cargo: cargoInicialCriacao,
                       ativo: true,
                       login: "",
                       senha: "",
@@ -822,12 +971,15 @@ function Funcionarios() {
                 <label>Setor</label>
                 <select
                   value={novoFuncionario.setor}
-                  onChange={(e) =>
+                  onChange={(e) => {
+                    const novoSetor = e.target.value;
+
                     setNovoFuncionario({
                       ...novoFuncionario,
-                      setor: e.target.value,
-                    })
-                  }
+                      setor: novoSetor,
+                      cargo: getCargoInicial(novoSetor),
+                    });
+                  }}
                 >
                   {setores.map((setor) => (
                     <option key={setor} value={setor}>
@@ -848,11 +1000,13 @@ function Funcionarios() {
                     })
                   }
                 >
-                  {cargos.map((cargo) => (
-                    <option key={cargo} value={cargo}>
-                      {cargo}
-                    </option>
-                  ))}
+                  {getCargosPermitidosPorSetor(novoFuncionario.setor).map(
+                    (cargo) => (
+                      <option key={cargo} value={cargo}>
+                        {cargo}
+                      </option>
+                    ),
+                  )}
                 </select>
               </div>
 
@@ -931,12 +1085,23 @@ function Funcionarios() {
                 <label>Setor</label>
                 <select
                   value={editFuncionario.setor}
-                  onChange={(e) =>
+                  onChange={(e) => {
+                    const novoSetor = e.target.value;
+                    const cargosPermitidos =
+                      getCargosPermitidosPorSetor(novoSetor);
+
+                    const cargoAtualAindaServe = cargosPermitidos.includes(
+                      editFuncionario.cargo,
+                    );
+
                     setEditFuncionario({
                       ...editFuncionario,
-                      setor: e.target.value,
-                    })
-                  }
+                      setor: novoSetor,
+                      cargo: cargoAtualAindaServe
+                        ? editFuncionario.cargo
+                        : getCargoInicial(novoSetor),
+                    });
+                  }}
                 >
                   {setores.map((setor) => (
                     <option key={setor} value={setor}>
@@ -957,11 +1122,13 @@ function Funcionarios() {
                     })
                   }
                 >
-                  {cargos.map((cargo) => (
-                    <option key={cargo} value={cargo}>
-                      {cargo}
-                    </option>
-                  ))}
+                  {getCargosPermitidosPorSetor(editFuncionario.setor).map(
+                    (cargo) => (
+                      <option key={cargo} value={cargo}>
+                        {cargo}
+                      </option>
+                    ),
+                  )}
                 </select>
               </div>
 

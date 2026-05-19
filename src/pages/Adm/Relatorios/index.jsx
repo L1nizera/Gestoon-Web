@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 import api from "../../../services/api";
 
 import PageLayout from "../../../components/ui/PageLayout";
@@ -17,6 +19,7 @@ function Relatorios() {
 
   const [ordemNome, setOrdemNome] = useState(null);
   const [ordemData, setOrdemData] = useState(null);
+  const [ordemRelatorio, setOrdemRelatorio] = useState("");
 
   const [funcionarios, setFuncionarios] = useState([]);
   const [tarefas, setTarefas] = useState([]);
@@ -30,6 +33,29 @@ function Relatorios() {
     3: "Caixa",
     4: "Repositor",
     5: "Auxiliar de Limpeza",
+    6: "Auxiliar Administrativo",
+    7: "Assistente Financeiro",
+    8: "Analista Financeiro",
+    9: "Auxiliar de RH",
+    10: "Analista de RH",
+    11: "Recepcionista",
+    12: "Atendente de Recepção",
+    13: "Atendente",
+    14: "Operador de Atendimento",
+    15: "Operador de Caixa",
+    16: "Fiscal de Caixa",
+    17: "Estoquista",
+    18: "Conferente de Estoque",
+    19: "Repositor de HortiFruti",
+    20: "Auxiliar de HortiFruti",
+    21: "Açougueiro",
+    22: "Auxiliar de Açougue",
+    23: "Padeiro",
+    24: "Auxiliar de Padaria",
+    25: "Balconista de Frios",
+    26: "Auxiliar de Frios",
+    27: "Repositor de Mercearia",
+    28: "Auxiliar de Mercearia",
   };
 
   const setorApiMap = {
@@ -39,7 +65,14 @@ function Relatorios() {
     4: "Atendimento",
     5: "Limpeza",
     6: "Estoque",
-    7: "Logística",
+    7: "RH",
+    8: "Recepção",
+    9: "Caixa",
+    10: "HortiFruti",
+    11: "Açougue",
+    12: "Padaria",
+    13: "Frios",
+    14: "Mercearia",
   };
 
   function parseDateValue(value) {
@@ -121,7 +154,7 @@ function Relatorios() {
               setorApiMap[Number(tarefa.tar_setor_id)] ||
               `Setor #${tarefa.tar_setor_id}`,
             status: normalizarStatus(tarefa.atr_status),
-          })
+          }),
         );
 
         setFuncionarios(funcionariosFormatados);
@@ -131,7 +164,7 @@ function Relatorios() {
 
         setError(
           err.response?.data?.mensagem ||
-            "Não foi possível carregar o relatório."
+            "Não foi possível carregar o relatório.",
         );
       } finally {
         setLoading(false);
@@ -176,42 +209,38 @@ function Relatorios() {
     return funcionarios
       .map((funcionario) => {
         let tarefasFuncionario = tarefas.filter(
-          (tarefa) => tarefa.funcionarioId === funcionario.id
+          (tarefa) => tarefa.funcionarioId === funcionario.id,
         );
 
         if (setorFiltro) {
           tarefasFuncionario = tarefasFuncionario.filter(
-            (tarefa) => tarefa.setor === setorFiltro
+            (tarefa) => tarefa.setor === setorFiltro,
           );
         }
 
-        const pendentes = tarefasFuncionario.filter(
-          (tarefa) => tarefa.status === "Pendente"
-        ).length;
-
         const emAndamento = tarefasFuncionario.filter(
-          (tarefa) => tarefa.status === "Em andamento"
+          (tarefa) => tarefa.status === "Em andamento",
         ).length;
 
         const concluidas = tarefasFuncionario.filter(
-          (tarefa) => tarefa.status === "Concluída"
+          (tarefa) => tarefa.status === "Concluída",
         ).length;
 
         const canceladas = tarefasFuncionario.filter(
-          (tarefa) => tarefa.status === "Cancelada"
+          (tarefa) => tarefa.status === "Cancelada",
         ).length;
 
-        const total = tarefasFuncionario.length;
+        const total = emAndamento + concluidas + canceladas;
 
         return {
           ...funcionario,
-          pendentes,
           emAndamento,
           concluidas,
           canceladas,
           total,
         };
       })
+
       .filter((funcionario) => {
         const nomeMatch = funcionario.nome
           .toLowerCase()
@@ -238,6 +267,30 @@ function Relatorios() {
         return nomeMatch && cargoMatch && setorMatch && dataMatch;
       })
       .sort((a, b) => {
+        if (ordemRelatorio === "nome-az") {
+          return a.nome.localeCompare(b.nome);
+        }
+
+        if (ordemRelatorio === "nome-za") {
+          return b.nome.localeCompare(a.nome);
+        }
+
+        if (ordemRelatorio === "concluidas-maior") {
+          return b.concluidas - a.concluidas;
+        }
+
+        if (ordemRelatorio === "canceladas-maior") {
+          return b.canceladas - a.canceladas;
+        }
+
+        if (ordemRelatorio === "andamento-maior") {
+          return b.emAndamento - a.emAndamento;
+        }
+
+        if (ordemRelatorio === "total-maior") {
+          return b.total - a.total;
+        }
+
         let resultado = 0;
 
         if (ordemNome) {
@@ -265,6 +318,7 @@ function Relatorios() {
     dataFiltro,
     ordemNome,
     ordemData,
+    ordemRelatorio,
   ]);
 
   function limparFiltros() {
@@ -274,10 +328,56 @@ function Relatorios() {
     setDataFiltro("");
     setOrdemNome(null);
     setOrdemData(null);
+    setOrdemRelatorio("");
   }
 
   function handleExport() {
-    alert("Exportação do relatório será ligada ao PDF depois.");
+    const doc = new jsPDF();
+
+    doc.setFontSize(18);
+    doc.text("Relatório de Funcionários - Gestoon", 14, 15);
+
+    doc.setFontSize(10);
+    doc.text(`Gerado em: ${new Date().toLocaleDateString("pt-BR")}`, 14, 22);
+
+    autoTable(doc, {
+      startY: 30,
+      head: [
+        [
+          "Nome",
+          "Cargo",
+          "Setor",
+          "Data",
+          "Em andamento",
+          "Concluídas",
+          "Canceladas",
+          "Total",
+        ],
+      ],
+      body: listaFiltrada.map((item) => [
+        item.nome,
+        item.cargo,
+        item.setor,
+        item.dataCriacao,
+        item.emAndamento,
+        item.concluidas,
+        item.canceladas,
+        item.total,
+      ]),
+      styles: {
+        fontSize: 8,
+        lineColor: [200, 200, 200],
+        lineWidth: 0.1,
+      },
+      headStyles: {
+        fillColor: [15, 23, 42],
+        textColor: 255,
+        lineWidth: 0.2,
+      },
+      theme: "grid",
+    });
+
+    doc.save("relatorio_funcionarios.pdf");
   }
 
   const columns = [
@@ -286,6 +386,7 @@ function Relatorios() {
       label: "Nome",
       sortable: true,
     },
+
     {
       key: "cargo",
       label: "Cargo",
@@ -296,32 +397,32 @@ function Relatorios() {
       label: "Setor",
       align: "center",
     },
+
     {
       key: "dataCriacao",
       label: "Data",
       align: "center",
       sortable: true,
     },
-    {
-      key: "pendentes",
-      label: "Pendentes",
-      align: "center",
-    },
+
     {
       key: "emAndamento",
       label: "Em andamento",
       align: "center",
     },
+
     {
       key: "concluidas",
       label: "Concluídas",
       align: "center",
     },
+
     {
       key: "canceladas",
       label: "Canceladas",
       align: "center",
     },
+
     {
       key: "total",
       label: "Total",
@@ -381,6 +482,27 @@ function Relatorios() {
               onChange={(e) => setDataFiltro(e.target.value)}
             />
           </div>
+
+          <div>
+            <small>Ordenar:</small>
+            <select
+              value={ordemRelatorio}
+              onChange={(e) => {
+                setOrdemRelatorio(e.target.value);
+                setOrdemNome(null);
+                setOrdemData(null);
+              }}
+            >
+              <option value="">Padrão</option>
+              <option value="nome-az">Nome A-Z</option>
+              <option value="nome-za">Nome Z-A</option>
+              <option value="concluidas-maior">Mais concluídas</option>
+              <option value="canceladas-maior">Mais canceladas</option>
+              <option value="andamento-maior">Mais em andamento</option>
+              <option value="total-maior">Mais tarefas no total</option>
+            </select>
+          </div>
+          
         </FilterPanel>
 
         <PageActions
