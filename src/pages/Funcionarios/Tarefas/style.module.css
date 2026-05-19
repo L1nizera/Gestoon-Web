@@ -217,6 +217,73 @@ body {
   flex-wrap: wrap;
 }
 
+/* ===== ALERT / TOAST MESSAGES ===== */
+.alertsWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  margin-bottom: 1.25rem;
+}
+
+.alert {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.2rem;
+  border-radius: 0.8rem;
+  box-shadow: 0 0.6rem 1.6rem rgba(2,6,23,0.06);
+  font-weight: 600;
+  font-size: 1.45rem;
+  animation: slideFadeDown 0.28s ease;
+}
+
+.alertSuccess {
+  background: var(--success-bg);
+  border: 0.12rem solid var(--success);
+  color: var(--success);
+}
+
+.alertError {
+  background: var(--danger-bg);
+  border: 0.12rem solid var(--danger);
+  color: var(--danger);
+}
+
+.alertIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.6rem;
+  height: 2.6rem;
+  border-radius: 0.6rem;
+  font-size: 1.6rem;
+}
+
+.alertContent {
+  flex: 1;
+}
+
+.alertClose {
+  background: transparent;
+  border: none;
+  font-size: 1.6rem;
+  color: inherit;
+  cursor: pointer;
+  padding: 0.2rem 0.6rem;
+  border-radius: 0.4rem;
+}
+
+@keyframes slideFadeDown {
+  from {
+    opacity: 0;
+    transform: translateY(-0.6rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 @media (max-width: 768px) {
   .filtrosContainer {
     flex-direction: column;

@@ -64,9 +64,14 @@ export default function Tarefas() {
   const [error, setError] = useState(null);
   const [aceitandoId, setAceitandoId] = useState(null);
   const [tarefaSelecionada, setTarefaSelecionada] = useState(null);
+  const [successMessage, setSuccessMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
   const { user } = useAuth();
   const tarefasKeyRef = useRef("");
+
+  const successTimeoutRef = useRef(null);
+  const errorTimeoutRef = useRef(null);
 
   // ───── FILTROS ─────
   const [busca, setBusca] = useState("");
@@ -78,21 +83,6 @@ export default function Tarefas() {
   /**
    * Formata data ISO para formato Brasil
    */
-  function formatarDataHora(dataISO) {
-    if (!dataISO) {
-      return { dataCriacao: "-", horaCriacao: "-" };
-    }
-
-    const data = new Date(dataISO);
-
-    return {
-      dataCriacao: data.toLocaleDateString("pt-BR"),
-      horaCriacao: data.toLocaleTimeString("pt-BR", {
-        hour: "2-digit",
-        minute: "2-digit",
-      }),
-    };
-  }
   function formatarDataHora(dataISO) {
     if (!dataISO) {
       return { dataCriacao: "-", horaCriacao: "-" };
@@ -202,6 +192,11 @@ export default function Tarefas() {
         err.response?.data || err.message,
       );
       setError("Não foi possível carregar as tarefas. Tente novamente.");
+      // show visual error message
+      const msg = err.response?.data?.mensagem || "Não foi possível carregar as tarefas. Tente novamente.";
+      setErrorMessage(msg);
+      if (errorTimeoutRef.current) clearTimeout(errorTimeoutRef.current);
+      errorTimeoutRef.current = setTimeout(() => setErrorMessage(""), 5000);
     } finally {
       if (mostrarLoading) {
         setLoading(false);
@@ -218,7 +213,10 @@ export default function Tarefas() {
       user?.id || user?.funcionario_id || user?.usuario_id || user?.id_funcionario;
 
     if (!funcionarioId) {
-      alert("Não foi possível identificar o usuário logado. Faça login novamente.");
+      const msg = "Não foi possível identificar o usuário logado. Faça login novamente.";
+      setErrorMessage(msg);
+      if (errorTimeoutRef.current) clearTimeout(errorTimeoutRef.current);
+      errorTimeoutRef.current = setTimeout(() => setErrorMessage(""), 5000);
       return;
     }
 
@@ -235,7 +233,10 @@ export default function Tarefas() {
         setTarefaSelecionada(null);
       }
 
-      alert("Tarefa aceita com sucesso.");
+      // show visual success
+      setSuccessMessage("Tarefa aceita com sucesso.");
+      if (successTimeoutRef.current) clearTimeout(successTimeoutRef.current);
+      successTimeoutRef.current = setTimeout(() => setSuccessMessage(""), 4000);
       await fetchTarefas(false);
     } catch (err) {
       console.error(
@@ -243,10 +244,10 @@ export default function Tarefas() {
         err.response?.data || err.message,
       );
 
-      alert(
-        err.response?.data?.mensagem ||
-        "Erro ao aceitar tarefa. Tente novamente mais tarde.",
-      );
+      const msg = err.response?.data?.mensagem || "Erro ao aceitar tarefa. Tente novamente mais tarde.";
+      setErrorMessage(msg);
+      if (errorTimeoutRef.current) clearTimeout(errorTimeoutRef.current);
+      errorTimeoutRef.current = setTimeout(() => setErrorMessage(""), 5000);
 
       await fetchTarefas(false);
     } finally {
@@ -272,6 +273,14 @@ export default function Tarefas() {
     }, 5000);
 
     return () => clearInterval(interval);
+  }, []);
+
+  // limpar timeouts de mensagens quando o componente desmonta
+  useEffect(() => {
+    return () => {
+      if (successTimeoutRef.current) clearTimeout(successTimeoutRef.current);
+      if (errorTimeoutRef.current) clearTimeout(errorTimeoutRef.current);
+    };
   }, []);
   // ───── COMPUTADOS ─────
 
@@ -411,6 +420,50 @@ export default function Tarefas() {
           </div>
 
           {/* TABELA OU MENSAGENS */}
+
+          {/* FEEDBACK VISUAL: sucess/error banners */}
+          {(successMessage || errorMessage) && (
+            <div className={styles.alertsWrapper}>
+              {successMessage && (
+                <div className={`${styles.alert} ${styles.alertSuccess}`} role="status">
+                  <div className={styles.alertIcon} aria-hidden>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20 6L9 17L4 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                  </div>
+                  <div className={styles.alertContent}>{successMessage}</div>
+                  <button
+                    className={styles.alertClose}
+                    onClick={() => {
+                      setSuccessMessage("");
+                      if (successTimeoutRef.current) clearTimeout(successTimeoutRef.current);
+                    }}
+                    aria-label="Fechar mensagem de sucesso"
+                  >
+                    ✕
+                  </button>
+                </div>
+              )}
+
+              {errorMessage && (
+                <div className={`${styles.alert} ${styles.alertError}`} role="alert">
+                  <div className={styles.alertIcon} aria-hidden>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 9v4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/><path d="M12 17h.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/><path d="M21 12A9 9 0 1 1 3 12a9 9 0 0 1 18 0z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                  </div>
+                  <div className={styles.alertContent}>{errorMessage}</div>
+                  <button
+                    className={styles.alertClose}
+                    onClick={() => {
+                      setErrorMessage("");
+                      if (errorTimeoutRef.current) clearTimeout(errorTimeoutRef.current);
+                    }}
+                    aria-label="Fechar mensagem de erro"
+                  >
+                    ✕
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+
           {loading ? (
             // LOADING
             <div className={styles.loadingContainer}>
