@@ -265,6 +265,58 @@
   display: block;
 }
 
+/* ===== VARIAÇÃO: MINHAS TAREFAS ===== */
+
+.minhasTarefas {
+  min-width: 105rem;
+}
+
+.minhasTarefas th:nth-child(1),
+.minhasTarefas td:nth-child(1) {
+  width: 22rem;
+}
+
+.minhasTarefas th:nth-child(2),
+.minhasTarefas td:nth-child(2) {
+  width: 14rem;
+  text-align: center;
+}
+
+.minhasTarefas th:nth-child(3),
+.minhasTarefas td:nth-child(3) {
+  width: 13rem;
+  text-align: center;
+}
+
+.minhasTarefas th:nth-child(4),
+.minhasTarefas td:nth-child(4) {
+  width: 14rem;
+  text-align: center;
+}
+
+.minhasTarefas th:nth-child(5),
+.minhasTarefas td:nth-child(5) {
+  width: 14rem;
+  text-align: center;
+}
+
+.minhasTarefas th:nth-child(6),
+.minhasTarefas td:nth-child(6) {
+  width: 12rem;
+  text-align: center;
+}
+
+.minhasTarefas th:nth-child(7),
+.minhasTarefas td:nth-child(7) {
+  width: 10rem;
+  text-align: center;
+}
+
+.minhasTarefas th:nth-child(8),
+.minhasTarefas td:nth-child(8) {
+  width: 24rem;
+}
+
 @media (max-width: 768px) {
   .tabelaContainer {
     width: 100%;
