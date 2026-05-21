@@ -305,6 +305,8 @@ function Home() {
           horaCriacao,
 
           descricao: tarefa.tar_descricao || "Sem descrição",
+          
+
         };
       });
 
@@ -1091,6 +1093,8 @@ function Home() {
                 <p>{selectedTask.descricao || "Sem descrição"}</p>
               </div>
             </div>
+
+            
           </Modal>
         )}
 

@@ -519,7 +519,7 @@ function Relatorios() {
               setOrdemData(null);
             }}
           >
-            Mais em andamento
+            Em andamento
           </button>
 
           <button
@@ -532,7 +532,7 @@ function Relatorios() {
               setOrdemData(null);
             }}
           >
-            Mais concluídas
+            Concluídas
           </button>
 
           <button
@@ -545,7 +545,7 @@ function Relatorios() {
               setOrdemData(null);
             }}
           >
-            Mais canceladas
+            Canceladas
           </button>
 
           <button
@@ -556,7 +556,7 @@ function Relatorios() {
               setOrdemData(null);
             }}
           >
-            Mais tarefas
+            Total
           </button>
         </div>
 
