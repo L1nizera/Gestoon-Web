@@ -13,16 +13,6 @@ const prioridadeApiMap = {
   3: "Alta",
 };
 
-const setorApiMap = {
-  1: "Administrativo",
-  2: "Financeiro",
-  3: "Operacional",
-  4: "Atendimento",
-  5: "Limpeza",
-  6: "Estoque",
-  7: "Logística",
-};
-
 const statusClasses = {
   Pendente: styles.statusPendente,
   "Em andamento": styles.statusAndamento,
@@ -151,8 +141,19 @@ export default function Tarefas() {
       const response = await api.get("/tarefas");
       const todosTarefas = response.data.dados || [];
 
+      const setorFuncionario = user?.func_setor_id;
+
       const tarefasFormatadas = todosTarefas
-        .filter((t) => Number(t.atr_status ?? 0) === 0)
+        .filter((t) => {
+          const tarefaPendente =
+            Number(t.atr_status ?? 0) === 0;
+
+          const mesmoSetor =
+            Number(t.tar_setor_id) ===
+            Number(user?.setorId);
+
+          return tarefaPendente && mesmoSetor;
+        })
         .map((tarefa) => {
           const { dataCriacao, horaCriacao } = formatarDataHora(
             tarefa.tar_data_criacao,
@@ -163,10 +164,7 @@ export default function Tarefas() {
             titulo: tarefa.tar_titulo || "-",
             prioridade:
               prioridadeApiMap[Number(tarefa.tar_prioridade)] || "Média",
-            setor:
-              tarefa.set_nome ||
-              setorApiMap[Number(tarefa.tar_setor_id)] ||
-              `Setor #${tarefa.tar_setor_id}`,
+            setor: tarefa.set_nome || "Sem setor",
             criadoPor:
               tarefa.usu_nome ||
               tarefa.user_nome ||
@@ -427,7 +425,7 @@ export default function Tarefas() {
               {successMessage && (
                 <div className={`${styles.alert} ${styles.alertSuccess}`} role="status">
                   <div className={styles.alertIcon} aria-hidden>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20 6L9 17L4 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20 6L9 17L4 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
                   </div>
                   <div className={styles.alertContent}>{successMessage}</div>
                   <button
@@ -446,7 +444,7 @@ export default function Tarefas() {
               {errorMessage && (
                 <div className={`${styles.alert} ${styles.alertError}`} role="alert">
                   <div className={styles.alertIcon} aria-hidden>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 9v4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/><path d="M12 17h.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/><path d="M21 12A9 9 0 1 1 3 12a9 9 0 0 1 18 0z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 9v4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /><path d="M12 17h.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /><path d="M21 12A9 9 0 1 1 3 12a9 9 0 0 1 18 0z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
                   </div>
                   <div className={styles.alertContent}>{errorMessage}</div>
                   <button
