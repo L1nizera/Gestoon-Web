@@ -3,8 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { FiAlertTriangle } from "react-icons/fi";
 import { useAuth } from "../../context/AuthContext";
 
-const TEMPO_TOTAL = 15 * 60 * 1000;
-const TEMPO_AVISO = 14 * 60 * 1000;
+const TEMPO_TOTAL = 5 * 60 * 1000;
+const TEMPO_AVISO = 4 * 60 * 1000;
 const CHAVE_ATIVIDADE = "gestoon:ultimaAtividade";
 
 export default function AutoLogout() {
@@ -52,8 +52,10 @@ export default function AutoLogout() {
   };
 
   const resetTimer = () => {
-    // se modal estiver aberto NÃO considera atividade
-    if (mostrarModal) return;
+    if (mostrarModal) {
+      setMostrarModal(false);
+      clearInterval(countdownIntervalRef.current);
+    }
 
     atualizarUltimaAtividade();
 
@@ -70,11 +72,8 @@ export default function AutoLogout() {
     // logout final
     logoutTimerRef.current = setTimeout(() => {
       const ultimaAtividade = localStorage.getItem(CHAVE_ATIVIDADE);
-
       const agora = Date.now();
-
-      const tempoInativo =
-        agora - Number(ultimaAtividade);
+      const tempoInativo = agora - Number(ultimaAtividade);
 
       // só desloga se TODAS as abas estiverem inativas
       if (tempoInativo >= TEMPO_TOTAL) {
@@ -115,6 +114,11 @@ export default function AutoLogout() {
         logout();
 
         navigate("/", { replace: true });
+        return;
+      }
+
+      if (event.key === CHAVE_ATIVIDADE && event.newValue) {
+        resetTimer();
       }
     };
 
