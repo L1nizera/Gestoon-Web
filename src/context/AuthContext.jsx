@@ -44,11 +44,11 @@ export function AuthProvider({ children }) {
       try {
         await api.get("/auth/verificar-sessao");
       } catch (err) {
-        if (err.response?.status === 401 || err.response?.status === 403) {
-          alert("Sua conta foi inativada. Você será desconectado.");
+        console.error("Erro ao verificar sessão:", err);
 
+        // só desloga se realmente não tiver autorização
+        if (err.response?.status === 401) {
           logout();
-
           window.location.href = "/";
         }
       }
