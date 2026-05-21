@@ -93,6 +93,7 @@ export default function MinhasTarefas() {
   const [selectedTask, setSelectedTask] = useState(null);
   const [fotoTarefa, setFotoTarefa] = useState(null);
   const [previewFoto, setPreviewFoto] = useState(null);
+  const [descricaoFoto, setDescricaoFoto] = useState("");
 
   useEffect(() => {
     carregarMinhasTarefas();
@@ -107,8 +108,38 @@ export default function MinhasTarefas() {
     setPreviewFoto(URL.createObjectURL(file));
   }
 
+  async function enviarFotoTarefa(tarefaId) {
+    if (!fotoTarefa) return;
+
+    const formData = new FormData();
+
+    formData.append("tarefa", tarefaId);
+    formData.append("descricao", descricaoFoto.trim());
+    formData.append("img", fotoTarefa);
+
+    const response = await api.post("/tarefaFotos", formData);
+
+    console.log("Foto enviada:", response.data);
+  }
+
+  function validarFotoAntesDeFinalizar() {
+    if (fotoTarefa && !descricaoFoto.trim()) {
+      showToast("Informe uma descrição para a foto enviada.", "warning");
+      return false;
+    }
+
+    return true;
+  }
+
   async function confirmarTarefa() {
     if (!selectedTask) return;
+
+    if (!validarFotoAntesDeFinalizar()) return;
+
+    if (selectedTask.status === "Concluída" || selectedTask.status === "Cancelada") {
+      showToast("Esta tarefa já foi finalizada e não pode ser alterada.", "warning");
+      return;
+    }
 
     try {
       const payload = {
@@ -124,11 +155,16 @@ export default function MinhasTarefas() {
 
       await api.patch(`/tarefas/${selectedTask.id}`, payload);
 
+      if (fotoTarefa) {
+        await enviarFotoTarefa(selectedTask.id);
+      }
+
       await carregarMinhasTarefas();
 
       setSelectedTask(null);
       setFotoTarefa(null);
       setPreviewFoto(null);
+      setDescricaoFoto("");
 
       showToast("Tarefa confirmada com sucesso.", "success");
     } catch (error) {
@@ -137,6 +173,7 @@ export default function MinhasTarefas() {
       showToast(
         error.response?.data?.mensagem ||
         error.response?.data?.dados ||
+        error.message ||
         "Erro ao confirmar tarefa.",
         "error",
       );
@@ -145,6 +182,13 @@ export default function MinhasTarefas() {
 
   async function cancelarTarefa() {
     if (!selectedTask) return;
+
+    if (!validarFotoAntesDeFinalizar()) return;
+
+    if (selectedTask.status === "Concluída" || selectedTask.status === "Cancelada") {
+      showToast("Esta tarefa já foi finalizada e não pode ser alterada.", "warning");
+      return;
+    }
 
     try {
       const payload = {
@@ -160,11 +204,16 @@ export default function MinhasTarefas() {
 
       await api.patch(`/tarefas/${selectedTask.id}`, payload);
 
+      if (fotoTarefa) {
+        await enviarFotoTarefa(selectedTask.id);
+      }
+
       await carregarMinhasTarefas();
 
       setSelectedTask(null);
       setFotoTarefa(null);
       setPreviewFoto(null);
+      setDescricaoFoto("");
 
       showToast("Tarefa cancelada com sucesso.", "success");
     } catch (error) {
@@ -173,17 +222,29 @@ export default function MinhasTarefas() {
       showToast(
         error.response?.data?.mensagem ||
         error.response?.data?.dados ||
+        error.message ||
         "Erro ao cancelar tarefa.",
         "error",
       );
     }
   }
 
+  function tarefaFinalizada() {
+    return (
+      selectedTask?.status === "Concluída" ||
+      selectedTask?.status === "Cancelada"
+    );
+  }
+
   const carregarMinhasTarefas = async () => {
     try {
-      const response = await api.get("/tarefas");
-      const todas = response.data.dados || [];
+      const [tarefasResponse, fotosResponse] = await Promise.all([
+        api.get("/tarefas"),
+        api.get("/tarefaFotos"),
+      ]);
 
+      const todas = tarefasResponse.data.dados || [];
+      const fotos = fotosResponse.data.dados || [];
       const minhas = todas
 
         .filter(
@@ -197,7 +258,21 @@ export default function MinhasTarefas() {
 
           const data = new Date(tarefa.tar_data_criacao);
 
+          const fotosDaTarefa = fotos
+            .filter((foto) => Number(foto.fot_tarefa_id) === Number(tarefa.tar_id))
+            .sort(
+              (a, b) =>
+                new Date(b.fot_data_envio).getTime() -
+                new Date(a.fot_data_envio).getTime()
+            );
+
+          const fotoDaTarefa = fotosDaTarefa[0] || null;
+
+          console.log("FOTO DA TAREFA:", tarefa.tar_id, fotoDaTarefa);
+
           return {
+
+
             id: tarefa.tar_id,
             titulo: tarefa.tar_titulo,
 
@@ -228,7 +303,9 @@ export default function MinhasTarefas() {
               minute: "2-digit",
             }),
 
-            foto: tarefa.tar_foto || tarefa.atr_foto || null,
+            foto: fotoDaTarefa?.fot_nome || null,
+            fotoDescricao: fotoDaTarefa?.fot_descricao || "",
+
           };
         });
 
@@ -290,9 +367,12 @@ export default function MinhasTarefas() {
           data={minhasTarefas}
           rowKey="id"
           onRowClick={(task) => {
+            console.log("TASK CLICADA:", task);
+            console.log("URL DA FOTO:", task.foto);
             setSelectedTask(task);
             setFotoTarefa(null);
             setPreviewFoto(task.foto || null);
+            setDescricaoFoto(task.fotoDescricao || "");
           }}
           emptyMessage="Nenhuma tarefa encontrada."
           variant="minhasTarefas"
@@ -305,6 +385,7 @@ export default function MinhasTarefas() {
               setSelectedTask(null);
               setFotoTarefa(null);
               setPreviewFoto(null);
+              setDescricaoFoto("");
             }}
             variant="between"
             actions={
@@ -315,6 +396,7 @@ export default function MinhasTarefas() {
                     setSelectedTask(null);
                     setFotoTarefa(null);
                     setPreviewFoto(null);
+                    setDescricaoFoto("");
                   }}
                 >
                   Fechar
@@ -323,7 +405,7 @@ export default function MinhasTarefas() {
                 <button
                   className={styles.btnPrimary}
                   onClick={confirmarTarefa}
-                  disabled={selectedTask.status === "Concluída"}
+                  disabled={tarefaFinalizada()}
                 >
                   Confirmar
                 </button>
@@ -331,7 +413,7 @@ export default function MinhasTarefas() {
                 <button
                   className={styles.btnDanger}
                   onClick={cancelarTarefa}
-                  disabled={selectedTask.status === "Cancelada"}
+                  disabled={tarefaFinalizada()}
                 >
                   Cancelar
                 </button>
@@ -392,20 +474,38 @@ export default function MinhasTarefas() {
             <div className={styles.formGroup}>
               <label>Foto da tarefa</label>
 
-              <input type="file" accept="image/*" onChange={handleFotoChange} />
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleFotoChange}
+                disabled={tarefaFinalizada()}
+              />
+            </div>
+
+            <div className={`${styles.formGroup} ${styles.full}`}>
+              <label>Descrição da foto</label>
+
+              <textarea
+                rows={3}
+                value={descricaoFoto}
+                onChange={(e) => setDescricaoFoto(e.target.value)}
+                placeholder="Ex: Foto da área limpa, produto conferido, gôndola organizada..."
+                disabled={tarefaFinalizada()}
+              />
             </div>
 
             {previewFoto && (
               <div className={styles.descricaoArea}>
-                <strong>Pré-visualização:</strong>
-
+                <strong>{fotoTarefa ? "Pré-visualização local:" : "Foto salva:"}</strong>
+                
                 <div className={styles.descricaoBox}>
                   <img
                     src={previewFoto}
                     alt="Foto da tarefa"
+                    onError={() => setPreviewFoto(null)}
                     style={{
                       width: "100%",
-                      maxHeight: "260px",
+                      maxHeight: "150px",
                       objectFit: "contain",
                       borderRadius: "0.8rem",
                     }}
