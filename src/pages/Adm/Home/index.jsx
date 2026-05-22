@@ -28,6 +28,7 @@ function Home() {
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [imageError, setImageError] = useState(false);
   const { showToast } = useToast();
 
   const primeiraCargaRef = useRef(true);
@@ -92,6 +93,35 @@ function Home() {
     Concluída: 2,
     Cancelada: 3,
   };
+
+  function buildTarefaFotoUrl(fotoNome) {
+    if (!fotoNome || typeof fotoNome !== "string") return null;
+    const nomeLimpo = fotoNome.trim();
+    if (!nomeLimpo) return null;
+
+    if (/^https?:\/\//i.test(nomeLimpo)) {
+      return nomeLimpo.replace(
+        /^https?:\/\/(10\.67\.23\.47:3333)/i,
+        "http://localhost:3333",
+      );
+    }
+
+    if (/^\/public\/tarefas\//i.test(nomeLimpo)) {
+      return `http://localhost:3333${nomeLimpo}`;
+    }
+
+    return `http://localhost:3333/uploads/tarefas/${encodeURIComponent(nomeLimpo)}`;
+  }
+
+  function isValidImageUrl(url) {
+    if (!url || typeof url !== "string") return false;
+    try {
+      const parsed = new URL(url);
+      return /\.(jpe?g|png|gif|webp|bmp|avif|svg)$/i.test(parsed.pathname);
+    } catch {
+      return false;
+    }
+  }
 
   const columns = [
     {
@@ -253,6 +283,7 @@ function Home() {
           tarefa.dataCriacao,
           tarefa.horaCriacao,
           tarefa.descricao,
+          tarefa.foto,
         ].join("::"),
       )
       .join("||");
@@ -268,19 +299,46 @@ function Home() {
 
       const mapaFuncionarios = await buscarFuncionariosMap();
 
-      const response = await api.get("/tarefas");
+      const [tarefasResponse, fotosResponse] = await Promise.all([
+        api.get("/tarefas"),
+        api.get("/tarefaFotos"),
+      ]);
 
-      const tarefasFormatadas = (response.data?.dados || []).map((tarefa) => {
+      const todasTarefas = tarefasResponse.data?.dados || [];
+      const todasFotos = fotosResponse.data?.dados || [];
+
+      const fotosPorTarefaId = todasFotos.reduce((acc, foto) => {
+        const tarefaId = Number(foto.fot_tarefa_id);
+        if (!acc[tarefaId]) acc[tarefaId] = [];
+        acc[tarefaId].push(foto);
+        return acc;
+      }, {});
+
+      console.log("tarefas", todasTarefas);
+      console.log("fotos", todasFotos);
+
+      const tarefasFormatadas = todasTarefas.map((tarefa) => {
         const { dataCriacao, horaCriacao } = formatarDataHora(
           tarefa.tar_data_criacao,
         );
 
+        const fotosDaTarefa = fotosPorTarefaId[Number(tarefa.tar_id)] || [];
+        const fotoDaTarefa = fotosDaTarefa
+          .slice()
+          .sort((a, b) =>
+            new Date(b.fot_data_envio).getTime() -
+            new Date(a.fot_data_envio).getTime(),
+          )[0] || null;
+
+        const nomeFoto = tarefa.fot_nome || fotoDaTarefa?.fot_nome;
 
         return {
           id: tarefa.tar_id,
           tarefaId: tarefa.tar_id,
 
           titulo: tarefa.tar_titulo || "-",
+
+          foto: buildTarefaFotoUrl(nomeFoto),
 
           status: formatarStatus(tarefa.atr_status),
 
@@ -305,7 +363,7 @@ function Home() {
           horaCriacao,
 
           descricao: tarefa.tar_descricao || "Sem descrição",
-          
+
 
         };
       });
@@ -354,6 +412,10 @@ function Home() {
 
     return () => clearInterval(interval);
   }, []);
+
+  useEffect(() => {
+    setImageError(false);
+  }, [selectedTask]);
 
   // if (loading && tarefas.length === 0) return <p>Carregando dados...</p>;
   // if (error) return <p style={{ color: 'red' }}>{error}</p>;
@@ -1094,9 +1156,42 @@ function Home() {
               </div>
             </div>
 
-            
+            {isValidImageUrl(selectedTask?.foto) && !imageError ? (
+              <div style={{ marginTop: "15px", textAlign: "center" }}>
+                <strong>Imagem:</strong>
+
+                <div>
+                  <img
+                    src={selectedTask.foto}
+                    alt="Foto da tarefa"
+                    onError={() => setImageError(true)}
+                    style={{
+                      maxWidth: "100%",
+                      maxHeight: "250px",
+                      borderRadius: "8px",
+                      marginTop: "10px",
+                      objectFit: "contain",
+                    }}
+                  />
+                </div>
+              </div>
+            ) : (
+              <div style={{ marginTop: "15px", textAlign: "center" }}>
+                <strong>Imagem:</strong>
+
+                <div style={{ marginTop: "8px" }}>
+                  <p style={{ color: "#666", fontStyle: "italic" }}>
+                    {selectedTask?.foto && imageError
+                      ? "Não foi possível carregar a imagem."
+                      : "Nenhuma imagem disponível para esta tarefa."}
+                  </p>
+                </div>
+              </div>
+            )}
+
           </Modal>
         )}
+
 
         {/* ===== MODAL EDITAR ===== */}
         {editTask && (

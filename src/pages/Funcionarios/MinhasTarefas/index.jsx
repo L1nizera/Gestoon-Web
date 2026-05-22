@@ -303,7 +303,9 @@ export default function MinhasTarefas() {
               minute: "2-digit",
             }),
 
-            foto: fotoDaTarefa?.fot_nome || null,
+            foto: fotoDaTarefa?.fot_nome
+              ? `http://localhost:3333/uploads/tarefas/${fotoDaTarefa.fot_nome}`
+              : null,
             fotoDescricao: fotoDaTarefa?.fot_descricao || "",
 
           };
@@ -497,7 +499,7 @@ export default function MinhasTarefas() {
             {previewFoto && (
               <div className={styles.descricaoArea}>
                 <strong>{fotoTarefa ? "Pré-visualização local:" : "Foto salva:"}</strong>
-                
+
                 <div className={styles.descricaoBox}>
                   <img
                     src={previewFoto}
