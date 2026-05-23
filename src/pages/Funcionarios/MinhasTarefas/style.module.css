@@ -259,6 +259,101 @@ body {
   font-size: 1.3rem;
 }
 
+.hideOnMobile {
+  display: block;
+}
+
+.showOnMobile {
+  display: none;
+}
+
+.cardList {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.taskCard {
+  width: 100%;
+  background: var(--bg-surface-alt);
+  border-radius: 1.2rem;
+  padding: 1.4rem;
+  box-shadow: 0 0.9rem 2rem rgba(15, 23, 42, 0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
+}
+
+.taskCard:hover {
+  transform: translateY(-2px);
+}
+
+.taskMeta {
+  font-size: 1.2rem;
+  color: var(--text-secondary);
+  margin: 0.25rem 0 0;
+}
+
+.taskSubtitle {
+  margin: 0 0 1rem;
+  font-size: 1.4rem;
+  color: var(--text-secondary);
+}
+
+.taskCardGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.taskField {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.taskLabel {
+  font-size: 1.5rem;
+  color: var(--text-secondary);
+  margin-top: 1rem;
+  font-weight: bold;
+}
+
+.taskValue {
+  font-size: 1.3rem;
+  color: var(--text-primary);
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+.taskDescription {
+  margin-top: 1rem;
+}
+
+.taskDescription strong {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 1.1rem;
+}
+
+.taskDescription p {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 1.3rem;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+@media (max-width: 768px) {
+  .hideOnMobile {
+    display: none;
+  }
+
+  .showOnMobile {
+    display: block;
+  }
+}
+
+
 .emptyState {
   padding: 2rem;
   color: var(--text-muted);

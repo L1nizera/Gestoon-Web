@@ -1,5 +1,6 @@
 import { useState, useMemo, useEffect, useRef } from "react";
 import styles from "../Home/style.module.css";
+import localStyles from "./style.module.css";
 import jsPDF from "jspdf";
 import Modal from "../../../components/Modal/Modal";
 import autoTable from "jspdf-autotable";
@@ -802,17 +803,92 @@ function Funcionarios() {
         ) : error ? (
           <p style={{ color: "red" }}>{error}</p>
         ) : (
-          <DataTable
-            columns={columns}
-            data={lista}
-            rowKey="id"
-            onRowClick={setSelected}
-            sortKey={ordemNome ? "nome" : ordemData ? "dataCriacao" : null}
-            sortDirection={getSortDirection(ordemNome ? "nome" : "dataCriacao")}
-            onSort={handleSort}
-            emptyMessage="Nenhum funcionário encontrado"
-            variant="funcionarios"
-          />
+          <>
+            <div className={localStyles.hideOnMobile}>
+              <DataTable
+                columns={columns}
+                data={lista}
+                rowKey="id"
+                onRowClick={setSelected}
+                sortKey={ordemNome ? "nome" : ordemData ? "dataCriacao" : null}
+                sortDirection={getSortDirection(ordemNome ? "nome" : "dataCriacao")}
+                onSort={handleSort}
+                emptyMessage="Nenhum funcionário encontrado"
+                variant="funcionarios"
+              />
+            </div>
+
+            <div className={localStyles.showOnMobile}>
+              {lista.length === 0 ? (
+                <p className={styles.textCenter}>Nenhum funcionário encontrado</p>
+              ) : (
+                <div className={localStyles.cardList}>
+                  {lista.map((funcionario) => (
+                    <article
+                      key={funcionario.id}
+                      className={`${styles.card} ${localStyles.employeeCard}`}
+                      onClick={() => setSelected(funcionario)}
+                      tabIndex={0}
+                      onKeyDown={(event) => {
+                        if (event.key === "Enter" || event.key === " ") {
+                          setSelected(funcionario);
+                        }
+                      }}
+                    >
+                      <div className={styles.cardHeader}>
+                        <div>
+                          <h2>{funcionario.nome}</h2>
+                          <p className={localStyles.cardId}>ID {funcionario.id}</p>
+                        </div>
+
+                        <span
+                          className={`${styles.badge} ${funcionario.ativo ? styles.statusConcluida : styles.statusCancelada}`}
+                        >
+                          {funcionario.ativo ? "Ativo" : "Inativo"}
+                        </span>
+                      </div>
+
+                      <div className={styles.cardBody}>
+                        <p className={localStyles.emailLine}>{funcionario.email}</p>
+
+                        <div className={localStyles.cardGrid}>
+                          <div className={localStyles.cardField}>
+                            <span className={localStyles.cardLabel}>Setor</span>
+                            <span className={localStyles.cardValue}>
+                              {funcionario.setor}
+                            </span>
+                          </div>
+
+                          <div className={localStyles.cardField}>
+                            <span className={localStyles.cardLabel}>Cargo</span>
+                            <span className={localStyles.cardValue}>
+                              {funcionario.cargo}
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className={localStyles.cardGrid}>
+                          <div className={localStyles.cardField}>
+                            <span className={localStyles.cardLabel}>Data</span>
+                            <span className={localStyles.cardValue}>
+                              {funcionario.dataCriacao}
+                            </span>
+                          </div>
+
+                          <div className={localStyles.cardField}>
+                            <span className={localStyles.cardLabel}>Hora</span>
+                            <span className={localStyles.cardValue}>
+                              {funcionario.horaCriacao}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              )}
+            </div>
+          </>
         )}
 
         {selected && (

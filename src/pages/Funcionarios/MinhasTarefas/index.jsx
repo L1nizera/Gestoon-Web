@@ -2,6 +2,7 @@ import { useState, useMemo, useEffect } from "react";
 import { useAuth } from "../../../context/AuthContext";
 import api from "../../../services/api";
 import styles from "../../Adm/Home/style.module.css";
+import localStyles from "./style.module.css";
 import DataTable from "../../../components/ui/DataTable";
 import Modal from "../../../components/Modal/Modal";
 import { useToast } from "../../../components/ui/Toast";
@@ -24,6 +25,9 @@ const prioridadeMap = {
   Média: "prioridadeMedia",
   Baixa: "prioridadeBaixa",
 };
+
+const statusOptions = ["Em andamento", "Concluída", "Cancelada"];
+const prioridadeOptions = ["Alta", "Média", "Baixa"];
 
 const columns = [
   {
@@ -94,10 +98,21 @@ export default function MinhasTarefas() {
   const [fotoTarefa, setFotoTarefa] = useState(null);
   const [previewFoto, setPreviewFoto] = useState(null);
   const [descricaoFoto, setDescricaoFoto] = useState("");
+  const [busca, setBusca] = useState("");
+  const [statusFiltro, setStatusFiltro] = useState("");
+  const [prioridadeFiltro, setPrioridadeFiltro] = useState("");
+  const [setorFiltro, setSetorFiltro] = useState("");
 
   useEffect(() => {
     carregarMinhasTarefas();
   }, []);
+
+  function handleTaskSelect(task) {
+    setSelectedTask(task);
+    setFotoTarefa(null);
+    setPreviewFoto(task.foto || null);
+    setDescricaoFoto(task.fotoDescricao || "");
+  }
 
   function handleFotoChange(event) {
     const file = event.target.files[0];
@@ -328,6 +343,48 @@ export default function MinhasTarefas() {
     [taskList]
   );
 
+  const setores = useMemo(
+    () =>
+      Array.from(new Set(taskList.map((task) => task.setor).filter(Boolean))).sort(),
+    [taskList]
+  );
+
+  const filteredTarefas = useMemo(() => {
+    let resultado = [...minhasTarefas];
+
+    if (busca.trim()) {
+      const texto = busca.trim().toLowerCase();
+      resultado = resultado.filter(
+        (task) =>
+          task.titulo.toLowerCase().includes(texto) ||
+          task.descricao.toLowerCase().includes(texto) ||
+          task.criadoPor.toLowerCase().includes(texto) ||
+          task.setor.toLowerCase().includes(texto)
+      );
+    }
+
+    if (statusFiltro) {
+      resultado = resultado.filter((task) => task.status === statusFiltro);
+    }
+
+    if (prioridadeFiltro) {
+      resultado = resultado.filter((task) => task.prioridade === prioridadeFiltro);
+    }
+
+    if (setorFiltro) {
+      resultado = resultado.filter((task) => task.setor === setorFiltro);
+    }
+
+    return resultado;
+  }, [minhasTarefas, busca, statusFiltro, prioridadeFiltro, setorFiltro]);
+
+  const limparFiltros = () => {
+    setBusca("");
+    setStatusFiltro("");
+    setPrioridadeFiltro("");
+    setSetorFiltro("");
+  };
+
   const counts = useMemo(() => {
     return taskList.reduce(
       (acc, task) => {
@@ -353,32 +410,150 @@ export default function MinhasTarefas() {
           <div>Em andamento: {counts.andamento}</div>
           <div>Concluídas: {counts.concluida}</div>
           <div>Canceladas: {counts.cancelada}</div>
-          <div>Total: {minhasTarefas.length}</div>
+          <div>Total: {filteredTarefas.length}</div>
+        </div>
+
+        <div className={styles.filtrosAvancados}>
+          <div>
+            <small>Buscar</small>
+            <input
+              className={styles.busca}
+              type="text"
+              placeholder="Buscar tarefa..."
+              value={busca}
+              onChange={(e) => setBusca(e.target.value)}
+            />
+          </div>
+
+          <div>
+            <small>Status</small>
+            <select
+              value={statusFiltro}
+              onChange={(e) => setStatusFiltro(e.target.value)}
+            >
+              <option value="">Todos</option>
+              {statusOptions.map((status) => (
+                <option key={status} value={status}>
+                  {status}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <small>Prioridade</small>
+            <select
+              value={prioridadeFiltro}
+              onChange={(e) => setPrioridadeFiltro(e.target.value)}
+            >
+              <option value="">Todas</option>
+              {prioridadeOptions.map((prioridade) => (
+                <option key={prioridade} value={prioridade}>
+                  {prioridade}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <small>Setor</small>
+            <select
+              value={setorFiltro}
+              onChange={(e) => setSetorFiltro(e.target.value)}
+            >
+              <option value="">Todos</option>
+              {setores.map((setor) => (
+                <option key={setor} value={setor}>
+                  {setor}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
 
         <div className={styles.acoes}>
-          <button className={styles.limparBtn} disabled>
-            Minhas tarefas
+          <button className={styles.limparBtn} onClick={limparFiltros}>
+            Limpar filtros
           </button>
 
-          <span>{minhasTarefas.length} registros</span>
+          <span>{filteredTarefas.length} registros</span>
         </div>
 
-        <DataTable
-          columns={columns}
-          data={minhasTarefas}
-          rowKey="id"
-          onRowClick={(task) => {
-            console.log("TASK CLICADA:", task);
-            console.log("URL DA FOTO:", task.foto);
-            setSelectedTask(task);
-            setFotoTarefa(null);
-            setPreviewFoto(task.foto || null);
-            setDescricaoFoto(task.fotoDescricao || "");
-          }}
-          emptyMessage="Nenhuma tarefa encontrada."
-          variant="minhasTarefas"
-        />
+        <div className={localStyles.hideOnMobile}>
+          <DataTable
+            columns={columns}
+            data={filteredTarefas}
+            rowKey="id"
+            onRowClick={handleTaskSelect}
+            emptyMessage="Nenhuma tarefa encontrada."
+            variant="minhasTarefas"
+          />
+        </div>
+
+        <div className={localStyles.showOnMobile}>
+          {filteredTarefas.length === 0 ? (
+            <p className={styles.textCenter}>Nenhuma tarefa encontrada.</p>
+          ) : (
+            <div className={localStyles.cardList}>
+              {filteredTarefas.map((task) => (
+                <article
+                  key={task.id}
+                  className={`${styles.card} ${localStyles.taskCard}`}
+                  onClick={() => handleTaskSelect(task)}
+                  tabIndex={0}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                      handleTaskSelect(task);
+                    }
+                  }}
+                >
+                  <div className={styles.cardHeader}>
+                    <div>
+                      <h2>{task.titulo}</h2>
+                      <p className={localStyles.taskMeta}>ID {task.id}</p>
+                    </div>
+                    <span
+                      className={`${styles.badge} ${styles[statusMap[task.status]] || styles.statusPendente}`}
+                    >
+                      {task.status}
+                    </span>
+                  </div>
+
+                  <div className={styles.cardBody}>
+                    <p className={localStyles.taskSubtitle}>{task.setor}</p>
+
+                    <div className={localStyles.taskCardGrid}>
+                      <div className={localStyles.taskField}>
+                        <span className={localStyles.taskLabel}>Prioridade</span>
+                        <span className={localStyles.taskValue}>{task.prioridade}</span>
+                      </div>
+                      <div className={localStyles.taskField}>
+                        <span className={localStyles.taskLabel}>Criado por</span>
+                        <span className={localStyles.taskValue}>{task.criadoPor}</span>
+                      </div>
+                    </div>
+
+                    <div className={localStyles.taskCardGrid}>
+                      <div className={localStyles.taskField}>
+                        <span className={localStyles.taskLabel}>Data</span>
+                        <span className={localStyles.taskValue}>{task.dataCriacao}</span>
+                      </div>
+                      <div className={localStyles.taskField}>
+                        <span className={localStyles.taskLabel}>Hora</span>
+                        <span className={localStyles.taskValue}>{task.horaCriacao}</span>
+                      </div>
+                    </div>
+
+                    <div className={localStyles.taskDescription}>
+                      <strong>Descrição</strong>
+                      <p>{task.descricao || "Sem descrição"}</p>
+                    </div>
+                  </div>
+                </article>
+              ))}
+            </div>
+          )}
+        </div>
 
         {selectedTask && (
           <Modal
