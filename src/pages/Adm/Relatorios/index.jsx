@@ -6,6 +6,7 @@ import api from "../../../services/api";
 import PageLayout from "../../../components/ui/PageLayout";
 import PageCard from "../../../components/ui/PageCard";
 import styles from "../Home/style.module.css";
+import localStyles from "./style.module.css";
 import DataTable from "../../../components/ui/DataTable";
 
 function Relatorios() {
@@ -161,7 +162,7 @@ function Relatorios() {
 
         setError(
           err.response?.data?.mensagem ||
-          "Não foi possível carregar o relatório.",
+            "Não foi possível carregar o relatório.",
         );
       } finally {
         setLoading(false);
@@ -328,7 +329,6 @@ function Relatorios() {
 
         return resultado;
       });
-
   }, [
     funcionarios,
     tarefas,
@@ -513,7 +513,7 @@ function Relatorios() {
             className={ordemMetrica === "emAndamento" ? styles.ativo : ""}
             onClick={() => {
               setOrdemMetrica((prev) =>
-                prev === "emAndamento" ? "" : "emAndamento"
+                prev === "emAndamento" ? "" : "emAndamento",
               );
               setOrdemNome(null);
               setOrdemData(null);
@@ -526,7 +526,7 @@ function Relatorios() {
             className={ordemMetrica === "concluidas" ? styles.ativo : ""}
             onClick={() => {
               setOrdemMetrica((prev) =>
-                prev === "concluidas" ? "" : "concluidas"
+                prev === "concluidas" ? "" : "concluidas",
               );
               setOrdemNome(null);
               setOrdemData(null);
@@ -539,7 +539,7 @@ function Relatorios() {
             className={ordemMetrica === "canceladas" ? styles.ativo : ""}
             onClick={() => {
               setOrdemMetrica((prev) =>
-                prev === "canceladas" ? "" : "canceladas"
+                prev === "canceladas" ? "" : "canceladas",
               );
               setOrdemNome(null);
               setOrdemData(null);
@@ -573,21 +573,110 @@ function Relatorios() {
         {error && <p style={{ color: "red" }}>{error}</p>}
 
         {!loading && !error && (
-          <DataTable
-            columns={columns}
-            data={listaFiltrada}
-            sortKey={
-              ordemNome
-                ? "nome"
-                : ordemData
-                  ? "dataCriacao"
-                  : ordemMetrica || null
-            }
-            sortDirection={ordemNome || ordemData || (ordemMetrica ? "maior" : null)}
-            onSort={handleSort}
-            emptyMessage="Nenhum resultado encontrado"
-            variant="relatorios"
-          />
+          <>
+            <div className={localStyles.hideOnMobile}>
+              <DataTable
+                columns={columns}
+                data={listaFiltrada}
+                sortKey={
+                  ordemNome
+                    ? "nome"
+                    : ordemData
+                      ? "dataCriacao"
+                      : ordemMetrica || null
+                }
+                sortDirection={
+                  ordemNome || ordemData || (ordemMetrica ? "maior" : null)
+                }
+                onSort={handleSort}
+                emptyMessage="Nenhum resultado encontrado"
+                variant="relatorios"
+              />
+            </div>
+
+            <div className={localStyles.showOnMobile}>
+              {listaFiltrada.length === 0 ? (
+                <p className={localStyles.textCenter}>
+                  Nenhum resultado encontrado
+                </p>
+              ) : (
+                <div className={localStyles.cardList}>
+                  {listaFiltrada.map((item) => (
+                    <article key={item.id} className={localStyles.reportCard}>
+                      <div className={localStyles.cardHeader}>
+                        <h2>{item.nome}</h2>
+                      </div>
+
+                      <div className={localStyles.cardBody}>
+                        <div className={localStyles.cardGrid}>
+                          <div className={localStyles.cardField}>
+                            <span className={localStyles.cardLabel}>Cargo</span>
+                            <span className={localStyles.cardValue}>
+                              {item.cargo}
+                            </span>
+                          </div>
+
+                          <div className={localStyles.cardField}>
+                            <span className={localStyles.cardLabel}>Setor</span>
+                            <span className={localStyles.cardValue}>
+                              {item.setor}
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className={localStyles.cardGrid}>
+                          <div className={localStyles.cardField}>
+                            <span className={localStyles.cardLabel}>Data</span>
+                            <span className={localStyles.cardValue}>
+                              {item.dataCriacao}
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className={localStyles.cardGrid}>
+                          <div className={localStyles.cardField}>
+                            <span className={localStyles.cardLabel}>
+                              Em andamento
+                            </span>
+                            <span className={localStyles.cardValue}>
+                              {item.emAndamento}
+                            </span>
+                          </div>
+
+                          <div className={localStyles.cardField}>
+                            <span className={localStyles.cardLabel}>
+                              Concluídas
+                            </span>
+                            <span className={localStyles.cardValue}>
+                              {item.concluidas}
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className={localStyles.cardGrid}>
+                          <div className={localStyles.cardField}>
+                            <span className={localStyles.cardLabel}>
+                              Canceladas
+                            </span>
+                            <span className={localStyles.cardValue}>
+                              {item.canceladas}
+                            </span>
+                          </div>
+
+                          <div className={localStyles.cardField}>
+                            <span className={localStyles.cardLabel}>Total</span>
+                            <span className={localStyles.cardValue}>
+                              {item.total}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              )}
+            </div>
+          </>
         )}
 
         <div className={styles.footerActions}>
@@ -599,7 +688,5 @@ function Relatorios() {
     </PageLayout>
   );
 }
-
-
 
 export default Relatorios;

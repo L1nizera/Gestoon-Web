@@ -271,6 +271,18 @@ body {
   display: grid;
   gap: 1rem;
   margin-top: 1.5rem;
+  max-height: calc(75vh - 180px);
+  overflow-y: auto;
+  padding-right: 0.5rem;
+}
+
+.cardList::-webkit-scrollbar {
+  width: 8px;
+}
+
+.cardList::-webkit-scrollbar-thumb {
+  background: var(--color-gray-300);
+  border-radius: 8px;
 }
 
 .taskCard {
