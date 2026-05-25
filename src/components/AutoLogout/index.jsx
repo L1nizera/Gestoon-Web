@@ -18,10 +18,28 @@ export default function AutoLogout() {
 
   const [mostrarModal, setMostrarModal] = useState(false);
   const [countdown, setCountdown] = useState(0);
+
   const deslogarUsuario = () => {
+    // Limpar todos os dados de autenticação
+    setMostrarModal(false);
+    clearInterval(countdownIntervalRef.current);
+    clearTimeout(logoutTimerRef.current);
+    clearTimeout(warningTimerRef.current);
+
+    // Limpar localStorage
+    localStorage.removeItem("gestoon:user");
+    localStorage.removeItem("gestoon:token");
+    localStorage.removeItem(CHAVE_ATIVIDADE);
+
+    // Limpar sessionStorage
+    sessionStorage.removeItem("gestoon:user");
+    sessionStorage.removeItem("gestoon:token");
+
+    // Executar logout do contexto
     logout();
 
-    navigate("/", { replace: true });
+    // Redirecionar para login
+    navigate("/login", { replace: true });
   };
 
   const atualizarUltimaAtividade = () => {
@@ -37,12 +55,17 @@ export default function AutoLogout() {
 
     setCountdown(segundosRestantes);
 
-    clearInterval(countdownIntervalRef.current);
+    // Limpar intervalo anterior se existir para evitar duplicados
+    if (countdownIntervalRef.current !== null) {
+      clearInterval(countdownIntervalRef.current);
+    }
 
     countdownIntervalRef.current = setInterval(() => {
       setCountdown((prev) => {
+        // Quando chegar em 1, retorna 0 e limpa o intervalo
         if (prev <= 1) {
           clearInterval(countdownIntervalRef.current);
+          countdownIntervalRef.current = null;
           return 0;
         }
 
@@ -54,13 +77,25 @@ export default function AutoLogout() {
   const resetTimer = () => {
     if (mostrarModal) {
       setMostrarModal(false);
-      clearInterval(countdownIntervalRef.current);
+      // Limpar o intervalo de countdown para evitar que continue rodando
+      if (countdownIntervalRef.current !== null) {
+        clearInterval(countdownIntervalRef.current);
+        countdownIntervalRef.current = null;
+      }
+      setCountdown(0);
     }
 
     atualizarUltimaAtividade();
 
-    clearTimeout(logoutTimerRef.current);
-    clearTimeout(warningTimerRef.current);
+    // Limpar timers anteriores para evitar duplicados
+    if (logoutTimerRef.current !== null) {
+      clearTimeout(logoutTimerRef.current);
+      logoutTimerRef.current = null;
+    }
+    if (warningTimerRef.current !== null) {
+      clearTimeout(warningTimerRef.current);
+      warningTimerRef.current = null;
+    }
 
     // aviso
     warningTimerRef.current = setTimeout(() => {
@@ -87,8 +122,13 @@ export default function AutoLogout() {
 
   const continuarConectado = () => {
     setMostrarModal(false);
+    setCountdown(0);
 
-    clearInterval(countdownIntervalRef.current);
+    // Limpar o intervalo de countdown para evitar que continue rodando
+    if (countdownIntervalRef.current !== null) {
+      clearInterval(countdownIntervalRef.current);
+      countdownIntervalRef.current = null;
+    }
 
     resetTimer();
   };
@@ -131,6 +171,10 @@ export default function AutoLogout() {
       clearTimeout(warningTimerRef.current);
       clearInterval(countdownIntervalRef.current);
 
+      logoutTimerRef.current = null;
+      warningTimerRef.current = null;
+      countdownIntervalRef.current = null;
+
       eventos.forEach((evento) => {
         window.removeEventListener(evento, resetTimer);
       });
@@ -138,6 +182,18 @@ export default function AutoLogout() {
       window.removeEventListener("storage", sincronizarAbas);
     };
   }, [user]);
+
+  // Efeito para disparar logout automático quando o contador chegar em 0
+  useEffect(() => {
+    if (mostrarModal && countdown === 0) {
+      // Aguarda um pequeno delay para garantir que o estado foi atualizado
+      const logoutTimer = setTimeout(() => {
+        deslogarUsuario();
+      }, 100);
+
+      return () => clearTimeout(logoutTimer);
+    }
+  }, [mostrarModal, countdown]);
 
   return (
     <>
