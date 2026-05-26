@@ -145,9 +145,8 @@ function Home() {
       align: "center",
       render: (row) => (
         <span
-          className={`${styles.badge} ${
-            styles[statusMap[row.status]] || styles.statusPendente
-          }`}
+          className={`${styles.badge} ${styles[statusMap[row.status]] || styles.statusPendente
+            }`}
         >
           {row.status}
         </span>
@@ -294,6 +293,34 @@ function Home() {
     return numero;
   }
 
+  const LIMITE_ESTIMATIVA_MINUTOS = 7 * 24 * 60;
+
+  function converterMinutosParaUnidade(minutos, unidade) {
+    const valor = Number(minutos);
+
+    if (!valor || Number.isNaN(valor)) {
+      return "";
+    }
+
+    let convertido = valor;
+
+    if (unidade === "horas") {
+      convertido = valor / 60;
+    }
+
+    if (unidade === "dias") {
+      convertido = valor / 1440;
+    }
+
+    return Number.isInteger(convertido)
+      ? convertido
+      : Number(convertido.toFixed(2));
+  }
+
+  function validarLimiteEstimativa(minutos) {
+    return minutos <= LIMITE_ESTIMATIVA_MINUTOS;
+  }
+
   async function buscarFuncionariosMap() {
     const response = await api.get("/funcionarios");
 
@@ -431,9 +458,9 @@ function Home() {
       if (primeiraCargaRef.current) {
         setError(
           err.response?.data?.mensagem ||
-            err.response?.data?.dados ||
-            err.message ||
-            "Não foi possível carregar as tarefas.",
+          err.response?.data?.dados ||
+          err.message ||
+          "Não foi possível carregar as tarefas.",
         );
       }
     } finally {
@@ -540,8 +567,8 @@ function Home() {
 
       alert(
         err.response?.data?.dados ||
-          err.response?.data?.mensagem ||
-          "Erro ao excluir tarefa. Verifique a API.",
+        err.response?.data?.mensagem ||
+        "Erro ao excluir tarefa. Verifique a API.",
       );
     }
   }
@@ -553,6 +580,7 @@ function Home() {
       ...task,
       estimativaValor: task.estimativaMinutos || "",
       estimativaUnidade: "minutos",
+      estimativaMinutosBase: Number(task.estimativaMinutos) || 0,
     });
   }
 
@@ -596,6 +624,11 @@ function Home() {
       return;
     }
 
+    if (!validarLimiteEstimativa(estimativaEmMinutos)) {
+      avisarCampo("Estimativa", "o prazo máximo permitido é de 7 dias.");
+      return;
+    }
+
     try {
       const payload = {
         titulo: editTask.titulo.trim(),
@@ -603,7 +636,7 @@ function Home() {
         prioridade,
         setorId,
         criadoPor: 1,
-        estimativaMinutos: Number(editTask.estimativaMinutos),
+        estimativaMinutos: estimativaEmMinutos,
         status,
         funcionarioId: 1,
       };
@@ -623,8 +656,8 @@ function Home() {
 
       showToast(
         err.response?.data?.dados ||
-          err.response?.data?.mensagem ||
-          "Erro ao editar tarefa. Verifique os dados informados.",
+        err.response?.data?.mensagem ||
+        "Erro ao editar tarefa. Verifique os dados informados.",
         "error",
       );
     }
@@ -667,8 +700,14 @@ function Home() {
       novaTask.estimativaUnidade,
     );
 
+
     if (!estimativaEmMinutos) {
       avisarCampo("Estimativa", "informe um tempo maior que zero.");
+      return;
+    }
+
+    if (!validarLimiteEstimativa(estimativaEmMinutos)) {
+      avisarCampo("Estimativa", "o prazo máximo permitido é de 7 dias.");
       return;
     }
 
@@ -703,8 +742,8 @@ function Home() {
     } catch (err) {
       showToast(
         err.response?.data?.mensagem ||
-          err.response?.data?.dados ||
-          "Erro ao criar tarefa. Verifique os dados informados.",
+        err.response?.data?.dados ||
+        "Erro ao criar tarefa. Verifique os dados informados.",
         "error",
       );
     }
@@ -1184,9 +1223,8 @@ function Home() {
               <div>
                 <strong>Prioridade:</strong>
                 <span
-                  className={`${styles.badge} ${
-                    styles[prioridadeMap[selectedTask.prioridade]]
-                  }`}
+                  className={`${styles.badge} ${styles[prioridadeMap[selectedTask.prioridade]]
+                    }`}
                 >
                   {selectedTask.prioridade}
                 </span>
@@ -1195,10 +1233,9 @@ function Home() {
               <div>
                 <strong>Status:</strong>
                 <span
-                  className={`${styles.badge} ${
-                    styles[statusMap[selectedTask.status]] ||
+                  className={`${styles.badge} ${styles[statusMap[selectedTask.status]] ||
                     styles.statusPendente
-                  }`}
+                    }`}
                 >
                   {selectedTask.status}
                 </span>
@@ -1359,10 +1396,17 @@ function Home() {
                 <input
                   type="number"
                   min="1"
-                  value={novaTask.estimativaValor}
+                  max={
+                    editTask.estimativaUnidade === "dias"
+                      ? 7
+                      : editTask.estimativaUnidade === "horas"
+                        ? 168
+                        : 10080
+                  }
+                  value={editTask.estimativaValor}
                   onChange={(e) =>
-                    setNovaTask({
-                      ...novaTask,
+                    setEditTask({
+                      ...editTask,
                       estimativaValor: e.target.value,
                     })
                   }
@@ -1373,13 +1417,25 @@ function Home() {
               <div className={styles.formGroup}>
                 <label>Unidade</label>
                 <select
-                  value={novaTask.estimativaUnidade}
-                  onChange={(e) =>
-                    setNovaTask({
-                      ...novaTask,
-                      estimativaUnidade: e.target.value,
-                    })
-                  }
+                  value={editTask.estimativaUnidade}
+                  onChange={(e) => {
+                    const novaUnidade = e.target.value;
+
+                    const minutosAtuais = converterEstimativaParaMinutos(
+                      editTask.estimativaValor,
+                      editTask.estimativaUnidade,
+                    );
+
+                    setEditTask({
+                      ...editTask,
+                      estimativaUnidade: novaUnidade,
+                      estimativaValor: converterMinutosParaUnidade(
+                        minutosAtuais,
+                        novaUnidade,
+                      ),
+                      estimativaMinutosBase: minutosAtuais,
+                    });
+                  }}
                 >
                   <option value="minutos">Minutos</option>
                   <option value="horas">Horas</option>
@@ -1512,19 +1568,54 @@ function Home() {
 
               {/* Estimativa Minutos */}
               <div className={styles.formGroup}>
-                <label>Estimativa em minutos</label>
+                <label>Estimativa</label>
                 <input
                   type="number"
                   min="1"
-                  value={novaTask.estimativaMinutos}
+                  max={
+                    novaTask.estimativaUnidade === "dias"
+                      ? 7
+                      : novaTask.estimativaUnidade === "horas"
+                        ? 168
+                        : 10080
+                  }
+                  value={novaTask.estimativaValor}
                   onChange={(e) =>
                     setNovaTask({
                       ...novaTask,
-                      estimativaMinutos: e.target.value,
+                      estimativaValor: e.target.value,
                     })
                   }
-                  placeholder="Ex: 90"
+                  placeholder="Ex: 2"
                 />
+              </div>
+
+              <div className={styles.formGroup}>
+                <label>Unidade</label>
+                <select
+                  value={novaTask.estimativaUnidade}
+                  onChange={(e) => {
+                    const novaUnidade = e.target.value;
+
+                    const minutosAtuais = converterEstimativaParaMinutos(
+                      novaTask.estimativaValor,
+                      novaTask.estimativaUnidade,
+                    );
+
+                    setNovaTask({
+                      ...novaTask,
+                      estimativaUnidade: novaUnidade,
+                      estimativaValor: converterMinutosParaUnidade(
+                        minutosAtuais,
+                        novaUnidade,
+                      ),
+                    });
+                  }}
+                >
+                  <option value="minutos">Minutos</option>
+                  <option value="horas">Horas</option>
+                  <option value="dias">Dias</option>
+                </select>
               </div>
 
               {/* DESCRIÇÃO */}
@@ -1567,7 +1658,7 @@ function Home() {
                   isMobile
                     ? false
                     : ({ name, percent }) =>
-                        `${name}: ${(percent * 100).toFixed(0)}%`
+                      `${name}: ${(percent * 100).toFixed(0)}%`
                 }
                 labelLine={false}
                 fontSize={isMobile ? 12 : 20}
