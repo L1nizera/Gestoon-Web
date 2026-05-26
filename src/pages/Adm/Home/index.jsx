@@ -31,6 +31,10 @@ function Home() {
   const [imageError, setImageError] = useState(false);
   const { showToast } = useToast();
 
+  function avisarCampo(campo, mensagem) {
+    showToast(`${campo}: ${mensagem}`, "warning");
+  }
+
   const primeiraCargaRef = useRef(true);
   const ultimaChaveTarefasRef = useRef("");
 
@@ -141,8 +145,9 @@ function Home() {
       align: "center",
       render: (row) => (
         <span
-          className={`${styles.badge} ${styles[statusMap[row.status]] || styles.statusPendente
-            }`}
+          className={`${styles.badge} ${
+            styles[statusMap[row.status]] || styles.statusPendente
+          }`}
         >
           {row.status}
         </span>
@@ -154,8 +159,7 @@ function Home() {
       align: "center",
       render: (row) => (
         <span
-          className={`${styles.badge} ${styles[prioridadeMap[row.prioridade]]
-            }`}
+          className={`${styles.badge} ${styles[prioridadeMap[row.prioridade]]}`}
         >
           {row.prioridade}
         </span>
@@ -243,14 +247,51 @@ function Home() {
       return `${valor} min`;
     }
 
-    const horas = Math.floor(valor / 60);
-    const minutosRestantes = valor % 60;
+    if (valor < 1440) {
+      const horas = Math.floor(valor / 60);
+      const minutosRestantes = valor % 60;
 
-    if (minutosRestantes === 0) {
-      return `${horas}h`;
+      if (minutosRestantes === 0) {
+        return `${horas}h`;
+      }
+
+      return `${horas}h ${minutosRestantes}min`;
     }
 
-    return `${horas}h ${minutosRestantes}min`;
+    const dias = Math.floor(valor / 1440);
+    const restoDepoisDias = valor % 1440;
+    const horas = Math.floor(restoDepoisDias / 60);
+    const minutosRestantes = restoDepoisDias % 60;
+
+    let texto = `${dias}d`;
+
+    if (horas > 0) {
+      texto += ` ${horas}h`;
+    }
+
+    if (minutosRestantes > 0) {
+      texto += ` ${minutosRestantes}min`;
+    }
+
+    return texto;
+  }
+
+  function converterEstimativaParaMinutos(valor, unidade) {
+    const numero = Number(valor);
+
+    if (!numero || Number.isNaN(numero) || numero <= 0) {
+      return 0;
+    }
+
+    if (unidade === "horas") {
+      return numero * 60;
+    }
+
+    if (unidade === "dias") {
+      return numero * 24 * 60;
+    }
+
+    return numero;
   }
 
   async function buscarFuncionariosMap() {
@@ -323,12 +364,14 @@ function Home() {
         );
 
         const fotosDaTarefa = fotosPorTarefaId[Number(tarefa.tar_id)] || [];
-        const fotoDaTarefa = fotosDaTarefa
-          .slice()
-          .sort((a, b) =>
-            new Date(b.fot_data_envio).getTime() -
-            new Date(a.fot_data_envio).getTime(),
-          )[0] || null;
+        const fotoDaTarefa =
+          fotosDaTarefa
+            .slice()
+            .sort(
+              (a, b) =>
+                new Date(b.fot_data_envio).getTime() -
+                new Date(a.fot_data_envio).getTime(),
+            )[0] || null;
 
         const nomeFoto = tarefa.fot_nome || fotoDaTarefa?.fot_nome;
 
@@ -363,8 +406,6 @@ function Home() {
           horaCriacao,
 
           descricao: tarefa.tar_descricao || "Sem descrição",
-
-
         };
       });
 
@@ -390,9 +431,9 @@ function Home() {
       if (primeiraCargaRef.current) {
         setError(
           err.response?.data?.mensagem ||
-          err.response?.data?.dados ||
-          err.message ||
-          "Não foi possível carregar as tarefas.",
+            err.response?.data?.dados ||
+            err.message ||
+            "Não foi possível carregar as tarefas.",
         );
       }
     } finally {
@@ -434,7 +475,8 @@ function Home() {
     setor: "Administrativo",
     prioridade: "Média",
     status: "Pendente",
-    estimativaMinutos: "",
+    estimativaValor: "",
+    estimativaUnidade: "minutos",
     descricao: "",
   });
 
@@ -498,20 +540,30 @@ function Home() {
 
       alert(
         err.response?.data?.dados ||
-        err.response?.data?.mensagem ||
-        "Erro ao excluir tarefa. Verifique a API.",
+          err.response?.data?.mensagem ||
+          "Erro ao excluir tarefa. Verifique a API.",
       );
     }
   }
 
   function abrirEdicao(task) {
-    setSelectedTask(null); // fecha o modal atual
-    setEditTask({ ...task });
+    setSelectedTask(null);
+
+    setEditTask({
+      ...task,
+      estimativaValor: task.estimativaMinutos || "",
+      estimativaUnidade: "minutos",
+    });
   }
 
   async function salvarEdicao() {
     if (!editTask.titulo.trim()) {
-      alert("O título da tarefa é obrigatório.");
+      avisarCampo("Título", "informe o nome da tarefa.");
+      return;
+    }
+
+    if (!editTask.descricao.trim()) {
+      avisarCampo("Descrição", "informe o que precisa ser feito na tarefa.");
       return;
     }
 
@@ -520,24 +572,34 @@ function Home() {
     const status = statusToApiMap[editTask.status];
 
     if (!setorId) {
-      alert("Setor inválido.");
+      avisarCampo("Setor", "selecione um setor válido.");
       return;
     }
 
     if (!prioridade) {
-      alert("Prioridade inválida.");
+      avisarCampo("Prioridade", "selecione uma prioridade válida.");
       return;
     }
 
     if (status === undefined) {
-      alert("Status inválido.");
+      avisarCampo("Status", "selecione um status válido.");
+      return;
+    }
+
+    const estimativaEmMinutos = converterEstimativaParaMinutos(
+      editTask.estimativaValor,
+      editTask.estimativaUnidade,
+    );
+
+    if (!estimativaEmMinutos) {
+      avisarCampo("Estimativa", "informe um tempo maior que zero.");
       return;
     }
 
     try {
       const payload = {
-        titulo: editTask.titulo,
-        descricao: editTask.descricao,
+        titulo: editTask.titulo.trim(),
+        descricao: editTask.descricao.trim(),
         prioridade,
         setorId,
         criadoPor: 1,
@@ -546,54 +608,79 @@ function Home() {
         funcionarioId: 1,
       };
 
-      console.log("Payload edição tarefa:", payload);
-
       await api.patch(`/tarefas/${editTask.tarefaId}`, payload);
 
       await fetchDados();
 
       setEditTask(null);
+
+      showToast("Tarefa atualizada com sucesso.", "success");
     } catch (err) {
       console.error(
         "Erro ao editar tarefa:",
         err.response?.data || err.message,
       );
 
-      alert(
+      showToast(
         err.response?.data?.dados ||
-        err.response?.data?.mensagem ||
-        "Erro ao editar tarefa. Verifique a API.",
+          err.response?.data?.mensagem ||
+          "Erro ao editar tarefa. Verifique os dados informados.",
+        "error",
       );
     }
   }
 
   async function criarTask() {
     if (!novaTask.titulo.trim()) {
-      showToast("O título da tarefa é obrigatório.", "warning");
+      avisarCampo("Título", "informe o nome da tarefa.");
+      return;
+    }
+
+    if (!novaTask.descricao.trim()) {
+      avisarCampo("Descrição", "informe o que precisa ser feito na tarefa.");
       return;
     }
 
     const setorId = setorToApiMap[novaTask.setor];
 
     if (!setorId) {
-      showToast("Setor inválido.", "warning");
+      avisarCampo("Setor", "selecione um setor válido.");
       return;
     }
 
-    if (!novaTask.estimativaMinutos || Number(novaTask.estimativaMinutos) <= 0) {
-      showToast("Informe uma estimativa válida em minutos.", "warning");
+    const prioridade = prioridadeToApiMap[novaTask.prioridade];
+
+    if (!prioridade) {
+      avisarCampo("Prioridade", "selecione uma prioridade válida.");
+      return;
+    }
+
+    const status = statusToApiMap[novaTask.status];
+
+    if (status === undefined) {
+      avisarCampo("Status", "selecione um status válido.");
+      return;
+    }
+
+    const estimativaEmMinutos = converterEstimativaParaMinutos(
+      novaTask.estimativaValor,
+      novaTask.estimativaUnidade,
+    );
+
+    if (!estimativaEmMinutos) {
+      avisarCampo("Estimativa", "informe um tempo maior que zero.");
       return;
     }
 
     try {
       const payload = {
-        titulo: novaTask.titulo,
-        descricao: novaTask.descricao,
-        prioridade: prioridadeToApiMap[novaTask.prioridade],
+        titulo: novaTask.titulo.trim(),
+        descricao: novaTask.descricao.trim(),
+        prioridade,
         setorId,
         criadoPor: 1,
-        estimativaMinutos: Number(novaTask.estimativaMinutos),
-        status: statusToApiMap[novaTask.status],
+        estimativaMinutos: estimativaEmMinutos,
+        status,
         funcionarioId: 1,
       };
 
@@ -605,7 +692,8 @@ function Home() {
         setor: "Administrativo",
         prioridade: "Média",
         status: "Pendente",
-        estimativaMinutos: "",
+        estimativaValor: "",
+        estimativaUnidade: "minutos",
         descricao: "",
       });
 
@@ -615,9 +703,9 @@ function Home() {
     } catch (err) {
       showToast(
         err.response?.data?.mensagem ||
-        err.response?.data?.dados ||
-        "Erro ao criar tarefa.",
-        "error"
+          err.response?.data?.dados ||
+          "Erro ao criar tarefa. Verifique os dados informados.",
+        "error",
       );
     }
   }
@@ -998,16 +1086,8 @@ function Home() {
             data={lista}
             rowKey="id"
             onRowClick={setSelectedTask}
-            sortKey={
-              ordemTitulo
-                ? "titulo"
-                : ordemData
-                  ? "dataCriacao"
-                  : null
-            }
-            sortDirection={
-              ordemTitulo || ordemData
-            }
+            sortKey={ordemTitulo ? "titulo" : ordemData ? "dataCriacao" : null}
+            sortDirection={ordemTitulo || ordemData}
             onSort={handleSort}
             emptyMessage="Nenhuma tarefa encontrada"
             variant="tarefas"
@@ -1104,8 +1184,9 @@ function Home() {
               <div>
                 <strong>Prioridade:</strong>
                 <span
-                  className={`${styles.badge} ${styles[prioridadeMap[selectedTask.prioridade]]
-                    }`}
+                  className={`${styles.badge} ${
+                    styles[prioridadeMap[selectedTask.prioridade]]
+                  }`}
                 >
                   {selectedTask.prioridade}
                 </span>
@@ -1114,9 +1195,10 @@ function Home() {
               <div>
                 <strong>Status:</strong>
                 <span
-                  className={`${styles.badge} ${styles[statusMap[selectedTask.status]] ||
+                  className={`${styles.badge} ${
+                    styles[statusMap[selectedTask.status]] ||
                     styles.statusPendente
-                    }`}
+                  }`}
                 >
                   {selectedTask.status}
                 </span>
@@ -1188,10 +1270,8 @@ function Home() {
                 </div>
               </div>
             )}
-
           </Modal>
         )}
-
 
         {/* ===== MODAL EDITAR ===== */}
         {editTask && (
@@ -1208,11 +1288,7 @@ function Home() {
                   Cancelar
                 </button>
 
-                <button
-                  className={styles.btnPrimary}
-                  onClick={salvarEdicao}
-                  disabled={!editTask.titulo}
-                >
+                <button className={styles.btnPrimary} onClick={salvarEdicao}>
                   Salvar
                 </button>
               </>
@@ -1279,19 +1355,36 @@ function Home() {
               </div>
 
               <div className={styles.formGroup}>
-                <label>Estimativa em minutos</label>
+                <label>Estimativa</label>
                 <input
                   type="number"
                   min="1"
-                  value={editTask.estimativaMinutos}
+                  value={novaTask.estimativaValor}
                   onChange={(e) =>
-                    setEditTask({
-                      ...editTask,
-                      estimativaMinutos: e.target.value,
-                      estimativaFormatada: formatarEstimativa(e.target.value),
+                    setNovaTask({
+                      ...novaTask,
+                      estimativaValor: e.target.value,
                     })
                   }
+                  placeholder="Ex: 2"
                 />
+              </div>
+
+              <div className={styles.formGroup}>
+                <label>Unidade</label>
+                <select
+                  value={novaTask.estimativaUnidade}
+                  onChange={(e) =>
+                    setNovaTask({
+                      ...novaTask,
+                      estimativaUnidade: e.target.value,
+                    })
+                  }
+                >
+                  <option value="minutos">Minutos</option>
+                  <option value="horas">Horas</option>
+                  <option value="dias">Dias</option>
+                </select>
               </div>
 
               <div className={`${styles.formGroup} ${styles.full}`}>
@@ -1325,7 +1418,8 @@ function Home() {
                       setor: "Administrativo",
                       prioridade: "Média",
                       status: "Pendente",
-                      estimativaMinutos: "",
+                      estimativaValor: "",
+                      estimativaUnidade: "minutos",
                       descricao: "",
                     });
                   }}
@@ -1341,7 +1435,8 @@ function Home() {
                       setor: "Administrativo",
                       prioridade: "Média",
                       status: "Pendente",
-                      estimativaMinutos: "",
+                      estimativaValor: "",
+                      estimativaUnidade: "minutos",
                       descricao: "",
                     })
                   }
@@ -1349,11 +1444,7 @@ function Home() {
                   Limpar
                 </button>
 
-                <button
-                  className={styles.btnPrimary}
-                  onClick={criarTask}
-                  disabled={!novaTask.titulo}
-                >
+                <button className={styles.btnPrimary} onClick={criarTask}>
                   Criar
                 </button>
               </>
@@ -1476,7 +1567,7 @@ function Home() {
                   isMobile
                     ? false
                     : ({ name, percent }) =>
-                      `${name}: ${(percent * 100).toFixed(0)}%`
+                        `${name}: ${(percent * 100).toFixed(0)}%`
                 }
                 labelLine={false}
                 fontSize={isMobile ? 12 : 20}

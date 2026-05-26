@@ -679,7 +679,9 @@ select {
 .colunaAtiva {
   background: var(--button-primary-bg) !important;
   color: var(--color-white);
-  animation: pulse;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
 }
 
 /* ===== ANIMAÇÕES GERAIS ===== */
@@ -716,12 +718,12 @@ button {
 }
 
 button:hover {
-  transform: translateY(-0.2rem);
-  box-shadow: 0 0.5rem 1.2rem rgba(0, 0, 0, 0.15);
+  transform: translateY(-0.12rem);
+  box-shadow: 0 0.5rem 1.2rem rgba(0, 0, 0, 0.13);
 }
 
 button:active {
-  transform: scale(0.97);
+  transform: translateY(0) scale(0.98);
 }
 
 button:focus,
@@ -1140,4 +1142,130 @@ th:focus {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/* ===== ANIMAÇÕES SUAVES DE ENTRADA ===== */
+
+@keyframes pageEnter {
+  from {
+    opacity: 0;
+    transform: translateY(1rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes cardEnter {
+  from {
+    opacity: 0;
+    transform: translateY(0.8rem) scale(0.985);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes listEnter {
+  from {
+    opacity: 0;
+    transform: translateY(0.6rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.cardContainer {
+  animation: pageEnter 0.32s ease both;
+}
+
+.resumo > div {
+  animation: cardEnter 0.28s ease both;
+}
+
+.resumo > div:nth-child(1) {
+  animation-delay: 0.03s;
+}
+
+.resumo > div:nth-child(2) {
+  animation-delay: 0.06s;
+}
+
+.resumo > div:nth-child(3) {
+  animation-delay: 0.09s;
+}
+
+.resumo > div:nth-child(4) {
+  animation-delay: 0.12s;
+}
+
+.resumo > div:nth-child(5) {
+  animation-delay: 0.15s;
+}
+
+.topActions,
+.filtrosAvancados,
+.filtros,
+.acoes,
+.footerActions,
+.grafico {
+  animation: listEnter 0.3s ease both;
+}
+
+.filtrosAvancados {
+  animation-delay: 0.04s;
+}
+
+.filtros {
+  animation-delay: 0.07s;
+}
+
+.acoes {
+  animation-delay: 0.1s;
+}
+
+.grafico {
+  animation-delay: 0.12s;
+}
+
+.tabelaContainer {
+  animation: listEnter 0.32s ease both;
+}
+
+.tabela tbody tr {
+  transition:
+    background 0.18s ease,
+    box-shadow 0.18s ease,
+    transform 0.18s ease;
+}
+
+.tabela tbody tr:hover {
+  transform: translateX(0.15rem);
+}
+
+input,
+select,
+textarea {
+  transition:
+    border-color 0.18s ease,
+    box-shadow 0.18s ease,
+    background 0.18s ease,
+    transform 0.18s ease;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow:
+    0 0 0 0.25rem rgba(37, 99, 235, 0.18),
+    0 0.4rem 1rem rgba(0, 0, 0, 0.1);
 }

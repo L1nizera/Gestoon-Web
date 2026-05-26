@@ -1,59 +1,71 @@
 .overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.5);
-  z-index: 999;
+  z-index: 9999;
+
+  background: rgba(0, 0, 0, 0.5);
+
+  animation: overlayFadeIn 0.18s ease both;
 }
 
 .modal {
   position: fixed;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
+  z-index: 10000;
+
   width: 90%;
   max-width: 60rem;
+  max-height: 88vh;
+
   background: var(--bg-card);
   padding: 2rem;
   border-radius: 1.2rem;
-  z-index: 1000;
-  box-shadow: 0 2rem 5rem rgba(0,0,0,0.25);
+  box-shadow: 0 2rem 5rem rgba(0, 0, 0, 0.25);
+
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+
+  transform: translate(-50%, -50%);
+  animation: modalEnterFixed 0.22s ease both;
 }
 
-/* ===== Estrutura ===== */
-
 .header {
+  flex-shrink: 0;
   margin-bottom: 1rem;
 }
 
 .body {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 0.8rem;
   margin-bottom: 1.5rem;
+  overscroll-behavior: contain;
 }
-
-/* ===== AÇÕES (PADRÃO) ===== */
 
 .actions {
+  flex-shrink: 0;
+
   display: flex;
   gap: 1rem;
+
+  padding-top: 1.2rem;
+  border-top: 0.1rem solid var(--border-default);
+  background: var(--bg-card);
 }
 
-/* VARIAÇÕES */
-
-/* botões à direita (editar) */
 .default {
   justify-content: flex-end;
 }
 
-/* distribuído (visualização) */
 .between {
   justify-content: space-between;
 }
 
-/* centralizado */
 .center {
   justify-content: center;
 }
-
-/* ===== BOTÕES ===== */
 
 .actions button {
   padding: 0.6rem 1.2rem;
@@ -62,4 +74,39 @@
   border: none;
   cursor: pointer;
   width: auto;
+}
+
+@keyframes overlayFadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes modalEnterFixed {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -46%) scale(0.97);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+@media (max-width: 768px) {
+  .modal {
+    width: 94%;
+    max-width: 94%;
+    max-height: 90vh;
+    padding: 1.5rem;
+  }
+
+  .actions {
+    flex-wrap: wrap;
+  }
 }

@@ -41,8 +41,9 @@ const columns = [
     align: "center",
     render: (row) => (
       <span
-        className={`${styles.badge} ${styles[statusMap[row.status]] || styles.statusPendente
-          }`}
+        className={`${styles.badge} ${
+          styles[statusMap[row.status]] || styles.statusPendente
+        }`}
       >
         {row.status}
       </span>
@@ -54,8 +55,9 @@ const columns = [
     align: "center",
     render: (row) => (
       <span
-        className={`${styles.badge} ${styles[prioridadeMap[row.prioridade]] || styles.prioridadeMedia
-          }`}
+        className={`${styles.badge} ${
+          styles[prioridadeMap[row.prioridade]] || styles.prioridadeMedia
+        }`}
       >
         {row.prioridade}
       </span>
@@ -88,6 +90,16 @@ const columns = [
   },
 ];
 
+function resolverUrlFoto(fotNome) {
+  if (!fotNome) return null;
+
+  if (fotNome.startsWith("http://") || fotNome.startsWith("https://")) {
+    return fotNome;
+  }
+
+  return `http://localhost:3333/uploads/tarefas/${fotNome}`;
+}
+
 export default function MinhasTarefas() {
   const [taskList, setTaskList] = useState([]);
   const { user } = useAuth();
@@ -112,6 +124,13 @@ export default function MinhasTarefas() {
     setFotoTarefa(null);
     setPreviewFoto(task.foto || null);
     setDescricaoFoto(task.fotoDescricao || "");
+  }
+
+  function limparModal() {
+    setSelectedTask(null);
+    setFotoTarefa(null);
+    setPreviewFoto(null);
+    setDescricaoFoto("");
   }
 
   function handleFotoChange(event) {
@@ -139,20 +158,29 @@ export default function MinhasTarefas() {
 
   function validarFotoAntesDeFinalizar() {
     if (fotoTarefa && !descricaoFoto.trim()) {
-      showToast("Informe uma descrição para a foto enviada.", "warning");
+      showToast(
+        "Descrição da foto: informe uma descrição antes de confirmar ou cancelar a tarefa.",
+        "warning",
+      );
       return false;
     }
 
     return true;
   }
-
+  
   async function confirmarTarefa() {
     if (!selectedTask) return;
 
     if (!validarFotoAntesDeFinalizar()) return;
 
-    if (selectedTask.status === "Concluída" || selectedTask.status === "Cancelada") {
-      showToast("Esta tarefa já foi finalizada e não pode ser alterada.", "warning");
+    if (
+      selectedTask.status === "Concluída" ||
+      selectedTask.status === "Cancelada"
+    ) {
+      showToast(
+        "Esta tarefa já foi finalizada e não pode ser alterada.",
+        "warning",
+      );
       return;
     }
 
@@ -187,9 +215,9 @@ export default function MinhasTarefas() {
 
       showToast(
         error.response?.data?.mensagem ||
-        error.response?.data?.dados ||
-        error.message ||
-        "Erro ao confirmar tarefa.",
+          error.response?.data?.dados ||
+          error.message ||
+          "Erro ao confirmar tarefa.",
         "error",
       );
     }
@@ -200,8 +228,14 @@ export default function MinhasTarefas() {
 
     if (!validarFotoAntesDeFinalizar()) return;
 
-    if (selectedTask.status === "Concluída" || selectedTask.status === "Cancelada") {
-      showToast("Esta tarefa já foi finalizada e não pode ser alterada.", "warning");
+    if (
+      selectedTask.status === "Concluída" ||
+      selectedTask.status === "Cancelada"
+    ) {
+      showToast(
+        "Esta tarefa já foi finalizada e não pode ser alterada.",
+        "warning",
+      );
       return;
     }
 
@@ -236,9 +270,9 @@ export default function MinhasTarefas() {
 
       showToast(
         error.response?.data?.mensagem ||
-        error.response?.data?.dados ||
-        error.message ||
-        "Erro ao cancelar tarefa.",
+          error.response?.data?.dados ||
+          error.message ||
+          "Erro ao cancelar tarefa.",
         "error",
       );
     }
@@ -260,12 +294,17 @@ export default function MinhasTarefas() {
 
       const todas = tarefasResponse.data.dados || [];
       const fotos = fotosResponse.data.dados || [];
+
+      console.log("USUARIO LOGADO:", user);
+      console.log("TODAS AS TAREFAS:", todas);
+      console.log("FOTOS:", fotos);
+
       const minhas = todas
 
         .filter(
           (t) =>
             Number(t.atr_funcionario_id) === Number(user.funcionarioId) &&
-            Number(t.atr_status) !== 0
+            Number(t.atr_status) !== 0,
         )
         .map((tarefa) => {
           console.log("USER:", user);
@@ -274,11 +313,13 @@ export default function MinhasTarefas() {
           const data = new Date(tarefa.tar_data_criacao);
 
           const fotosDaTarefa = fotos
-            .filter((foto) => Number(foto.fot_tarefa_id) === Number(tarefa.tar_id))
+            .filter(
+              (foto) => Number(foto.fot_tarefa_id) === Number(tarefa.tar_id),
+            )
             .sort(
               (a, b) =>
                 new Date(b.fot_data_envio).getTime() -
-                new Date(a.fot_data_envio).getTime()
+                new Date(a.fot_data_envio).getTime(),
             );
 
           const fotoDaTarefa = fotosDaTarefa[0] || null;
@@ -286,8 +327,6 @@ export default function MinhasTarefas() {
           console.log("FOTO DA TAREFA:", tarefa.tar_id, fotoDaTarefa);
 
           return {
-
-
             id: tarefa.tar_id,
             titulo: tarefa.tar_titulo,
 
@@ -300,7 +339,8 @@ export default function MinhasTarefas() {
 
             statusNumero: Number(tarefa.atr_status),
 
-            prioridade: prioridadeApiMap[Number(tarefa.tar_prioridade)] || "Média",
+            prioridade:
+              prioridadeApiMap[Number(tarefa.tar_prioridade)] || "Média",
             prioridadeId: Number(tarefa.tar_prioridade),
 
             setor: tarefa.set_nome || "-",
@@ -318,13 +358,13 @@ export default function MinhasTarefas() {
               minute: "2-digit",
             }),
 
-            foto: fotoDaTarefa?.fot_nome
-              ? `http://localhost:3333/uploads/tarefas/${fotoDaTarefa.fot_nome}`
-              : null,
+            foto: resolverUrlFoto(fotoDaTarefa?.fot_nome),
             fotoDescricao: fotoDaTarefa?.fot_descricao || "",
-
+            temRegistroFoto: Boolean(fotoDaTarefa),
           };
         });
+
+      console.log("MINHAS TAREFAS FILTRADAS:", minhas);
 
       setTaskList(minhas);
     } catch (error) {
@@ -338,15 +378,17 @@ export default function MinhasTarefas() {
         (task) =>
           task.status === "Em andamento" ||
           task.status === "Concluída" ||
-          task.status === "Cancelada"
+          task.status === "Cancelada",
       ),
-    [taskList]
+    [taskList],
   );
 
   const setores = useMemo(
     () =>
-      Array.from(new Set(taskList.map((task) => task.setor).filter(Boolean))).sort(),
-    [taskList]
+      Array.from(
+        new Set(taskList.map((task) => task.setor).filter(Boolean)),
+      ).sort(),
+    [taskList],
   );
 
   const filteredTarefas = useMemo(() => {
@@ -359,7 +401,7 @@ export default function MinhasTarefas() {
           task.titulo.toLowerCase().includes(texto) ||
           task.descricao.toLowerCase().includes(texto) ||
           task.criadoPor.toLowerCase().includes(texto) ||
-          task.setor.toLowerCase().includes(texto)
+          task.setor.toLowerCase().includes(texto),
       );
     }
 
@@ -368,7 +410,9 @@ export default function MinhasTarefas() {
     }
 
     if (prioridadeFiltro) {
-      resultado = resultado.filter((task) => task.prioridade === prioridadeFiltro);
+      resultado = resultado.filter(
+        (task) => task.prioridade === prioridadeFiltro,
+      );
     }
 
     if (setorFiltro) {
@@ -393,7 +437,7 @@ export default function MinhasTarefas() {
         if (task.status === "Cancelada") acc.cancelada += 1;
         return acc;
       },
-      { andamento: 0, concluida: 0, cancelada: 0 }
+      { andamento: 0, concluida: 0, cancelada: 0 },
     );
   }, [taskList]);
 
@@ -524,23 +568,35 @@ export default function MinhasTarefas() {
 
                     <div className={localStyles.taskCardGrid}>
                       <div className={localStyles.taskField}>
-                        <span className={localStyles.taskLabel}>Prioridade</span>
-                        <span className={localStyles.taskValue}>{task.prioridade}</span>
+                        <span className={localStyles.taskLabel}>
+                          Prioridade
+                        </span>
+                        <span className={localStyles.taskValue}>
+                          {task.prioridade}
+                        </span>
                       </div>
                       <div className={localStyles.taskField}>
-                        <span className={localStyles.taskLabel}>Criado por</span>
-                        <span className={localStyles.taskValue}>{task.criadoPor}</span>
+                        <span className={localStyles.taskLabel}>
+                          Criado por
+                        </span>
+                        <span className={localStyles.taskValue}>
+                          {task.criadoPor}
+                        </span>
                       </div>
                     </div>
 
                     <div className={localStyles.taskCardGrid}>
                       <div className={localStyles.taskField}>
                         <span className={localStyles.taskLabel}>Data</span>
-                        <span className={localStyles.taskValue}>{task.dataCriacao}</span>
+                        <span className={localStyles.taskValue}>
+                          {task.dataCriacao}
+                        </span>
                       </div>
                       <div className={localStyles.taskField}>
                         <span className={localStyles.taskLabel}>Hora</span>
-                        <span className={localStyles.taskValue}>{task.horaCriacao}</span>
+                        <span className={localStyles.taskValue}>
+                          {task.horaCriacao}
+                        </span>
                       </div>
                     </div>
 
@@ -558,42 +614,31 @@ export default function MinhasTarefas() {
         {selectedTask && (
           <Modal
             title={selectedTask.titulo}
-            onClose={() => {
-              setSelectedTask(null);
-              setFotoTarefa(null);
-              setPreviewFoto(null);
-              setDescricaoFoto("");
-            }}
+            onClose={limparModal}
             variant="between"
             actions={
               <>
-                <button
-                  className={styles.btnClose}
-                  onClick={() => {
-                    setSelectedTask(null);
-                    setFotoTarefa(null);
-                    setPreviewFoto(null);
-                    setDescricaoFoto("");
-                  }}
-                >
+                <button className={styles.btnClose} onClick={limparModal}>
                   Fechar
                 </button>
 
-                <button
-                  className={styles.btnPrimary}
-                  onClick={confirmarTarefa}
-                  disabled={tarefaFinalizada()}
-                >
-                  Confirmar
-                </button>
+                {!tarefaFinalizada() && (
+                  <>
+                    <button
+                      className={styles.btnPrimary}
+                      onClick={confirmarTarefa}
+                    >
+                      Confirmar
+                    </button>
 
-                <button
-                  className={styles.btnDanger}
-                  onClick={cancelarTarefa}
-                  disabled={tarefaFinalizada()}
-                >
-                  Cancelar
-                </button>
+                    <button
+                      className={styles.btnDanger}
+                      onClick={cancelarTarefa}
+                    >
+                      Cancelar
+                    </button>
+                  </>
+                )}
               </>
             }
           >
@@ -601,8 +646,10 @@ export default function MinhasTarefas() {
               <div>
                 <strong>Status:</strong>
                 <span
-                  className={`${styles.badge} ${styles[statusMap[selectedTask.status]] || styles.statusPendente
-                    }`}
+                  className={`${styles.badge} ${
+                    styles[statusMap[selectedTask.status]] ||
+                    styles.statusPendente
+                  }`}
                 >
                   {selectedTask.status}
                 </span>
@@ -611,9 +658,10 @@ export default function MinhasTarefas() {
               <div>
                 <strong>Prioridade:</strong>
                 <span
-                  className={`${styles.badge} ${styles[prioridadeMap[selectedTask.prioridade]] ||
+                  className={`${styles.badge} ${
+                    styles[prioridadeMap[selectedTask.prioridade]] ||
                     styles.prioridadeMedia
-                    }`}
+                  }`}
                 >
                   {selectedTask.prioridade}
                 </span>
@@ -648,51 +696,104 @@ export default function MinhasTarefas() {
               </div>
             </div>
 
-            <div className={styles.formGroup}>
-              <label>Foto da tarefa</label>
+            {!tarefaFinalizada() && (
+              <>
+                <div className={styles.formGroup}>
+                  <label>Foto da tarefa</label>
 
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleFotoChange}
-                disabled={tarefaFinalizada()}
-              />
-            </div>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFotoChange}
+                  />
+                </div>
 
-            <div className={`${styles.formGroup} ${styles.full}`}>
-              <label>Descrição da foto</label>
+                <div className={`${styles.formGroup} ${styles.full}`}>
+                  <label>Descrição da foto</label>
 
-              <textarea
-                rows={3}
-                value={descricaoFoto}
-                onChange={(e) => setDescricaoFoto(e.target.value)}
-                placeholder="Ex: Foto da área limpa, produto conferido, gôndola organizada..."
-                disabled={tarefaFinalizada()}
-              />
-            </div>
+                  <textarea
+                    rows={2}
+                    value={descricaoFoto}
+                    onChange={(e) => setDescricaoFoto(e.target.value)}
+                    placeholder="Ex: Foto da área limpa, produto conferido, gôndola organizada..."
+                  />
+                </div>
+              </>
+            )}
+
+            {tarefaFinalizada() && descricaoFoto && (
+              <div className={styles.descricaoArea}>
+                <strong>Descrição da foto:</strong>
+
+                <div className={styles.descricaoBox}>
+                  <p>{descricaoFoto}</p>
+                </div>
+              </div>
+            )}
 
             {previewFoto && (
               <div className={styles.descricaoArea}>
-                <strong>{fotoTarefa ? "Pré-visualização local:" : "Foto salva:"}</strong>
+                <strong>
+                  {fotoTarefa ? "Pré-visualização local:" : "Foto salva:"}
+                </strong>
 
-                <div className={styles.descricaoBox}>
+                <div
+                  className={styles.descricaoBox}
+                  style={{
+                    minHeight: "22rem",
+                    maxHeight: "26rem",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    padding: "1rem",
+                    overflow: "hidden",
+                  }}
+                >
                   <img
                     src={previewFoto}
                     alt="Foto da tarefa"
                     onError={() => setPreviewFoto(null)}
                     style={{
                       width: "100%",
-                      maxHeight: "150px",
+                      height: "100%",
+                      maxHeight: "24rem",
                       objectFit: "contain",
                       borderRadius: "0.8rem",
+                      display: "block",
                     }}
                   />
                 </div>
               </div>
             )}
+
+            {tarefaFinalizada() &&
+              !previewFoto &&
+              !selectedTask.temRegistroFoto && (
+                <div className={styles.descricaoArea}>
+                  <strong>Foto da tarefa:</strong>
+
+                  <div className={styles.descricaoBox}>
+                    <p>Nenhuma foto foi enviada para esta tarefa.</p>
+                  </div>
+                </div>
+              )}
+
+            {tarefaFinalizada() &&
+              !previewFoto &&
+              selectedTask.temRegistroFoto && (
+                <div className={styles.descricaoArea}>
+                  <strong>Foto da tarefa:</strong>
+
+                  <div className={styles.descricaoBox}>
+                    <p>
+                      Existe um registro de foto para esta tarefa, mas o arquivo
+                      da imagem não foi encontrado na pasta de uploads.
+                    </p>
+                  </div>
+                </div>
+              )}
           </Modal>
         )}
-
       </div>
     </div>
   );

@@ -303,8 +303,9 @@ function Funcionarios() {
       align: "center",
       render: (row) => (
         <span
-          className={`${styles.badge} ${row.ativo ? styles.statusConcluida : styles.statusCancelada
-            }`}
+          className={`${styles.badge} ${
+            row.ativo ? styles.statusConcluida : styles.statusCancelada
+          }`}
         >
           {row.ativo ? "Ativo" : "Inativo"}
         </span>
@@ -365,12 +366,17 @@ function Funcionarios() {
 
   async function salvarEdicaoFuncionario() {
     if (!editFuncionario.nome.trim()) {
-      showToast("O nome do funcionário é obrigatório.", "warning");
+      avisarCampo("Nome", "informe o nome do funcionário.");
+      return;
+    }
+
+    if (!editFuncionario.email.trim()) {
+      avisarCampo("Email", "informe o email do funcionário.");
       return;
     }
 
     if (!validarEmail(editFuncionario.email)) {
-      showToast("Email inválido.", "warning");
+      avisarCampo("Email", "informe um email válido.");
       return;
     }
 
@@ -388,12 +394,18 @@ function Funcionarios() {
     }
 
     if (cargoId === 1) {
-      showToast("Não é permitido alterar funcionário para Gerente pelo painel.", "warning");
+      showToast(
+        "Não é permitido alterar funcionário para Gerente pelo painel.",
+        "warning",
+      );
       return;
     }
 
     if (usuarioEhSupervisor && cargoId === 2) {
-      showToast("Supervisores não podem alterar funcionário para Supervisor.", "warning");
+      showToast(
+        "Supervisores não podem alterar funcionário para Supervisor.",
+        "warning",
+      );
       return;
     }
 
@@ -425,20 +437,13 @@ function Funcionarios() {
       setEditFuncionario(null);
 
       showToast("Funcionário atualizado com sucesso.", "success");
-
     } catch (err) {
-      const erroApi = err.response?.data;
-
-      console.error("Erro ao editar funcionário:", erroApi || err.message);
-
-      showToast(
-        erroApi?.mensagem ||
-        (typeof erroApi?.dados === "string"
-          ? erroApi.dados
-          : "Erro ao editar funcionário. Verifique a API.") ||
-        "Erro ao editar funcionário. Verifique a API.",
-        "error",
+      console.error(
+        "Erro ao editar funcionário:",
+        err.response?.data || err.message,
       );
+
+      showToast(normalizarMensagemErro(err), "error");
     }
   }
 
@@ -446,29 +451,85 @@ function Funcionarios() {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   }
 
+  function normalizarMensagemErro(err) {
+    const erroApi = err.response?.data;
+
+    const partes = [erroApi?.mensagem, erroApi?.dados, err.message]
+      .filter(Boolean)
+      .map((item) => {
+        if (typeof item === "string") return item;
+        return JSON.stringify(item);
+      });
+
+    const mensagem = partes.join(" ");
+
+    if (mensagem.includes("Duplicate entry")) {
+      if (mensagem.includes("func_email")) {
+        return "Email: já existe um funcionário cadastrado com esse email.";
+      }
+
+      if (mensagem.includes("usu_login")) {
+        return "Login: já existe um usuário cadastrado com esse login.";
+      }
+
+      if (mensagem.includes("func_login")) {
+        return "Login: já existe um funcionário usando esse login.";
+      }
+
+      return "Cadastro duplicado: já existe um registro com essas informações.";
+    }
+
+    if (mensagem.includes("cannot be null")) {
+      return "Campos obrigatórios: preencha todos os dados necessários.";
+    }
+
+    if (mensagem.includes("Data too long")) {
+      return "Campo inválido: algum texto informado está maior que o permitido.";
+    }
+
+    if (mensagem.includes("foreign key constraint")) {
+      return "Vínculo inválido: setor, cargo ou usuário relacionado não foi encontrado.";
+    }
+
+    if (mensagem.includes("Erro ao cadastrar Funcionário")) {
+      return "Erro ao cadastrar funcionário. Verifique se email, login, setor e cargo estão corretos.";
+    }
+
+    return mensagem || "Erro inesperado. Verifique os dados e tente novamente.";
+  }
+
+  function avisarCampo(campo, mensagem) {
+    showToast(`${campo}: ${mensagem}`, "warning");
+  }
+
   async function criarFuncionario() {
     if (!novoFuncionario.nome.trim()) {
-      showToast("O nome do funcionário é obrigatório.", "warning");
+      avisarCampo("Nome", "informe o nome do funcionário.");
+      return;
+    }
+
+    if (!novoFuncionario.email.trim()) {
+      avisarCampo("Email", "informe o email do funcionário.");
       return;
     }
 
     if (!validarEmail(novoFuncionario.email)) {
-      showToast("Email inválido.", "warning");
+      avisarCampo("Email", "informe um email válido.");
       return;
     }
 
     if (!novoFuncionario.login.trim()) {
-      showToast("O login de acesso é obrigatório.", "warning");
+      avisarCampo("Login", "informe o login de acesso.");
       return;
     }
 
     if (!novoFuncionario.senha.trim()) {
-      showToast("A senha de acesso é obrigatória.", "warning");
+      avisarCampo("Senha", "informe a senha de acesso.");
       return;
     }
 
     if (novoFuncionario.senha.length < 4) {
-      showToast("A senha deve ter pelo menos 4 caracteres.", "warning");
+      avisarCampo("Senha", "use pelo menos 4 caracteres.");
       return;
     }
 
@@ -483,7 +544,10 @@ function Funcionarios() {
     }
 
     if (cargoId === 1) {
-      showToast("Não é permitido criar perfil de Gerente pelo painel.", "warning");
+      showToast(
+        "Não é permitido criar perfil de Gerente pelo painel.",
+        "warning",
+      );
       return;
     }
 
@@ -525,7 +589,8 @@ function Funcionarios() {
 
       if (!funcionarioId) {
         showToast(
-          "Funcionário criado, mas não foi possível obter o ID para criar o usuário.", "warning"
+          "Funcionário criado, mas não foi possível obter o ID para criar o usuário.",
+          "warning",
         );
         return;
       }
@@ -554,19 +619,13 @@ function Funcionarios() {
       setCreateFuncionarioOpen(false);
 
       showToast("Funcionário cadastrado com sucesso.", "success");
-      
     } catch (err) {
       console.error(
         "Erro ao cadastrar funcionário:",
         err.response?.data || err.message,
       );
 
-      showToast(
-        err.response?.data?.dados ||
-        err.response?.data?.mensagem ||
-        "Erro ao cadastrar funcionário. Verifique a API.",
-        "error",
-      );
+      showToast(normalizarMensagemErro(err), "error");
     }
   }
 
@@ -811,7 +870,9 @@ function Funcionarios() {
                 rowKey="id"
                 onRowClick={setSelected}
                 sortKey={ordemNome ? "nome" : ordemData ? "dataCriacao" : null}
-                sortDirection={getSortDirection(ordemNome ? "nome" : "dataCriacao")}
+                sortDirection={getSortDirection(
+                  ordemNome ? "nome" : "dataCriacao",
+                )}
                 onSort={handleSort}
                 emptyMessage="Nenhum funcionário encontrado"
                 variant="funcionarios"
@@ -820,7 +881,9 @@ function Funcionarios() {
 
             <div className={localStyles.showOnMobile}>
               {lista.length === 0 ? (
-                <p className={styles.textCenter}>Nenhum funcionário encontrado</p>
+                <p className={styles.textCenter}>
+                  Nenhum funcionário encontrado
+                </p>
               ) : (
                 <div className={localStyles.cardList}>
                   {lista.map((funcionario) => (
@@ -838,7 +901,9 @@ function Funcionarios() {
                       <div className={styles.cardHeader}>
                         <div>
                           <h2>{funcionario.nome}</h2>
-                          <p className={localStyles.cardId}>ID {funcionario.id}</p>
+                          <p className={localStyles.cardId}>
+                            ID {funcionario.id}
+                          </p>
                         </div>
 
                         <span
@@ -849,7 +914,9 @@ function Funcionarios() {
                       </div>
 
                       <div className={styles.cardBody}>
-                        <p className={localStyles.emailLine}>{funcionario.email}</p>
+                        <p className={localStyles.emailLine}>
+                          {funcionario.email}
+                        </p>
 
                         <div className={localStyles.cardGrid}>
                           <div className={localStyles.cardField}>
@@ -934,10 +1001,11 @@ function Funcionarios() {
                 <strong>Status:</strong>
 
                 <span
-                  className={`${styles.badge} ${selected.ativo
-                    ? styles.statusConcluida
-                    : styles.statusCancelada
-                    }`}
+                  className={`${styles.badge} ${
+                    selected.ativo
+                      ? styles.statusConcluida
+                      : styles.statusCancelada
+                  }`}
                 >
                   {selected.ativo ? "Ativo" : "Inativo"}
                 </span>
