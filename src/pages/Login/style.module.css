@@ -10,7 +10,7 @@
       rgba(14, 165, 233, 0.5),
       rgba(255, 255, 255, 0.88)
     ),
-    url(/public/fundo_login.jpg);
+    url(/fundo_login.jpg);
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
