@@ -167,7 +167,7 @@ export default function MinhasTarefas() {
 
     return true;
   }
-  
+
   async function confirmarTarefa() {
     if (!selectedTask) return;
 
@@ -190,7 +190,13 @@ export default function MinhasTarefas() {
         descricao: selectedTask.descricao,
         prioridade: selectedTask.prioridadeId,
         setorId: selectedTask.setorId,
-        criadoPor: 1,
+        criadoPor:
+          user?.funcionarioId ||
+          user?.func_id ||
+          user?.id ||
+          user?.usuario_id ||
+          user?.id_funcionario ||
+          1,
         estimativaMinutos: selectedTask.estimativaMinutos,
         status: 2,
         funcionarioId: selectedTask.funcionarioId,
@@ -245,7 +251,13 @@ export default function MinhasTarefas() {
         descricao: selectedTask.descricao,
         prioridade: selectedTask.prioridadeId,
         setorId: selectedTask.setorId,
-        criadoPor: 1,
+        criadoPor:
+          user?.funcionarioId ||
+          user?.func_id ||
+          user?.id ||
+          user?.usuario_id ||
+          user?.id_funcionario ||
+          1,
         estimativaMinutos: selectedTask.estimativaMinutos,
         status: 3,
         funcionarioId: selectedTask.funcionarioId,

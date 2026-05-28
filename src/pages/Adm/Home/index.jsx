@@ -7,6 +7,7 @@ import Modal from "../../../components/Modal/Modal";
 import DataTable from "../../../components/ui/DataTable";
 import api from "../../../services/api";
 import { useToast } from "../../../components/ui/Toast";
+import { useAuth } from "../../../context/AuthContext";
 
 function Home() {
   const [funcionariosMap, setFuncionariosMap] = useState({});
@@ -30,6 +31,7 @@ function Home() {
   const [error, setError] = useState(null);
   const [imageError, setImageError] = useState(false);
   const { showToast } = useToast();
+  const { user } = useAuth();
 
   function avisarCampo(campo, mensagem) {
     showToast(`${campo}: ${mensagem}`, "warning");
@@ -145,8 +147,9 @@ function Home() {
       align: "center",
       render: (row) => (
         <span
-          className={`${styles.badge} ${styles[statusMap[row.status]] || styles.statusPendente
-            }`}
+          className={`${styles.badge} ${
+            styles[statusMap[row.status]] || styles.statusPendente
+          }`}
         >
           {row.status}
         </span>
@@ -458,9 +461,9 @@ function Home() {
       if (primeiraCargaRef.current) {
         setError(
           err.response?.data?.mensagem ||
-          err.response?.data?.dados ||
-          err.message ||
-          "Não foi possível carregar as tarefas.",
+            err.response?.data?.dados ||
+            err.message ||
+            "Não foi possível carregar as tarefas.",
         );
       }
     } finally {
@@ -567,8 +570,8 @@ function Home() {
 
       alert(
         err.response?.data?.dados ||
-        err.response?.data?.mensagem ||
-        "Erro ao excluir tarefa. Verifique a API.",
+          err.response?.data?.mensagem ||
+          "Erro ao excluir tarefa. Verifique a API.",
       );
     }
   }
@@ -635,10 +638,22 @@ function Home() {
         descricao: editTask.descricao.trim(),
         prioridade,
         setorId,
-        criadoPor: 1,
+        criadoPor:
+          user?.funcionarioId ||
+          user?.func_id ||
+          user?.id ||
+          user?.usuario_id ||
+          user?.id_funcionario ||
+          1,
         estimativaMinutos: estimativaEmMinutos,
         status,
-        funcionarioId: 1,
+        funcionarioId:
+          user?.funcionarioId ||
+          user?.func_id ||
+          user?.id ||
+          user?.usuario_id ||
+          user?.id_funcionario ||
+          1,
       };
 
       await api.patch(`/tarefas/${editTask.tarefaId}`, payload);
@@ -656,8 +671,8 @@ function Home() {
 
       showToast(
         err.response?.data?.dados ||
-        err.response?.data?.mensagem ||
-        "Erro ao editar tarefa. Verifique os dados informados.",
+          err.response?.data?.mensagem ||
+          "Erro ao editar tarefa. Verifique os dados informados.",
         "error",
       );
     }
@@ -700,7 +715,6 @@ function Home() {
       novaTask.estimativaUnidade,
     );
 
-
     if (!estimativaEmMinutos) {
       avisarCampo("Estimativa", "informe um tempo maior que zero.");
       return;
@@ -717,10 +731,22 @@ function Home() {
         descricao: novaTask.descricao.trim(),
         prioridade,
         setorId,
-        criadoPor: 1,
+        criadoPor:
+          user?.funcionarioId ||
+          user?.func_id ||
+          user?.id ||
+          user?.usuario_id ||
+          user?.id_funcionario ||
+          1,
         estimativaMinutos: estimativaEmMinutos,
         status,
-        funcionarioId: 1,
+        funcionarioId:
+          user?.funcionarioId ||
+          user?.func_id ||
+          user?.id ||
+          user?.usuario_id ||
+          user?.id_funcionario ||
+          1,
       };
 
       await api.post("/tarefas", payload);
@@ -742,8 +768,8 @@ function Home() {
     } catch (err) {
       showToast(
         err.response?.data?.mensagem ||
-        err.response?.data?.dados ||
-        "Erro ao criar tarefa. Verifique os dados informados.",
+          err.response?.data?.dados ||
+          "Erro ao criar tarefa. Verifique os dados informados.",
         "error",
       );
     }
@@ -1223,8 +1249,9 @@ function Home() {
               <div>
                 <strong>Prioridade:</strong>
                 <span
-                  className={`${styles.badge} ${styles[prioridadeMap[selectedTask.prioridade]]
-                    }`}
+                  className={`${styles.badge} ${
+                    styles[prioridadeMap[selectedTask.prioridade]]
+                  }`}
                 >
                   {selectedTask.prioridade}
                 </span>
@@ -1233,9 +1260,10 @@ function Home() {
               <div>
                 <strong>Status:</strong>
                 <span
-                  className={`${styles.badge} ${styles[statusMap[selectedTask.status]] ||
+                  className={`${styles.badge} ${
+                    styles[statusMap[selectedTask.status]] ||
                     styles.statusPendente
-                    }`}
+                  }`}
                 >
                   {selectedTask.status}
                 </span>
@@ -1658,7 +1686,7 @@ function Home() {
                   isMobile
                     ? false
                     : ({ name, percent }) =>
-                      `${name}: ${(percent * 100).toFixed(0)}%`
+                        `${name}: ${(percent * 100).toFixed(0)}%`
                 }
                 labelLine={false}
                 fontSize={isMobile ? 12 : 20}
