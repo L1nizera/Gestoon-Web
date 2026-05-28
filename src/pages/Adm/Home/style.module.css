@@ -137,7 +137,7 @@ select {
 }
 
 /* cada bloco (período, mês, setor) */
-.filtrosAvancados > div {
+.filtrosAvancados>div {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
@@ -358,11 +358,9 @@ select {
 }
 
 .resumo div {
-  background: linear-gradient(
-    135deg,
-    var(--color-slate-900),
-    var(--color-gray-900)
-  );
+  background: linear-gradient(135deg,
+      var(--color-slate-900),
+      var(--color-gray-900));
   color: var(--color-white);
   padding: 1.4rem;
   border-radius: 1rem;
@@ -413,10 +411,6 @@ select {
   background: var(--bg-card);
   animation: fadeSlideIn 0.3s ease;
   table-layout: fixed;
-}
-
-.tabela tbody tr {
-  animation: fadeRow 0.2s ease;
 }
 
 @keyframes fadeRow {
@@ -583,7 +577,7 @@ select {
   background: var(--bg-card);
   padding: 2rem;
   border-radius: 1.2rem;
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
   max-width: 100%;
   animation: fadeSlideIn 0.5s ease;
   transition: all 0.3s ease;
@@ -689,15 +683,13 @@ select {
 .tabela tr {
   cursor: pointer;
   transition:
-    background 0.2s ease,
-    box-shadow 0.2s ease;
+    background 0.15s ease,
+    box-shadow 0.15s ease;
 }
 
 .tabela tr:hover {
   background: var(--color-gray-200);
-  box-shadow:
-    inset 0.4rem 0 0 var(--color-primary),
-    inset -0.4rem 0 0 var(--color-primary);
+  box-shadow: inset 0.35rem 0 0 var(--color-primary);
 }
 
 @keyframes fadeIn {
@@ -1032,7 +1024,7 @@ th:focus {
   border-bottom: none;
 }
 
-.modalGrid > div {
+.modalGrid>div {
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
@@ -1186,27 +1178,27 @@ th:focus {
   animation: pageEnter 0.32s ease both;
 }
 
-.resumo > div {
+.resumo>div {
   animation: cardEnter 0.28s ease both;
 }
 
-.resumo > div:nth-child(1) {
+.resumo>div:nth-child(1) {
   animation-delay: 0.03s;
 }
 
-.resumo > div:nth-child(2) {
+.resumo>div:nth-child(2) {
   animation-delay: 0.06s;
 }
 
-.resumo > div:nth-child(3) {
+.resumo>div:nth-child(3) {
   animation-delay: 0.09s;
 }
 
-.resumo > div:nth-child(4) {
+.resumo>div:nth-child(4) {
   animation-delay: 0.12s;
 }
 
-.resumo > div:nth-child(5) {
+.resumo>div:nth-child(5) {
   animation-delay: 0.15s;
 }
 
@@ -1241,13 +1233,12 @@ th:focus {
 
 .tabela tbody tr {
   transition:
-    background 0.18s ease,
-    box-shadow 0.18s ease,
-    transform 0.18s ease;
+    background 0.15s ease,
+    box-shadow 0.15s ease;
 }
 
 .tabela tbody tr:hover {
-  transform: translateX(0.15rem);
+  transform: none;
 }
 
 input,
@@ -1268,4 +1259,76 @@ textarea:focus {
   box-shadow:
     0 0 0 0.25rem rgba(37, 99, 235, 0.18),
     0 0.4rem 1rem rgba(0, 0, 0, 0.1);
+}
+
+.confirmBox {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  font-size: 1.4rem;
+  color: var(--text-primary);
+}
+
+.confirmBox strong {
+  color: var(--color-danger, #ef4444);
+}
+
+button:disabled,
+button:disabled:hover,
+button:disabled:active {
+  cursor: not-allowed;
+  opacity: 0.55;
+  transform: none !important;
+  box-shadow: none !important;
+  filter: none !important;
+}
+
+.deleteConfirmBox {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.4rem;
+
+  padding: 1.2rem 0;
+}
+
+.deleteIcon {
+  width: 4.2rem;
+  height: 4.2rem;
+  min-width: 4.2rem;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+  background: rgba(239, 68, 68, 0.12);
+  color: #ef4444;
+
+  font-size: 2.2rem;
+  font-weight: 800;
+}
+
+.deleteConfirmBox h3 {
+  margin: 0 0 0.8rem;
+  font-size: 1.7rem;
+  color: var(--text-primary);
+}
+
+.deleteConfirmBox p {
+  margin: 0 0 0.6rem;
+  font-size: 1.4rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.deleteConfirmBox strong {
+  color: var(--text-primary);
+}
+
+.deleteConfirmBox span {
+  display: block;
+  font-size: 1.3rem;
+  color: #ef4444;
+  font-weight: 600;
 }

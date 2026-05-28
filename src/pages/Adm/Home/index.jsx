@@ -22,6 +22,7 @@ function Home() {
   const [dataFim, setDataFim] = useState("");
   const [tasksState, setTasksState] = useState([]);
   const [editTask, setEditTask] = useState(null);
+  const [taskParaExcluir, setTaskParaExcluir] = useState(null);
   const [menuAtivo, setMenuAtivo] = useState("tarefas");
   const [isMobile, setIsMobile] = useState(
     typeof window !== "undefined" ? window.innerWidth < 768 : false,
@@ -147,9 +148,8 @@ function Home() {
       align: "center",
       render: (row) => (
         <span
-          className={`${styles.badge} ${
-            styles[statusMap[row.status]] || styles.statusPendente
-          }`}
+          className={`${styles.badge} ${styles[statusMap[row.status]] || styles.statusPendente
+            }`}
         >
           {row.status}
         </span>
@@ -461,9 +461,9 @@ function Home() {
       if (primeiraCargaRef.current) {
         setError(
           err.response?.data?.mensagem ||
-            err.response?.data?.dados ||
-            err.message ||
-            "Não foi possível carregar as tarefas.",
+          err.response?.data?.dados ||
+          err.message ||
+          "Não foi possível carregar as tarefas.",
         );
       }
     } finally {
@@ -479,7 +479,7 @@ function Home() {
 
     const interval = setInterval(() => {
       fetchDados();
-    }, 5000);
+    }, 15000);
 
     return () => clearInterval(interval);
   }, []);
@@ -554,29 +554,39 @@ function Home() {
   }
 
   async function excluirTask(id) {
-    if (!confirm("Tem certeza que deseja excluir esta tarefa?")) return;
-
     try {
       await api.delete(`/tarefas/${id}`);
 
       await fetchDados();
 
       setSelectedTask(null);
+      setTaskParaExcluir(null);
+
+      showToast("Tarefa excluída com sucesso.", "success");
     } catch (err) {
       console.error(
         "Erro ao excluir tarefa:",
         err.response?.data || err.message,
       );
 
-      alert(
+      showToast(
         err.response?.data?.dados ||
-          err.response?.data?.mensagem ||
-          "Erro ao excluir tarefa. Verifique a API.",
+        err.response?.data?.mensagem ||
+        "Erro ao excluir tarefa. Verifique os dados informados.",
+        "error",
       );
     }
   }
 
   function abrirEdicao(task) {
+    if (task.status === "Concluída") {
+      showToast(
+        "Tarefa concluída: esta tarefa não pode mais ser editada.",
+        "warning",
+      );
+      return;
+    }
+
     setSelectedTask(null);
 
     setEditTask({
@@ -671,8 +681,8 @@ function Home() {
 
       showToast(
         err.response?.data?.dados ||
-          err.response?.data?.mensagem ||
-          "Erro ao editar tarefa. Verifique os dados informados.",
+        err.response?.data?.mensagem ||
+        "Erro ao editar tarefa. Verifique os dados informados.",
         "error",
       );
     }
@@ -768,8 +778,8 @@ function Home() {
     } catch (err) {
       showToast(
         err.response?.data?.mensagem ||
-          err.response?.data?.dados ||
-          "Erro ao criar tarefa. Verifique os dados informados.",
+        err.response?.data?.dados ||
+        "Erro ao criar tarefa. Verifique os dados informados.",
         "error",
       );
     }
@@ -1215,31 +1225,51 @@ function Home() {
             title={selectedTask.titulo}
             variant="between"
             onClose={() => setSelectedTask(null)}
-            actions={
+            actions={(close) => (
               <>
                 <button
                   className={styles.btnClose}
-                  onClick={() => setSelectedTask(null)}
+                  onClick={() => close()}
                 >
                   Fechar
                 </button>
 
-                <button
-                  className={styles.btnPrimary}
-                  onClick={() => abrirEdicao(selectedTask)}
-                >
-                  Editar
-                </button>
+                {selectedTask.status !== "Concluída" && (
+                  <button
+                    className={styles.btnPrimary}
+                    onClick={() => {
+                      const tarefa = selectedTask;
+
+                      close(() => {
+                        setEditTask({
+                          ...tarefa,
+                          estimativaValor: tarefa.estimativaMinutos || "",
+                          estimativaUnidade: "minutos",
+                          estimativaMinutosBase: Number(tarefa.estimativaMinutos) || 0,
+                        });
+                      });
+                    }}
+                  >
+                    Editar
+                  </button>
+                )}
 
                 <button
                   className={styles.btnDanger}
-                  onClick={() => excluirTask(selectedTask.id)}
+                  onClick={() => {
+                    const tarefa = selectedTask;
+
+                    close(() => {
+                      setTaskParaExcluir(tarefa);
+                    });
+                  }}
                 >
                   Excluir
                 </button>
               </>
-            }
+            )}
           >
+
             <div className={styles.modalGrid}>
               <div>
                 <strong>ID:</strong>
@@ -1249,9 +1279,8 @@ function Home() {
               <div>
                 <strong>Prioridade:</strong>
                 <span
-                  className={`${styles.badge} ${
-                    styles[prioridadeMap[selectedTask.prioridade]]
-                  }`}
+                  className={`${styles.badge} ${styles[prioridadeMap[selectedTask.prioridade]]
+                    }`}
                 >
                   {selectedTask.prioridade}
                 </span>
@@ -1260,10 +1289,9 @@ function Home() {
               <div>
                 <strong>Status:</strong>
                 <span
-                  className={`${styles.badge} ${
-                    styles[statusMap[selectedTask.status]] ||
+                  className={`${styles.badge} ${styles[statusMap[selectedTask.status]] ||
                     styles.statusPendente
-                  }`}
+                    }`}
                 >
                   {selectedTask.status}
                 </span>
@@ -1335,6 +1363,46 @@ function Home() {
                 </div>
               </div>
             )}
+          </Modal>
+        )}
+
+        {taskParaExcluir && (
+          <Modal
+            title="Excluir tarefa"
+            onClose={() => setTaskParaExcluir(null)}
+            variant="between"
+            actions={(close) => (
+              <>
+                <button
+                  className={styles.btnSecondary}
+                  onClick={() => close()}
+                >
+                  Cancelar
+                </button>
+
+                <button
+                  className={styles.btnDanger}
+                  onClick={() => excluirTask(taskParaExcluir.id)}
+                >
+                  Sim, excluir
+                </button>
+              </>
+            )}
+          >
+            <div className={styles.deleteConfirmBox}>
+              <div className={styles.deleteIcon}>!</div>
+
+              <div>
+                <h3>Confirmar exclusão</h3>
+
+                <p>
+                  A tarefa <strong>{taskParaExcluir.titulo}</strong> será removida do
+                  sistema.
+                </p>
+
+                <span>Essa ação não poderá ser desfeita.</span>
+              </div>
+            </div>
           </Modal>
         )}
 
@@ -1491,20 +1559,21 @@ function Home() {
             title="Criar Tarefa"
             onClose={() => setCreateTaskOpen(false)}
             variant="between"
-            actions={
+            actions={(close) => (
               <>
                 <button
                   className={styles.btnDanger}
                   onClick={() => {
-                    setCreateTaskOpen(false);
-                    setNovaTask({
-                      titulo: "",
-                      setor: "Administrativo",
-                      prioridade: "Média",
-                      status: "Pendente",
-                      estimativaValor: "",
-                      estimativaUnidade: "minutos",
-                      descricao: "",
+                    close(() => {
+                      setNovaTask({
+                        titulo: "",
+                        setor: "Administrativo",
+                        prioridade: "Média",
+                        status: "Pendente",
+                        estimativaValor: "",
+                        estimativaUnidade: "minutos",
+                        descricao: "",
+                      });
                     });
                   }}
                 >
@@ -1532,7 +1601,7 @@ function Home() {
                   Criar
                 </button>
               </>
-            }
+            )}
           >
             <div className={styles.formGrid}>
               {/* TÍTULO */}
@@ -1594,7 +1663,7 @@ function Home() {
                 </select>
               </div>
 
-              {/* Estimativa Minutos */}
+              {/* ESTIMATIVA */}
               <div className={styles.formGroup}>
                 <label>Estimativa</label>
                 <input
@@ -1686,7 +1755,7 @@ function Home() {
                   isMobile
                     ? false
                     : ({ name, percent }) =>
-                        `${name}: ${(percent * 100).toFixed(0)}%`
+                      `${name}: ${(percent * 100).toFixed(0)}%`
                 }
                 labelLine={false}
                 fontSize={isMobile ? 12 : 20}
