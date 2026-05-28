@@ -1,0 +1,90 @@
+.header {
+  position: absolute;
+  inset: 0 0 auto 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.6rem 3rem;
+  gap: 2rem;
+  background: rgba(2, 6, 23, 0.82);
+  backdrop-filter: blur(18px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.logo {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--color-white);
+  letter-spacing: 0.12rem;
+}
+
+.nav {
+  flex: 1;
+}
+
+.menu {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.link {
+  color: rgba(255, 255, 255, 0.78);
+  text-decoration: none;
+  font-size: 1.3rem;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.link:hover {
+  color: var(--color-white);
+  transform: translateY(-1px);
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+}
+
+@media (max-width: 900px) {
+  .header {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 1.2rem 1.5rem;
+  }
+
+  .menu {
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 0.8rem;
+  }
+
+  .actions {
+    justify-content: center;
+    margin-top: 0.8rem;
+  }
+}
+
+@media (max-width: 520px) {
+  .header {
+    padding: 1rem 1rem;
+  }
+
+  .menu {
+    gap: 0.8rem;
+  }
+
+  .link {
+    font-size: 1.2rem;
+  }
+}

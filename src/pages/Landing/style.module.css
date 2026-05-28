@@ -1,0 +1,350 @@
+.container {
+  min-height: 100vh;
+    display: flex;
+      flex-direction: column;
+        padding-top: 7.2rem;
+          background: linear-gradient(180deg, var(--color-primary-100), var(--bg-main));
+            color: var(--text-primary);
+            }
+            
+.hero {
+  padding: 4rem 6rem;
+    position: relative;
+    }
+    
+.heroCard {
+  position: relative;
+    overflow: hidden;
+      background: var(--bg-card);
+        border: 1px solid rgba(14, 165, 233, 0.16);
+          box-shadow: var(--shadow-soft);
+            border-radius: 2rem;
+              padding: 2.5rem;
+              }
+              
+.heroSlider {
+  overflow: hidden;
+    position: relative;
+    }
+    
+.heroSlideTrack {
+  display: flex;
+    width: 300%;
+      transition: transform 0.7s ease;
+      }
+      
+.heroSlide {
+  min-width: 100%;
+    display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(320px, 1fr);
+        gap: 2.5rem;
+          align-items: center;
+            overflow: hidden;
+            }
+            
+.heroBadge {
+  display: inline-flex;
+    align-items: center;
+      justify-content: center;
+        padding: 0.8rem 1.2rem;
+          border-radius: 999px;
+            background: var(--color-primary-100);
+              color: var(--color-primary-700);
+                font-weight: 700;
+                  font-size: 1.2rem;
+                    margin-bottom: 1.6rem;
+                    }
+                    
+.heroContent {
+  max-width: 640px;
+  }
+  
+.title {
+  font-size: clamp(3rem, 4vw, 4.4rem);
+    line-height: 1.05;
+      margin: 0 0 1.6rem 0;
+        color: var(--color-slate-900);
+        }
+        
+.subtitle {
+  font-size: 1.5rem;
+    line-height: 1.8;
+      margin: 0 0 2rem 0;
+        color: var(--text-secondary);
+        }
+        
+.ctaRow {
+  display: flex;
+    gap: 1rem;
+      flex-wrap: wrap;
+      }
+      
+.heroIllustration {
+  position: relative;
+    min-height: 360px;
+      border-radius: 1.8rem;
+        background: radial-gradient(circle at top left, rgba(14, 165, 233, 0.18), transparent 35%),
+            radial-gradient(circle at bottom right, rgba(59, 130, 246, 0.2), transparent 25%),
+                linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+                  padding: 2rem;
+                    display: grid;
+                      grid-template-rows: 1fr auto;
+                        gap: 1.4rem;
+                        }
+                        
+.illustrationBlock {
+  position: relative;
+    border-radius: 1.6rem;
+      background: linear-gradient(180deg, rgba(14, 165, 233, 0.16), rgba(56, 189, 248, 0.08));
+        min-height: 220px;
+          overflow: hidden;
+          };
+          
+.illustrationBlock::before,
+.illustrationBlock::after {
+  content: "";
+    position: absolute;
+      border-radius: 50%;
+      };
+      
+.illustrationBlock::before {
+  width: 140px;
+    height: 140px;
+      background: rgba(14, 165, 233, 0.24);
+        top: -32px;
+          right: -32px;
+          }
+          
+.illustrationBlock::after {
+  width: 100px;
+    height: 100px;
+      background: rgba(59, 130, 246, 0.18);
+        bottom: -24px;
+          left: -24px;
+          }
+          
+.illustrationInfo {
+  display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1rem;
+      }
+      
+.infoCard,
+.infoCardAlt {
+  background: var(--bg-card);
+    border-radius: 1.2rem;
+      padding: 1.6rem;
+        box-shadow: var(--shadow-soft);
+        }
+        
+.infoCard strong,
+.infoCardAlt strong {
+  display: block;
+    font-size: 2rem;
+      color: var(--color-primary-700);
+        margin-bottom: 0.75rem;
+        }
+        
+.infoCard span,
+.infoCardAlt span {
+  display: block;
+    color: var(--text-secondary);
+      line-height: 1.6;
+      }
+      
+.heroNavButton {
+  position: absolute;
+    top: 50%;
+      transform: translateY(-50%);
+        width: 3.2rem;
+          height: 3.2rem;
+            border-radius: 999px;
+              border: none;
+                background: rgba(14, 165, 233, 0.16);
+                  color: var(--color-slate-900);
+                    font-size: 2rem;
+                      cursor: pointer;
+                        transition: transform 0.2s ease, background 0.2s ease;
+                          display: grid;
+                            place-items: center;
+                            }
+                            
+.heroNavButton:hover {
+  transform: translateY(-50%) scale(1.05);
+    background: rgba(14, 165, 233, 0.26);
+    }
+    
+.heroNavLeft {
+  left: 1rem;
+  }
+  
+.heroNavRight {
+  right: 1rem;
+  }
+  
+.heroPagination {
+  position: absolute;
+    left: 50%;
+      bottom: 1.2rem;
+        transform: translateX(-50%);
+          display: flex;
+            gap: 0.65rem;
+            }
+            
+.paginationDot {
+  width: 0.95rem;
+    height: 0.95rem;
+      border-radius: 50%;
+        border: 1px solid rgba(14, 165, 233, 0.45);
+          background: rgba(255, 255, 255, 0.78);
+            cursor: pointer;
+              transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+              }
+              
+.paginationDot:hover {
+  transform: scale(1.1);
+  }
+  
+.activeDot {
+  background: var(--primary);
+    border-color: var(--primary);
+    }
+    
+.main {
+  padding: 0 6rem 4rem;
+    display: flex;
+      flex-direction: column;
+        gap: 2.4rem;
+        }
+        
+#inicio,
+#funcionalidades,
+#sobre,
+#beneficios,
+#contato {
+  scroll-margin-top: 8.4rem;
+  }
+  
+.about,
+.featureCard,
+.contact {
+  background: var(--bg-card);
+    padding: 2rem;
+      border-radius: 1.4rem;
+        box-shadow: var(--shadow-soft);
+        }
+        
+.about h2,
+.features h2,
+.benefits h2,
+.contact h2 {
+  margin-bottom: 1rem;
+  }
+  
+.about p,
+.featureCard p,
+.contact p {
+  color: var(--text-secondary);
+    line-height: 1.75;
+    }
+    
+.features {
+  padding-top: 0.6rem;
+  }
+  
+.benefits {
+  padding-top: 0.6rem;
+  }
+  
+.benefitsGrid {
+  display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1.4rem;
+        margin-top: 1rem;
+        }
+        
+.contact {
+  padding-top: 1.6rem;
+  }
+  
+.featuresGrid {
+  display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1.4rem;
+        margin-top: 1rem;
+        }
+        
+.featureCard {
+  border: 1px solid rgba(14, 165, 233, 0.12);
+  }
+  
+.featureCard h3 {
+  margin-bottom: 0.8rem;
+    color: var(--color-slate-900);
+    }
+    
+.footer {
+  margin-top: auto;
+    padding: 2rem 6rem;
+      text-align: center;
+        color: var(--text-secondary);
+        }
+        
+@media (max-width: 900px) {
+  .hero {
+      padding: 3rem 2rem;
+        }
+        
+  .heroCard {
+      padding: 2rem;
+        }
+        
+  .heroSlide {
+      grid-template-columns: 1fr;
+        }
+        
+  .heroIllustration {
+      min-height: 240px;
+        }
+        
+  .heroPagination {
+      bottom: 0.65rem;
+        }
+        
+  .heroNavButton {
+      width: 2.8rem;
+          height: 2.8rem;
+              font-size: 1.8rem;
+                }
+                
+  .main {
+      padding: 0 2rem 3rem;
+        }
+        
+  .featuresGrid,
+    .benefitsGrid {
+        grid-template-columns: 1fr;
+          }
+          }
+          
+@media (max-width: 600px) {
+  .title {
+      font-size: 2.8rem;
+        }
+        
+  .heroIllustration {
+      min-height: 220px;
+        }
+        
+  .illustrationInfo {
+      grid-template-columns: 1fr;
+        }
+        
+  .footer,
+    .about,
+      .featureCard,
+        .contact {
+            padding: 1.6rem;
+              }
+              }
+              
