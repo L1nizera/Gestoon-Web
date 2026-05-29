@@ -303,9 +303,8 @@ function Funcionarios() {
       align: "center",
       render: (row) => (
         <span
-          className={`${styles.badge} ${
-            row.ativo ? styles.statusConcluida : styles.statusCancelada
-          }`}
+          className={`${styles.badge} ${row.ativo ? styles.statusConcluida : styles.statusCancelada
+            }`}
         >
           {row.ativo ? "Ativo" : "Inativo"}
         </span>
@@ -899,13 +898,18 @@ function Funcionarios() {
             Limpar Filtros
           </button>
 
-          <button
-            className={styles.criarBtn}
-            onClick={() => setCreateFuncionarioOpen(true)}
-          >
-            Cadastrar Funcionário
-          </button>
+          <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: "1rem" }}>
+
+            <button
+              className={styles.criarBtn}
+              onClick={() => setCreateFuncionarioOpen(true)}
+            >
+              Cadastrar Funcionário
+            </button>
+          </div>
         </div>
+
+        <span>{lista.length} encontrados</span>
 
         {loading ? (
           <p>Carregando funcionários...</p>
@@ -1051,11 +1055,10 @@ function Funcionarios() {
                 <strong>Status:</strong>
 
                 <span
-                  className={`${styles.badge} ${
-                    selected.ativo
-                      ? styles.statusConcluida
-                      : styles.statusCancelada
-                  }`}
+                  className={`${styles.badge} ${selected.ativo
+                    ? styles.statusConcluida
+                    : styles.statusCancelada
+                    }`}
                 >
                   {selected.ativo ? "Ativo" : "Inativo"}
                 </span>
