@@ -3,6 +3,8 @@ import { Navigate, useNavigate } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import api from "../../services/api";
+import PageTransition from "../../components/ui/PageTransition/index.jsx";
+
 
 function Login() {
   const navigate = useNavigate();
@@ -38,7 +40,9 @@ function Login() {
   }, []);
 
   if (user) {
-    return <Navigate to={user.tipo === "admin" ? "/home" : "/tarefas"} replace />;
+    return (
+      <Navigate to={user.tipo === "admin" ? "/home" : "/tarefas"} replace />
+    );
   }
 
   async function handleLogin(e) {
@@ -72,42 +76,44 @@ function Login() {
 
       showMessage(
         err.response?.data?.mensagem || "Usuário ou senha inválidos.",
-        "error"
+        "error",
       );
     }
   }
 
   return (
-    <div className={styles.loginContainer}>
-      <h1 className={styles.logo}>Gestoon</h1>
+    <PageTransition>
+      <div className={styles.loginContainer}>
+        <h1 className={styles.logo}>Gestoon</h1>
 
-      <form className={styles.loginBox} onSubmit={handleLogin}>
-        <h2>Login</h2>
+        <form className={styles.loginBox} onSubmit={handleLogin}>
+          <h2>Login</h2>
 
-        <input
-          placeholder="Email / Usuário"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
+          <input
+            placeholder="Email / Usuário"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
 
-        <input
-          type="password"
-          placeholder="Senha"
-          value={senha}
-          onChange={(e) => setSenha(e.target.value)}
-        />
+          <input
+            type="password"
+            placeholder="Senha"
+            value={senha}
+            onChange={(e) => setSenha(e.target.value)}
+          />
 
-        {message && (
-          <p className={`${styles.message} ${styles[messageType]}`}>
-            {message}
-          </p>
-        )}
+          {message && (
+            <p className={`${styles.message} ${styles[messageType]}`}>
+              {message}
+            </p>
+          )}
 
-        <button type="submit" className={styles.button}>
-          Entrar
-        </button>
-      </form>
-    </div>
+          <button type="submit" className={styles.button}>
+            Entrar
+          </button>
+        </form>
+      </div>
+    </PageTransition>
   );
 }
 

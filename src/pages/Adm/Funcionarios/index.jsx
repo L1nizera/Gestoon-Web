@@ -361,7 +361,12 @@ function Funcionarios() {
     }
 
     setSelected(null);
-    setEditFuncionario({ ...funcionario });
+
+    setEditFuncionario({
+      ...funcionario,
+      login: funcionario.login || "",
+      novaSenha: "",
+    });
   }
 
   async function salvarEdicaoFuncionario() {
@@ -372,6 +377,19 @@ function Funcionarios() {
 
     if (!editFuncionario.email.trim()) {
       avisarCampo("Email", "informe o email do funcionário.");
+      return;
+    }
+
+    if (!editFuncionario.login.trim()) {
+      avisarCampo("Login", "informe o login de acesso.");
+      return;
+    }
+
+    if (
+      editFuncionario.novaSenha.trim() &&
+      editFuncionario.novaSenha.trim().length < 4
+    ) {
+      avisarCampo("Senha", "use pelo menos 4 caracteres.");
       return;
     }
 
@@ -420,17 +438,44 @@ function Funcionarios() {
     }
 
     try {
-      const payload = {
-        nome: editFuncionario.nome,
-        email: editFuncionario.email,
+      const payloadFuncionario = {
+        nome: editFuncionario.nome.trim(),
+        email: editFuncionario.email.trim(),
         setorId,
         cargoId,
         ativo: editFuncionario.ativo ? 1 : 0,
       };
 
-      console.log("Payload edição funcionário:", payload);
+      console.log("ID FUNCIONÁRIO:", editFuncionario.id);
+      console.log("ID USUÁRIO:", editFuncionario.usuarioId);
+      console.log("PAYLOAD FUNCIONÁRIO:", payloadFuncionario);
 
-      await api.patch(`/funcionarios/${editFuncionario.id}`, payload);
+      await api.patch(
+        `/funcionarios/${editFuncionario.id}`,
+        payloadFuncionario,
+      );
+
+      if (!editFuncionario.usuarioId) {
+        showToast(
+          "Funcionário atualizado, mas o ID do usuário não foi encontrado.",
+          "warning",
+        );
+        return;
+      }
+
+      const payloadUsuario = {
+        login: editFuncionario.login.trim(),
+        ativo: editFuncionario.ativo ? 1 : 0,
+      };
+
+      if (editFuncionario.novaSenha?.trim()) {
+        payloadUsuario.senha = editFuncionario.novaSenha.trim();
+      }
+
+      console.log("ID USUÁRIO ENVIADO:", editFuncionario.usuarioId);
+      console.log("PAYLOAD USUÁRIO:", payloadUsuario);
+
+      await api.patch(`/usuarios/${editFuncionario.usuarioId}`, payloadUsuario);
 
       await fetchDados();
 
@@ -663,8 +708,11 @@ function Funcionarios() {
 
           return {
             id: funcionario.func_id,
+            usuarioId: funcionario.usu_id,
+
             nome: funcionario.func_nome || "-",
             email: funcionario.func_email || "-",
+            login: funcionario.usu_login || "",
 
             setorId: Number(funcionario.func_setor_id),
             cargoId: Number(funcionario.func_crg_id),
@@ -686,6 +734,8 @@ function Funcionarios() {
           };
         },
       );
+
+      console.log("FUNCIONÁRIOS FORMATADOS:", funcionariosFormatados);
 
       const novaChave = gerarChaveFuncionarios(funcionariosFormatados);
 
@@ -1283,6 +1333,36 @@ function Funcionarios() {
                     ),
                   )}
                 </select>
+              </div>
+
+              <div className={styles.formGroup}>
+                <label>Login de acesso</label>
+                <input
+                  type="text"
+                  value={editFuncionario.login}
+                  onChange={(e) =>
+                    setEditFuncionario({
+                      ...editFuncionario,
+                      login: e.target.value,
+                    })
+                  }
+                  placeholder="Login de acesso"
+                />
+              </div>
+
+              <div className={styles.formGroup}>
+                <label>Nova senha</label>
+                <input
+                  type="password"
+                  value={editFuncionario.novaSenha}
+                  onChange={(e) =>
+                    setEditFuncionario({
+                      ...editFuncionario,
+                      novaSenha: e.target.value,
+                    })
+                  }
+                  placeholder="Deixe vazio para manter a senha atual"
+                />
               </div>
 
               <div className={styles.formGroup}>

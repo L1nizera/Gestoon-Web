@@ -14,10 +14,17 @@ export function ToastProvider({ children }) {
   const [toast, setToast] = useState(null);
   const timeoutRef = useRef(null);
 
-  function showToast(message, type = "info") {
+  function clearToast() {
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
     }
+
+    setToast(null);
+  }
+
+  function showToast(message, type = "info") {
+    clearToast();
 
     setToast({
       message,
@@ -30,24 +37,15 @@ export function ToastProvider({ children }) {
     }, TOAST_DURATION[type] || TOAST_DURATION.info);
   }
 
-  function closeToast() {
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-      timeoutRef.current = null;
-    }
-
-    setToast(null);
-  }
-
   return (
-    <ToastContext.Provider value={{ showToast }}>
+    <ToastContext.Provider value={{ showToast, clearToast }}>
       {children}
 
       {toast && (
         <div className={`${styles.toast} ${styles[toast.type]}`}>
           <span>{toast.message}</span>
 
-          <button type="button" onClick={closeToast}>
+          <button type="button" onClick={clearToast}>
             ×
           </button>
         </div>

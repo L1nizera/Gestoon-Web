@@ -1,0 +1,16 @@
+.pageTransition {
+  animation: pageFadeIn 0.45s alternate;
+}
+
+@keyframes pageFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(0.8rem);
+    
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

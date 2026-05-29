@@ -1,9 +1,11 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import { useToast } from "../../components/ui/Toast";
 import styles from "./style.module.css";
 
 function Sidebar({ isOpen = false, onClose }) {
   const { user, logout } = useAuth();
+  const { clearToast } = useToast();
   const navigate = useNavigate();
 
   const menuItems = [
@@ -18,11 +20,25 @@ function Sidebar({ isOpen = false, onClose }) {
   if (!user) return null;
 
   const availableItems = menuItems.filter((item) =>
-    item.allowed.includes(user.tipo)
+    item.allowed.includes(user.tipo),
   );
 
+  function handleLogout() {
+    clearToast();
+
+    logout();
+
+    if (onClose) {
+      onClose();
+    }
+
+    navigate("/");
+  }
+
   return (
-    <div className={`${styles.sidebar} ${isOpen ? styles.open : styles.closed}`}>
+    <div
+      className={`${styles.sidebar} ${isOpen ? styles.open : styles.closed}`}
+    >
       <div className={styles.title}>Gestoon</div>
       <hr className={styles.separator} />
       <div className={styles.header}>
@@ -49,13 +65,8 @@ function Sidebar({ isOpen = false, onClose }) {
         ))}
       </ul>
 
-      <button
-        className={styles.logoutBtn}
-        onClick={() => {
-          logout();
-          navigate("/");
-        }}
-      >
+      <button className={styles.logoutBtn} 
+      onClick={handleLogout}>
         Sair
       </button>
     </div>

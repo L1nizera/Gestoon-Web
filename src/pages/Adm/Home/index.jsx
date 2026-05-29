@@ -148,8 +148,9 @@ function Home() {
       align: "center",
       render: (row) => (
         <span
-          className={`${styles.badge} ${styles[statusMap[row.status]] || styles.statusPendente
-            }`}
+          className={`${styles.badge} ${
+            styles[statusMap[row.status]] || styles.statusPendente
+          }`}
         >
           {row.status}
         </span>
@@ -461,9 +462,9 @@ function Home() {
       if (primeiraCargaRef.current) {
         setError(
           err.response?.data?.mensagem ||
-          err.response?.data?.dados ||
-          err.message ||
-          "Não foi possível carregar as tarefas.",
+            err.response?.data?.dados ||
+            err.message ||
+            "Não foi possível carregar as tarefas.",
         );
       }
     } finally {
@@ -571,8 +572,8 @@ function Home() {
 
       showToast(
         err.response?.data?.dados ||
-        err.response?.data?.mensagem ||
-        "Erro ao excluir tarefa. Verifique os dados informados.",
+          err.response?.data?.mensagem ||
+          "Erro ao excluir tarefa. Verifique os dados informados.",
         "error",
       );
     }
@@ -681,14 +682,14 @@ function Home() {
 
       showToast(
         err.response?.data?.dados ||
-        err.response?.data?.mensagem ||
-        "Erro ao editar tarefa. Verifique os dados informados.",
+          err.response?.data?.mensagem ||
+          "Erro ao editar tarefa. Verifique os dados informados.",
         "error",
       );
     }
   }
 
-  async function criarTask() {
+  async function criarTask(close) {
     if (!novaTask.titulo.trim()) {
       avisarCampo("Título", "informe o nome da tarefa.");
       return;
@@ -762,24 +763,28 @@ function Home() {
       await api.post("/tarefas", payload);
       await fetchDados();
 
-      setNovaTask({
-        titulo: "",
-        setor: "Administrativo",
-        prioridade: "Média",
-        status: "Pendente",
-        estimativaValor: "",
-        estimativaUnidade: "minutos",
-        descricao: "",
-      });
-
-      setCreateTaskOpen(false);
-
       showToast("Tarefa criada com sucesso.", "success");
+
+      if (typeof close === "function") {
+        close(() => {
+          setNovaTask({
+            titulo: "",
+            setor: "Administrativo",
+            prioridade: "Média",
+            status: "Pendente",
+            estimativaValor: "",
+            estimativaUnidade: "minutos",
+            descricao: "",
+          });
+        });
+      } else {
+        setCreateTaskOpen(false);
+      }
     } catch (err) {
       showToast(
         err.response?.data?.mensagem ||
-        err.response?.data?.dados ||
-        "Erro ao criar tarefa. Verifique os dados informados.",
+          err.response?.data?.dados ||
+          "Erro ao criar tarefa. Verifique os dados informados.",
         "error",
       );
     }
@@ -1227,10 +1232,7 @@ function Home() {
             onClose={() => setSelectedTask(null)}
             actions={(close) => (
               <>
-                <button
-                  className={styles.btnClose}
-                  onClick={() => close()}
-                >
+                <button className={styles.btnClose} onClick={() => close()}>
                   Fechar
                 </button>
 
@@ -1245,7 +1247,8 @@ function Home() {
                           ...tarefa,
                           estimativaValor: tarefa.estimativaMinutos || "",
                           estimativaUnidade: "minutos",
-                          estimativaMinutosBase: Number(tarefa.estimativaMinutos) || 0,
+                          estimativaMinutosBase:
+                            Number(tarefa.estimativaMinutos) || 0,
                         });
                       });
                     }}
@@ -1269,7 +1272,6 @@ function Home() {
               </>
             )}
           >
-
             <div className={styles.modalGrid}>
               <div>
                 <strong>ID:</strong>
@@ -1279,8 +1281,9 @@ function Home() {
               <div>
                 <strong>Prioridade:</strong>
                 <span
-                  className={`${styles.badge} ${styles[prioridadeMap[selectedTask.prioridade]]
-                    }`}
+                  className={`${styles.badge} ${
+                    styles[prioridadeMap[selectedTask.prioridade]]
+                  }`}
                 >
                   {selectedTask.prioridade}
                 </span>
@@ -1289,9 +1292,10 @@ function Home() {
               <div>
                 <strong>Status:</strong>
                 <span
-                  className={`${styles.badge} ${styles[statusMap[selectedTask.status]] ||
+                  className={`${styles.badge} ${
+                    styles[statusMap[selectedTask.status]] ||
                     styles.statusPendente
-                    }`}
+                  }`}
                 >
                   {selectedTask.status}
                 </span>
@@ -1373,10 +1377,7 @@ function Home() {
             variant="between"
             actions={(close) => (
               <>
-                <button
-                  className={styles.btnSecondary}
-                  onClick={() => close()}
-                >
+                <button className={styles.btnSecondary} onClick={() => close()}>
                   Cancelar
                 </button>
 
@@ -1396,8 +1397,8 @@ function Home() {
                 <h3>Confirmar exclusão</h3>
 
                 <p>
-                  A tarefa <strong>{taskParaExcluir.titulo}</strong> será removida do
-                  sistema.
+                  A tarefa <strong>{taskParaExcluir.titulo}</strong> será
+                  removida do sistema.
                 </p>
 
                 <span>Essa ação não poderá ser desfeita.</span>
@@ -1597,7 +1598,10 @@ function Home() {
                   Limpar
                 </button>
 
-                <button className={styles.btnPrimary} onClick={criarTask}>
+                <button
+                  className={styles.btnPrimary}
+                  onClick={() => criarTask(close)}
+                >
                   Criar
                 </button>
               </>
@@ -1755,7 +1759,7 @@ function Home() {
                   isMobile
                     ? false
                     : ({ name, percent }) =>
-                      `${name}: ${(percent * 100).toFixed(0)}%`
+                        `${name}: ${(percent * 100).toFixed(0)}%`
                 }
                 labelLine={false}
                 fontSize={isMobile ? 12 : 20}

@@ -9,6 +9,7 @@ import styles from "../Home/style.module.css";
 import localStyles from "./style.module.css";
 import DataTable from "../../../components/ui/DataTable";
 
+
 function Relatorios() {
   const [nomeFiltro, setNomeFiltro] = useState("");
   const [cargoFiltro, setCargoFiltro] = useState("");

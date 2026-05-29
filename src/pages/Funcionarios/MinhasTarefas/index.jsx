@@ -190,13 +190,7 @@ export default function MinhasTarefas() {
         descricao: selectedTask.descricao,
         prioridade: selectedTask.prioridadeId,
         setorId: selectedTask.setorId,
-        criadoPor:
-          user?.funcionarioId ||
-          user?.func_id ||
-          user?.id ||
-          user?.usuario_id ||
-          user?.id_funcionario ||
-          1,
+        criadoPor: selectedTask.criadoPorId,
         estimativaMinutos: selectedTask.estimativaMinutos,
         status: 2,
         funcionarioId: selectedTask.funcionarioId,
@@ -251,13 +245,7 @@ export default function MinhasTarefas() {
         descricao: selectedTask.descricao,
         prioridade: selectedTask.prioridadeId,
         setorId: selectedTask.setorId,
-        criadoPor:
-          user?.funcionarioId ||
-          user?.func_id ||
-          user?.id ||
-          user?.usuario_id ||
-          user?.id_funcionario ||
-          1,
+        criadoPor: selectedTask.criadoPorId,
         estimativaMinutos: selectedTask.estimativaMinutos,
         status: 3,
         funcionarioId: selectedTask.funcionarioId,
@@ -359,6 +347,8 @@ export default function MinhasTarefas() {
             setorId: Number(tarefa.tar_setor_id),
 
             criadoPor: tarefa.usu_nome || "-",
+            criadoPorId: Number(tarefa.tar_criado_por),
+
             funcionarioId: Number(tarefa.atr_funcionario_id),
 
             descricao: tarefa.tar_descricao || "-",
