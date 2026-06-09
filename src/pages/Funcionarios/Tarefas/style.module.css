@@ -74,8 +74,6 @@ body {
   .title {
     font-size: 2.4rem;
   }
-
-
 }
 
 /* ===== SUMMARY GRID ===== */
@@ -173,14 +171,16 @@ body {
   background: var(--bg-surface);
   color: var(--text-primary);
   transition: all 0.25s ease;
-  font-family: 'Source Sans 3', sans-serif;
+  font-family: "Source Sans 3", sans-serif;
 }
 
 .filtrosContainer input:focus,
 .filtrosContainer select:focus {
   outline: none;
   border-color: var(--primary);
-  box-shadow: 0 0 0 0.25rem var(--primary-light), 0 0.4rem 1rem rgba(2, 6, 23, 0.15);
+  box-shadow:
+    0 0 0 0.25rem var(--primary-light),
+    0 0.4rem 1rem rgba(2, 6, 23, 0.15);
   transform: translateY(-1px);
 }
 
@@ -231,7 +231,7 @@ body {
   gap: 1rem;
   padding: 1rem 1.2rem;
   border-radius: 0.8rem;
-  box-shadow: 0 0.6rem 1.6rem rgba(2,6,23,0.06);
+  box-shadow: 0 0.6rem 1.6rem rgba(2, 6, 23, 0.06);
   font-weight: 600;
   font-size: 1.45rem;
   animation: slideFadeDown 0.28s ease;
@@ -365,6 +365,29 @@ body {
 
 .mobileOnly {
   display: none;
+}
+
+.btnDetalhes {
+  background: transparent;
+  border: none;
+  color: var(--color-primary);
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.btnDetalhes:hover {
+  opacity: 0.8;
+}
+
+.clickableRow {
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.clickableRow:hover {
+  background: #eef4ff;
+  transform: translateY(-1px);
 }
 
 /* ===== MOBILE CARDS CONTAINER (ESCONDIDO NO DESKTOP) ===== */
@@ -505,12 +528,16 @@ body {
 
 .table tr {
   cursor: pointer;
-  transition: background 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    background 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .table tr:hover {
   background: var(--color-gray-200);
-  box-shadow: inset 0.4rem 0 0 var(--color-primary), inset -0.4rem 0 0 var(--color-primary);
+  box-shadow:
+    inset 0.4rem 0 0 var(--color-primary),
+    inset -0.4rem 0 0 var(--color-primary);
 }
 
 .textCenter {
@@ -664,7 +691,6 @@ body {
   position: fixed;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
   width: 90%;
   max-width: 60rem;
   max-height: 85vh;
@@ -675,21 +701,10 @@ body {
   z-index: 1000;
   display: flex;
   flex-direction: column;
-  animation: slideUp 0.3s ease;
   overflow-y: auto;
+  animation: modalOpen 0.25s ease;
 }
 
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translate(-50%, -40%);
-  }
-
-  to {
-    opacity: 1;
-    transform: translate(-50%, -50%);
-  }
-}
 
 .modalContent::-webkit-scrollbar {
   width: 0.8rem;
@@ -1185,7 +1200,6 @@ body {
     padding: 0.7rem 0.8rem;
   }
 
-
   /* HIDE TABLE, SHOW MOBILE VIEW */
   .tableWrapper {
     display: none;
@@ -1338,5 +1352,28 @@ th:focus {
   .tabelaContainer {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
+  }
+}
+
+@keyframes modalOpen {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.92);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+.removingRow {
+  animation: removeTask 0.3s ease forwards;
+}
+
+@keyframes removeTask {
+  to {
+    opacity: 0;
+    transform: translateX(30px);
   }
 }

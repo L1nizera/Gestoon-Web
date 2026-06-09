@@ -2,6 +2,7 @@ import { useState, useMemo, useEffect, useRef } from "react";
 import { useAuth } from "../../../context/AuthContext";
 import styles from "./style.module.css";
 import api from "../../../services/api";
+import Modal from "../../../components/Modal/index.jsx";
 
 // ═════════════════════════════════════════════════════════════════
 // 📌 MAPEAMENTOS DA API
@@ -56,6 +57,7 @@ export default function Tarefas() {
   const [tarefaSelecionada, setTarefaSelecionada] = useState(null);
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [removendoId, setRemovendoId] = useState(null);
 
   const { user } = useAuth();
   const tarefasKeyRef = useRef("");
@@ -121,7 +123,7 @@ export default function Tarefas() {
           tarefa.descricao,
           tarefa.dataCriacao,
           tarefa.horaCriacao,
-          tarefa.estimativaMinutos,
+          tarefa.tar_estimativa_minutos,
         ].join("-"),
       )
       .join("|");
@@ -145,12 +147,9 @@ export default function Tarefas() {
 
       const tarefasFormatadas = todosTarefas
         .filter((t) => {
-          const tarefaPendente =
-            Number(t.atr_status ?? 0) === 0;
+          const tarefaPendente = Number(t.atr_status ?? 0) === 0;
 
-          const mesmoSetor =
-            Number(t.tar_setor_id) ===
-            Number(user?.setorId);
+          const mesmoSetor = Number(t.tar_setor_id) === Number(user?.setorId);
 
           return tarefaPendente && mesmoSetor;
         })
@@ -177,7 +176,6 @@ export default function Tarefas() {
           };
         });
 
-
       const novaChave = gerarChaveTarefas(tarefasFormatadas);
 
       if (novaChave !== tarefasKeyRef.current) {
@@ -191,7 +189,9 @@ export default function Tarefas() {
       );
       setError("Não foi possível carregar as tarefas. Tente novamente.");
       // show visual error message
-      const msg = err.response?.data?.mensagem || "Não foi possível carregar as tarefas. Tente novamente.";
+      const msg =
+        err.response?.data?.mensagem ||
+        "Não foi possível carregar as tarefas. Tente novamente.";
       setErrorMessage(msg);
       if (errorTimeoutRef.current) clearTimeout(errorTimeoutRef.current);
       errorTimeoutRef.current = setTimeout(() => setErrorMessage(""), 5000);
@@ -202,16 +202,19 @@ export default function Tarefas() {
     }
   }
 
-
   /**
    * Aceita uma tarefa e atualiza o status para "Em andamento" (1)
    */
   async function aceitarTarefa(tarefaId) {
     const funcionarioId =
-      user?.id || user?.funcionario_id || user?.usuario_id || user?.id_funcionario;
+      user?.id ||
+      user?.funcionario_id ||
+      user?.usuario_id ||
+      user?.id_funcionario;
 
     if (!funcionarioId) {
-      const msg = "Não foi possível identificar o usuário logado. Faça login novamente.";
+      const msg =
+        "Não foi possível identificar o usuário logado. Faça login novamente.";
       setErrorMessage(msg);
       if (errorTimeoutRef.current) clearTimeout(errorTimeoutRef.current);
       errorTimeoutRef.current = setTimeout(() => setErrorMessage(""), 5000);
@@ -225,7 +228,11 @@ export default function Tarefas() {
         funcionario_id: funcionarioId,
       });
 
-      setTarefasDisponiveis((prev) => prev.filter((t) => t.id !== tarefaId));
+      setRemovendoId(tarefaId);
+
+      setTimeout(() => {
+        setTarefasDisponiveis((prev) => prev.filter((t) => t.id !== tarefaId));
+      }, 300);
 
       if (tarefaSelecionada?.id === tarefaId) {
         setTarefaSelecionada(null);
@@ -242,7 +249,9 @@ export default function Tarefas() {
         err.response?.data || err.message,
       );
 
-      const msg = err.response?.data?.mensagem || "Erro ao aceitar tarefa. Tente novamente mais tarde.";
+      const msg =
+        err.response?.data?.mensagem ||
+        "Erro ao aceitar tarefa. Tente novamente mais tarde.";
       setErrorMessage(msg);
       if (errorTimeoutRef.current) clearTimeout(errorTimeoutRef.current);
       errorTimeoutRef.current = setTimeout(() => setErrorMessage(""), 5000);
@@ -347,7 +356,6 @@ export default function Tarefas() {
 
         {/* SEÇÃO PRINCIPAL */}
         <section className={styles.section}>
-
           {/* FILTROS */}
           <div className={styles.filtrosContainer}>
             <div className={styles.filtroGroup}>
@@ -423,16 +431,34 @@ export default function Tarefas() {
           {(successMessage || errorMessage) && (
             <div className={styles.alertsWrapper}>
               {successMessage && (
-                <div className={`${styles.alert} ${styles.alertSuccess}`} role="status">
+                <div
+                  className={`${styles.alert} ${styles.alertSuccess}`}
+                  role="status"
+                >
                   <div className={styles.alertIcon} aria-hidden>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20 6L9 17L4 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                    <svg
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M20 6L9 17L4 12"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
                   </div>
                   <div className={styles.alertContent}>{successMessage}</div>
                   <button
                     className={styles.alertClose}
                     onClick={() => {
                       setSuccessMessage("");
-                      if (successTimeoutRef.current) clearTimeout(successTimeoutRef.current);
+                      if (successTimeoutRef.current)
+                        clearTimeout(successTimeoutRef.current);
                     }}
                     aria-label="Fechar mensagem de sucesso"
                   >
@@ -442,16 +468,48 @@ export default function Tarefas() {
               )}
 
               {errorMessage && (
-                <div className={`${styles.alert} ${styles.alertError}`} role="alert">
+                <div
+                  className={`${styles.alert} ${styles.alertError}`}
+                  role="alert"
+                >
                   <div className={styles.alertIcon} aria-hidden>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 9v4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /><path d="M12 17h.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /><path d="M21 12A9 9 0 1 1 3 12a9 9 0 0 1 18 0z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                    <svg
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M12 9v4"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                      <path
+                        d="M12 17h.01"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                      <path
+                        d="M21 12A9 9 0 1 1 3 12a9 9 0 0 1 18 0z"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
                   </div>
                   <div className={styles.alertContent}>{errorMessage}</div>
                   <button
                     className={styles.alertClose}
                     onClick={() => {
                       setErrorMessage("");
-                      if (errorTimeoutRef.current) clearTimeout(errorTimeoutRef.current);
+                      if (errorTimeoutRef.current)
+                        clearTimeout(errorTimeoutRef.current);
                     }}
                     aria-label="Fechar mensagem de erro"
                   >
@@ -531,13 +589,19 @@ export default function Tarefas() {
                       <th className={styles.textCenter}>Criado por</th>
                       <th className={styles.textCenter}>Data</th>
                       <th className={styles.textCenter}>Hora</th>
-                      <th className={styles.textCenter}>Descrição</th>
                       <th className={styles.textCenter}>Ação</th>
                     </tr>
                   </thead>
                   <tbody>
                     {tarefasFiltradas.map((tarefa) => (
-                      <tr key={tarefa.id}>
+                      <tr
+                        key={tarefa.id}
+                        onClick={() => setTarefaSelecionada(tarefa)}
+                        className={`
+                        ${styles.clickableRow}
+                        ${removendoId === tarefa.id ? styles.removingRow : ""}
+                      `}
+                      >
                         <td title={tarefa.titulo}>
                           <strong>{tarefa.titulo}</strong>
                         </td>
@@ -545,34 +609,24 @@ export default function Tarefas() {
                           <PrioridadeBadge prioridade={tarefa.prioridade} />
                         </td>
                         <td className={styles.textCenter}>{tarefa.setor}</td>
-                        <td className={styles.textCenter}>{tarefa.criadoPor}</td>
+                        <td className={styles.textCenter}>
+                          {tarefa.criadoPor}
+                        </td>
                         <td className={styles.textCenter}>
                           {tarefa.dataCriacao}
                         </td>
                         <td className={styles.textCenter}>
                           {tarefa.horaCriacao}
                         </td>
-                        <td>
-                          <button
-                            onClick={() => setTarefaSelecionada(tarefa)}
-                            style={{
-                              background: "transparent",
-                              border: "none",
-                              color: "var(--primary)",
-                              cursor: "pointer",
-                              fontWeight: "600",
-                              textDecoration: "underline",
-                              fontSize: "1.35rem",
-                            }}
-                          >
-                            Ler mais →
-                          </button>
-                        </td>
                         <td className={styles.actionCell}>
                           <button
-                            className={`${styles.btnAccept} ${aceitandoId === tarefa.id ? styles.loading : ""
-                              }`}
-                            onClick={() => aceitarTarefa(tarefa.id)}
+                            className={`${styles.btnAccept} ${
+                              aceitandoId === tarefa.id ? styles.loading : ""
+                            }`}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              aceitarTarefa(tarefa.id);
+                            }}
                             disabled={aceitandoId !== null}
                             title={
                               aceitandoId === tarefa.id
@@ -599,6 +653,7 @@ export default function Tarefas() {
                   <div
                     key={tarefa.id}
                     className={`${styles.card} ${styles.mobileCard}`}
+                    onClick={() => setTarefaSelecionada(tarefa)}
                   >
                     {/* CABEÇALHO DO CARD */}
                     <div className={styles.cardHeader}>
@@ -627,9 +682,13 @@ export default function Tarefas() {
 
                       <div className={styles.mobileCardActions}>
                         <button
-                          className={`${styles.btnAccept} ${aceitandoId === tarefa.id ? styles.loading : ""
-                            }`}
-                          onClick={() => aceitarTarefa(tarefa.id)}
+                          className={`${styles.btnAccept} ${
+                            aceitandoId === tarefa.id ? styles.loading : ""
+                          }`}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            aceitarTarefa(tarefa.id);
+                          }}
                           disabled={aceitandoId !== null}
                           title={
                             aceitandoId === tarefa.id
@@ -649,77 +708,29 @@ export default function Tarefas() {
             </>
           )}
         </section>
-
       </div>
 
       {/* MODAL: LER DESCRIÇÃO COMPLETA */}
+      {/* MODAL: DETALHES DA TAREFA */}
       {tarefaSelecionada && (
-        <>
-          <div
-            className={styles.modalOverlay}
-            onClick={() => setTarefaSelecionada(null)}
-          />
-          <div className={styles.modalContent}>
-            <div className={styles.modalHeader}>
-              <h3>{tarefaSelecionada.titulo}</h3>
-              <button
-                className={styles.closeButton}
-                onClick={() => setTarefaSelecionada(null)}
-              >
-                ✕
-              </button>
-            </div>
-
-            <div className={styles.modalBody}>
-              <div className={styles.modalField}>
-                <label>Descrição Completa:</label>
-                <p>{tarefaSelecionada.descricao}</p>
-              </div>
-
-              <div className={styles.modalGrid}>
-                <div className={styles.modalField}>
-                  <label>Prioridade:</label>
-                  <PrioridadeBadge prioridade={tarefaSelecionada.prioridade} />
-                </div>
-                <div className={styles.modalField}>
-                  <label>Setor:</label>
-                  <p>{tarefaSelecionada.setor}</p>
-                </div>
-                <div className={styles.modalField}>
-                  <label>Criado por:</label>
-                  <p>{tarefaSelecionada.criadoPor}</p>
-                </div>
-                <div className={styles.modalField}>
-                  <label>Data:</label>
-                  <p>{tarefaSelecionada.dataCriacao}</p>
-                </div>
-                <div className={styles.modalField}>
-                  <label>Hora:</label>
-                  <p>{tarefaSelecionada.horaCriacao}</p>
-                </div>
-                <div className={styles.modalField}>
-                  <label>Estimativa</label>
-                  <p>
-                    {formatarEstimativa(
-                      tarefaSelecionada.tar_estimativa_minutos
-                    )}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className={styles.modalFooter}>
+        <Modal
+          title={tarefaSelecionada.titulo}
+          onClose={() => setTarefaSelecionada(null)}
+          actions={
+            <>
               <button
                 className={styles.btnModalClose}
                 onClick={() => setTarefaSelecionada(null)}
               >
                 Fechar
               </button>
+
               <button
-                className={`${styles.btnAccept} ${aceitandoId === tarefaSelecionada.id ? styles.loading : ""
-                  }`}
-                onClick={() => {
-                  aceitarTarefa(tarefaSelecionada.id);
+                className={`${styles.btnAccept} ${
+                  aceitandoId === tarefaSelecionada.id ? styles.loading : ""
+                }`}
+                onClick={async () => {
+                  await aceitarTarefa(tarefaSelecionada.id);
                   setTarefaSelecionada(null);
                 }}
                 disabled={aceitandoId !== null}
@@ -728,9 +739,52 @@ export default function Tarefas() {
                   ? "✓ Aceitando..."
                   : "✓ Aceitar"}
               </button>
+            </>
+          }
+        >
+          <div className={styles.modalField}>
+            <label>Descrição</label>
+
+            <div className={styles.descricaoPreview}>
+              {tarefaSelecionada.descricao}
             </div>
           </div>
-        </>
+
+          <div className={styles.modalGrid}>
+            <div className={styles.modalField}>
+              <label>Prioridade</label>
+
+              <PrioridadeBadge prioridade={tarefaSelecionada.prioridade} />
+            </div>
+
+            <div className={styles.modalField}>
+              <label>Setor</label>
+              <p>{tarefaSelecionada.setor}</p>
+            </div>
+
+            <div className={styles.modalField}>
+              <label>Criado por</label>
+              <p>{tarefaSelecionada.criadoPor}</p>
+            </div>
+
+            <div className={styles.modalField}>
+              <label>Data</label>
+              <p>{tarefaSelecionada.dataCriacao}</p>
+            </div>
+
+            <div className={styles.modalField}>
+              <label>Hora</label>
+              <p>{tarefaSelecionada.horaCriacao}</p>
+            </div>
+
+            <div className={styles.modalField}>
+              <label>Estimativa</label>
+              <p>
+                {formatarEstimativa(tarefaSelecionada.tar_estimativa_minutos)}
+              </p>
+            </div>
+          </div>
+        </Modal>
       )}
     </div>
   );

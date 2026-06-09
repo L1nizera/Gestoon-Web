@@ -33,7 +33,17 @@ const columns = [
   {
     key: "titulo",
     label: "Título",
-    render: (row) => <span title={row.titulo}>{row.titulo}</span>,
+    render: (row) => (
+      <span
+        className={styles.linkTitulo}
+        onClick={(e) => {
+          e.stopPropagation();
+          setTarefaSelecionada(row);
+        }}
+      >
+        {row.titulo}
+      </span>
+    ),
   },
   {
     key: "status",
@@ -82,11 +92,6 @@ const columns = [
     key: "horaCriacao",
     label: "Hora",
     align: "center",
-  },
-  {
-    key: "descricao",
-    label: "Descrição",
-    render: (row) => <span title={row.descricao}>{row.descricao}</span>,
   },
 ];
 
