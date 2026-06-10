@@ -4,7 +4,7 @@ import api from "../../../services/api";
 import styles from "../../Adm/Home/style.module.css";
 import localStyles from "./style.module.css";
 import DataTable from "../../../components/ui/DataTable";
-import Modal from "../../../components/Modal/Modal";
+import Modal from "../../../components/Modal";
 import { useToast } from "../../../components/ui/Toast";
 
 const prioridadeApiMap = {

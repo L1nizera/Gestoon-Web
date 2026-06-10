@@ -3,7 +3,7 @@ import styles from "./style.module.css";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import Modal from "../../../components/Modal/Modal";
+import Modal from "../../../components/Modal";
 import DataTable from "../../../components/ui/DataTable";
 import api from "../../../services/api";
 import { useToast } from "../../../components/ui/Toast";
