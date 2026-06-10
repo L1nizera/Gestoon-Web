@@ -80,6 +80,25 @@
   font-weight: 400;
 }
 
+.academicNote {
+  margin: 0 0 1rem 0;
+  color: #475569;
+  font-size: 0.95rem;
+}
+
+.featureList {
+  list-style: disc;
+  margin: 0 0 1.5rem 1.2rem;
+  padding: 0;
+  color: #0f172a;
+  font-weight: 500;
+}
+
+.featureList li {
+  margin-bottom: 0.4rem;
+  font-size: 0.98rem;
+}
+
 .socialProof {
   display: flex;
   align-items: center;
@@ -156,7 +175,7 @@
   flex-direction: column;
   gap: 1.2rem;
   backdrop-filter: blur(20px);
-  box-shadow: 0 20px 60px rgba(14, 165, 233, 0.15), 
+  box-shadow: 0 20px 60px rgba(14, 165, 233, 0.12), 
              inset 0 1px 0 rgba(255, 255, 255, 0.5);
   animation: floatPreview 4s ease-in-out infinite;
   position: relative;
@@ -210,6 +229,15 @@
   gap: 1rem;
 }
 
+.mockupImage {
+  width: 100%;
+  height: auto;
+  border-radius: 1rem;
+  border: 1px solid rgba(14, 165, 233, 0.12);
+  box-shadow: 0 10px 30px rgba(2, 132, 199, 0.08);
+  object-fit: cover;
+}
+
 .previewBar {
   height: 0.5rem;
   background: linear-gradient(90deg, #0284c7 0%, #06b6d4 100%);
@@ -227,6 +255,28 @@
   background: linear-gradient(90deg, #7dd3fc 0%, #a5f3fc 100%);
 }
 
+/* Demo large preview */
+.demoSection {
+  display: flex;
+  justify-content: center;
+  padding: 3rem 2rem;
+}
+
+.dashboardPreviewLarge {
+  width: 100%;
+  max-width: 1000px;
+  border-radius: 1.2rem;
+  overflow: hidden;
+  box-shadow: 0 30px 80px rgba(2, 132, 199, 0.08);
+  border: 1px solid rgba(14,165,233,0.08);
+}
+
+.mockupLarge {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
 /* ===== BENEFITS SECTION ===== */
 .benefits {
   display: grid;
@@ -242,9 +292,9 @@
   border-radius: 1.2rem;
   padding: 2rem;
   text-align: center;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.28s ease, box-shadow 0.28s ease, background 0.28s ease;
   backdrop-filter: blur(16px);
-  box-shadow: 0 8px 24px rgba(14, 165, 233, 0.08);
+  box-shadow: 0 8px 24px rgba(14, 165, 233, 0.06);
   position: relative;
   overflow: hidden;
 }
@@ -258,10 +308,10 @@
 }
 
 .benefitCard:hover {
-  transform: translateY(-8px);
-  background: rgba(255, 255, 255, 0.8);
-  border-color: var(--color-primary-400);
-  box-shadow: 0 16px 40px rgba(14, 165, 233, 0.15);
+  transform: translateY(-6px);
+  background: rgba(255, 255, 255, 0.9);
+  border-color: rgba(2,132,199,0.18);
+  box-shadow: 0 18px 50px rgba(2, 132, 199, 0.08);
 }
 
 .benefitCard h3 {
@@ -315,6 +365,116 @@
 
 .footerLinks a:hover {
   color: var(--color-primary-600);
+}
+
+/* Features cards */
+.features {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.2rem;
+  padding: 2.5rem 4rem;
+}
+
+.featureCard {
+  background: white;
+  border-radius: 1rem;
+  padding: 1.6rem;
+  text-align: left;
+  box-shadow: 0 8px 30px rgba(2,132,199,0.04);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  border: 1px solid rgba(14,165,233,0.06);
+}
+
+.featureCard:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 18px 50px rgba(2,132,199,0.08);
+}
+
+.featureIcon {
+  font-size: 1.6rem;
+  width: 48px;
+  height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg,#e6f6ff,#d9f2ff);
+  border-radius: 0.8rem;
+  margin-bottom: 0.6rem;
+}
+
+.featureCard h4 {
+  margin: 0 0 0.35rem 0;
+  color: #0c4a6e;
+}
+
+.featureCard p {
+  margin: 0;
+  color: #475569;
+  font-size: 0.95rem;
+}
+
+/* How it works */
+.howItWorks {
+  padding: 2rem 4rem;
+}
+
+.howItWorks h3 {
+  margin: 0 0 1rem 0;
+  color: #0c4a6e;
+}
+
+.steps {
+  display: flex;
+  gap: 1rem;
+}
+
+.step {
+  background: white;
+  border-radius: 0.8rem;
+  padding: 1rem 1.2rem;
+  flex: 1;
+  text-align: center;
+  box-shadow: 0 8px 24px rgba(2,132,199,0.04);
+}
+
+.stepNum {
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  background: linear-gradient(135deg,#0284c7,#06b6d4);
+  color: white;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  margin-bottom: 0.6rem;
+}
+
+.step p { margin: 0; color: #475569; font-weight: 600; }
+
+/* Proof of value */
+.valueProof {
+  padding: 2rem 4rem 3rem 4rem;
+}
+
+.valueProof h3 { margin-bottom: 0.8rem; color: #0c4a6e; }
+
+.valueProof ul { margin: 0; padding-left: 1.2rem; color: #475569; }
+
+.valueProof li { margin-bottom: 0.4rem; }
+
+/* Responsive adjustments for new sections */
+@media (max-width: 1024px) {
+  .features { grid-template-columns: 1fr; padding: 1.2rem 2.5rem; }
+  .howItWorks .steps { flex-direction: column; }
+  .benefits { grid-template-columns: 1fr; padding: 1.2rem 2.5rem; }
+}
+
+@media (max-width: 480px) {
+  .ctaButtons { flex-direction: column; }
+  .dashboardPreview { padding: 1rem; }
+  .demoSection { padding: 1.5rem 1rem; }
+  .featureIcon { width: 40px; height: 40px; }
 }
 
 /* ===== RESPONSIVE ===== */
@@ -427,6 +587,17 @@
 
   .footer {
     padding: 0.8rem 1.5rem;
+  }
+}
+
+/* About section styling keeps visual consistency with benefit cards */
+.about {
+  padding: 2rem 4rem;
+}
+
+@media (max-width: 1024px) {
+  .about {
+    padding: 1.2rem 2.5rem;
   }
 }
 
