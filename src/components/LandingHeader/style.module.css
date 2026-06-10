@@ -14,6 +14,7 @@
   border-bottom: 1px solid rgba(14, 165, 233, 0.1);
   height: 6rem;
   box-shadow: 0 2px 16px rgba(14, 165, 233, 0.08);
+  
 }
 
 .brand {
@@ -21,6 +22,7 @@
   align-items: center;
   gap: 0.5rem;
   flex-shrink: 0;
+  
 }
 
 .logo {
@@ -31,12 +33,14 @@
   -webkit-text-fill-color: transparent;
   background-clip: text;
   letter-spacing: -0.01em;
+  
 }
 
 .nav {
   flex: 1;
   display: flex;
   justify-content: center;
+  
 }
 
 .menu {
@@ -56,6 +60,8 @@
   font-weight: 500;
   transition: all 0.3s ease;
   position: relative;
+
+  
 }
 
 .link::after {
@@ -67,20 +73,24 @@
   height: 2px;
   background: linear-gradient(90deg, #0284c7, #0ea5e9);
   transition: width 0.3s ease;
+  
 }
 
 .link:hover {
   color: #0284c7;
+  
 }
 
 .link:hover::after {
   width: 100%;
+  
 }
 
 .actions {
   display: flex;
   align-items: center;
   flex-shrink: 0;
+  
 }
 
 .actions button {
@@ -99,6 +109,7 @@
 .actions button:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 16px rgba(2, 132, 199, 0.4);
+  
 }
 
 /* ===== RESPONSIVE ===== */

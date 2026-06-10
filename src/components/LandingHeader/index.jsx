@@ -6,8 +6,7 @@ const menuItems = [
   { href: "#inicio", label: "Início" },
   { href: "#funcionalidades", label: "Funcionalidades" },
   { href: "#sobre", label: "Sobre Nós" },
-  { href: "#beneficios", label: "Benefícios" },
-  { href: "#contato", label: "Contato" },
+  
 ];
 
 export default function LandingHeader() {
