@@ -620,9 +620,8 @@ export default function Tarefas() {
                         </td>
                         <td className={styles.actionCell}>
                           <button
-                            className={`${styles.btnAccept} ${
-                              aceitandoId === tarefa.id ? styles.loading : ""
-                            }`}
+                            className={`${styles.btnAccept} ${aceitandoId === tarefa.id ? styles.loading : ""
+                              }`}
                             onClick={(e) => {
                               e.stopPropagation();
                               aceitarTarefa(tarefa.id);
@@ -682,9 +681,8 @@ export default function Tarefas() {
 
                       <div className={styles.mobileCardActions}>
                         <button
-                          className={`${styles.btnAccept} ${
-                            aceitandoId === tarefa.id ? styles.loading : ""
-                          }`}
+                          className={`${styles.btnAccept} ${aceitandoId === tarefa.id ? styles.loading : ""
+                            }`}
                           onClick={(e) => {
                             e.stopPropagation();
                             aceitarTarefa(tarefa.id);
@@ -710,78 +708,82 @@ export default function Tarefas() {
         </section>
       </div>
 
-      {/* MODAL: LER DESCRIÇÃO COMPLETA */}
       {/* MODAL: DETALHES DA TAREFA */}
       {tarefaSelecionada && (
         <Modal
           title={tarefaSelecionada.titulo}
           onClose={() => setTarefaSelecionada(null)}
+          variant="between"
           actions={
             <>
               <button
-                className={styles.btnModalClose}
+                className={styles.btnClose}
                 onClick={() => setTarefaSelecionada(null)}
               >
                 Fechar
               </button>
 
               <button
-                className={`${styles.btnAccept} ${
-                  aceitandoId === tarefaSelecionada.id ? styles.loading : ""
-                }`}
+                className={`${styles.btnPrimary} ${aceitandoId === tarefaSelecionada.id
+                    ? styles.loading
+                    : ""
+                  }`}
                 onClick={async () => {
                   await aceitarTarefa(tarefaSelecionada.id);
                   setTarefaSelecionada(null);
                 }}
-                disabled={aceitandoId !== null}
               >
                 {aceitandoId === tarefaSelecionada.id
-                  ? "✓ Aceitando..."
-                  : "✓ Aceitar"}
+                  ? "Aceitando..."
+                  : "Aceitar"}
               </button>
             </>
           }
         >
-          <div className={styles.modalField}>
-            <label>Descrição</label>
-
-            <div className={styles.descricaoPreview}>
-              {tarefaSelecionada.descricao}
-            </div>
-          </div>
-
           <div className={styles.modalGrid}>
-            <div className={styles.modalField}>
-              <label>Prioridade</label>
+            <div>
+              <strong>Prioridade:</strong>
 
-              <PrioridadeBadge prioridade={tarefaSelecionada.prioridade} />
+              <PrioridadeBadge
+                prioridade={tarefaSelecionada.prioridade}
+              />
             </div>
 
-            <div className={styles.modalField}>
-              <label>Setor</label>
+            <div>
+              <strong>Setor:</strong>
               <p>{tarefaSelecionada.setor}</p>
             </div>
 
-            <div className={styles.modalField}>
-              <label>Criado por</label>
+            <div>
+              <strong>Criado por:</strong>
               <p>{tarefaSelecionada.criadoPor}</p>
             </div>
 
-            <div className={styles.modalField}>
-              <label>Data</label>
+            <div>
+              <strong>Data:</strong>
               <p>{tarefaSelecionada.dataCriacao}</p>
             </div>
 
-            <div className={styles.modalField}>
-              <label>Hora</label>
+            <div>
+              <strong>Hora:</strong>
               <p>{tarefaSelecionada.horaCriacao}</p>
             </div>
 
-            <div className={styles.modalField}>
-              <label>Estimativa</label>
+            <div>
+              <strong>Estimativa:</strong>
               <p>
-                {formatarEstimativa(tarefaSelecionada.tar_estimativa_minutos)}
+                {formatarEstimativa(
+                  tarefaSelecionada.tar_estimativa_minutos
+                )}
               </p>
+            </div>
+          </div>
+
+          <div className={styles.descricaoArea}>
+            <strong>Descrição:</strong>
+
+            <div className={styles.descricaoBox}>
+              <p>{tarefaSelecionada.descricao}</p>
             </div>
           </div>
         </Modal>

@@ -21,7 +21,6 @@ body {
 
 /* ===== DASHBOARD ===== */
 .dashboard {
-  padding: 0;
   background: transparent;
   display: flex;
   flex-direction: column;
@@ -38,12 +37,6 @@ body {
   to {
     opacity: 1;
     transform: translateY(0);
-  }
-}
-
-@media (max-width: 768px) {
-  .dashboard {
-    padding: 1.5rem;
   }
 }
 
@@ -137,6 +130,14 @@ body {
   .summaryGrid {
     grid-template-columns: 1fr;
   }
+}
+
+.subtitle {
+  margin-top: 0.6rem;
+  font-size: 1.5rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  max-width: 70rem;
 }
 
 /* ===== FILTERS SECTION ===== */
@@ -278,6 +279,7 @@ body {
     opacity: 0;
     transform: translateY(-0.6rem);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -363,10 +365,6 @@ body {
   display: block;
 }
 
-.mobileOnly {
-  display: none;
-}
-
 .btnDetalhes {
   background: transparent;
   border: none;
@@ -387,7 +385,6 @@ body {
 
 .clickableRow:hover {
   background: #eef4ff;
-  transform: translateY(-1px);
 }
 
 /* ===== MOBILE CARDS CONTAINER (ESCONDIDO NO DESKTOP) ===== */
@@ -439,7 +436,7 @@ body {
 
 .table {
   width: 100%;
-  min-width: 100rem;
+  min-width: 70rem;
   border-collapse: separate;
   border-spacing: 0;
   background: var(--bg-card);
@@ -449,6 +446,14 @@ body {
 
 .table tbody tr {
   animation: fadeRow 0.2s ease;
+}
+
+.descricaoBox {
+  margin-top: 0.8rem;
+  padding: 1.2rem;
+  border: 1px solid var(--border-default);
+  border-radius: 0.8rem;
+  background: var(--bg-surface);
 }
 
 @keyframes fadeRow {
@@ -582,46 +587,40 @@ body {
 }
 
 /* ===== BUTTONS ===== */
-.btnAccept {
-  border: none;
-  border-radius: 0.8rem;
-  padding: 0.8rem 1.2rem;
-  background: var(--button-success-bg);
+.btnPrimary {
+  background: var(--button-primary-bg);
   color: var(--color-white);
-  font-weight: 600;
-  font-size: 1.35rem;
+  border: none;
+  border-radius: 0.6rem;
   cursor: pointer;
-  transition: all 0.3s ease;
-  min-width: 13rem;
-  position: relative;
+  font-weight: 500;
 }
 
-.btnAccept:hover:not(:disabled) {
-  background: var(--button-success-hover);
-  transform: translateY(-2px);
-  box-shadow: 0 0.8rem 1.6rem rgba(34, 197, 94, 0.3);
+.btnPrimary:hover {
+  background: var(--button-primary-hover);
 }
 
-.btnAccept:active:not(:disabled) {
-  transform: translateY(0);
-  box-shadow: 0 0.2rem 0.4rem rgba(34, 197, 94, 0.2);
+.btnClose {
+  background: var(--button-secondary-bg);
+  color: var(--color-white);
+  border: none;
+  border-radius: 0.6rem;
+  cursor: pointer;
+  font-weight: 500;
 }
 
-.btnAccept:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
+.btnClose:hover {
+  background: var(--button-secondary-hover);
 }
 
-.btnAccept.loading {
-  opacity: 0.8;
-  pointer-events: none;
-}
-
-.actionCell {
-  text-align: center;
-  vertical-align: middle;
+.btnPrimary,
+.btnClose {
+  padding: 10px 16px;
+  font-size: 14px;
+  min-height: 30px;
+  display: inline-flex;
+  align-items: center;
   justify-content: center;
-  gap: 0.5rem;
 }
 
 /* ===== EMPTY STATE ===== */
@@ -802,11 +801,47 @@ body {
 
 .modalGrid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1.5rem;
-  margin-top: 2rem;
-  padding-top: 2rem;
-  border-top: 0.1rem solid var(--border-default);
+  grid-template-columns: 1fr 1fr;
+  gap: 1.2rem 2rem;
+  margin-top: 0.5rem;
+  margin-bottom: 1.4rem;
+}
+
+.modalGrid>div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding-bottom: 0.35rem;
+  border-bottom: 0.1rem solid rgba(148, 163, 184, 0.25);
+}
+
+.modalGrid strong {
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.modalGrid p {
+  margin: 0;
+  font-size: 1.4rem;
+  color: var(--text-primary);
+}
+
+.descricaoArea {
+  margin-top: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.descricaoArea strong {
+  display: block;
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.6rem;
+}
+
+.descricaoBox p {
+  margin: 0;
+  font-size: 1.4rem;
 }
 
 @media (max-width: 768px) {
@@ -965,44 +1000,35 @@ body {
   .dashboard {
     padding: 1.5rem;
   }
-}
 
-.pageHeader {
-  flex-direction: column;
-  gap: 1.5rem;
-}
+  .pageHeader {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
 
-.summaryGrid {
-  grid-template-columns: repeat(2, 1fr);
-  width: 100%;
-}
+  .summaryGrid {
+    grid-template-columns: repeat(2, 1fr);
+    width: 100%;
+  }
 
-.title {
-  font-size: 2.2rem;
-}
+  .title {
+    font-size: 2.2rem;
+  }
 
-.pageHeaderContent {
-  width: 100%;
-}
+  .pageHeaderContent {
+    width: 100%;
+  }
 
-.filtrosContainer {
-  flex-direction: column;
-  gap: 1rem;
-}
+  .filtrosContainer {
+    flex-direction: column;
+    gap: 1rem;
+  }
 
-.filtroGroup select,
-.filtroGroup input {
-  width: 100%;
-  min-width: auto;
-}
-
-.btnAccept {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 11rem;
-  padding: 0.7rem 1rem;
-  font-size: 1.2rem;
+  .filtroGroup select,
+  .filtroGroup input {
+    width: 100%;
+    min-width: auto;
+  }
 }
 
 @media (max-width: 768px) {
@@ -1010,153 +1036,156 @@ body {
     display: none !important;
   }
 
-  .tableWrapper {
-    display: none;
-  }
-
-  /* MOSTRAR CARDS NO MOBILE */
   .mobileOnly {
     display: flex !important;
     flex-direction: column;
     gap: 12px;
-    max-height: calc(75vh - 240px);
-    overflow-y: auto;
-    padding-right: 0.5rem;
-  }
-
-  .mobileCardsContainer {
-    display: flex;
-    flex-direction: column;
-    gap: 2rem;
-    max-height: calc(100vh - 280px);
-    overflow-y: auto;
-    padding: 1rem 0;
-  }
-
-  .mobileCardsContainer::-webkit-scrollbar {
-    width: 0.6rem;
-  }
-
-  .mobileCardsContainer::-webkit-scrollbar-track {
-    background: var(--bg-surface);
-    border-radius: 1rem;
-  }
-
-  .mobileCardsContainer::-webkit-scrollbar-thumb {
-    background: var(--text-secondary);
-    border-radius: 1rem;
-    opacity: 0.6;
-  }
-
-  .mobileCardsContainer::-webkit-scrollbar-thumb:hover {
-    background: var(--text-primary);
-    opacity: 1;
-  }
-
-  /* CARD MOBILE */
-  .mobileCard {
-    background: var(--bg-card);
-    border-radius: 2rem;
-    padding: 1.8rem;
-    display: flex;
-    flex-direction: column;
-    gap: 1.6rem;
-    border: 0.1rem solid var(--border-default);
-    box-shadow: 0 1rem 2.2rem rgba(0, 0, 0, 0.08);
-    position: relative;
-    transition: all 0.3s ease;
-    animation: fadeRow 0.2s ease;
-    padding-bottom: 5.4rem;
-  }
-
-  .mobileCard:hover {
-    box-shadow: 0 1.2rem 2.8rem rgba(0, 0, 0, 0.12);
-    transform: translateY(-2px);
-  }
-
-  .mobileCard:active {
-    transform: scale(0.99);
-  }
-
-  /* CABEÇALHO DO CARD */
-  .mobileCardHeader {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 1rem;
-    margin-bottom: 0.5rem;
-  }
-
-  .mobileCardHeader strong {
-    font-size: 1.7rem;
-    font-weight: 700;
-    color: var(--text-primary);
-    flex: 1;
-    word-break: break-word;
-    line-height: 1.2;
-  }
-
-  /* CORPO DO CARD */
-  .mobileCardBody {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-  }
-
-  .mobileCardBody p {
-    margin: 0;
-    font-size: 1.45rem;
-    color: var(--text-secondary);
-    line-height: 1.5;
-  }
-
-  .mobileCardBody strong {
-    color: var(--text-primary);
-    font-weight: 700;
-  }
-
-  /* RODAPÉ DO CARD */
-  .mobileCardFooter {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 1.5rem;
-    padding-top: 1rem;
-    gap: 1rem;
-    border-top: 0.1rem solid var(--border-default);
-  }
-
-  .mobileCardFooter .cardFooter {
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
-    gap: 1rem;
-    font-size: 1.6rem;
-    color: var(--text-muted);
-    margin: 0;
-    padding: 0;
-    width: auto;
-  }
-
-  .mobileCardFooter .cardFooter span {
-    margin: 0;
-    white-space: nowrap;
-  }
-
-  .mobileCardActions {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-  }
-
-  .mobileCard .btnAccept {
-    width: fit-content;
-    min-width: auto;
-    height: 3rem;
-    font-size: 1.1rem;
-    padding: 0.45rem 1rem;
   }
 }
+
+/* MOSTRAR CARDS NO MOBILE */
+.mobileOnly {
+  display: flex !important;
+  flex-direction: column;
+  gap: 12px;
+  max-height: calc(75vh - 240px);
+  overflow-y: auto;
+  padding-right: 0.5rem;
+}
+
+.mobileCardsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  max-height: calc(100vh - 280px);
+  overflow-y: auto;
+  padding: 1rem 0;
+}
+
+.mobileCardsContainer::-webkit-scrollbar {
+  width: 0.6rem;
+}
+
+.mobileCardsContainer::-webkit-scrollbar-track {
+  background: var(--bg-surface);
+  border-radius: 1rem;
+}
+
+.mobileCardsContainer::-webkit-scrollbar-thumb {
+  background: var(--text-secondary);
+  border-radius: 1rem;
+  opacity: 0.6;
+}
+
+.mobileCardsContainer::-webkit-scrollbar-thumb:hover {
+  background: var(--text-primary);
+  opacity: 1;
+}
+
+/* CARD MOBILE */
+.mobileCard {
+  background: var(--bg-card);
+  border-radius: 2rem;
+  padding: 1.8rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.6rem;
+  border: 0.1rem solid var(--border-default);
+  box-shadow: 0 1rem 2.2rem rgba(0, 0, 0, 0.08);
+  position: relative;
+  transition: all 0.3s ease;
+  animation: fadeRow 0.2s ease;
+  padding-bottom: 5.4rem;
+}
+
+.mobileCard:hover {
+  box-shadow: 0 1.2rem 2.8rem rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
+}
+
+.mobileCard:active {
+  transform: scale(0.99);
+}
+
+/* CABEÇALHO DO CARD */
+.mobileCardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.mobileCardHeader strong {
+  font-size: 1.7rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  flex: 1;
+  word-break: break-word;
+  line-height: 1.2;
+}
+
+/* CORPO DO CARD */
+.mobileCardBody {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.mobileCardBody p {
+  margin: 0;
+  font-size: 1.45rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.mobileCardBody strong {
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+/* RODAPÉ DO CARD */
+.mobileCardFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  gap: 1rem;
+  border-top: 0.1rem solid var(--border-default);
+}
+
+.mobileCardFooter .cardFooter {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 1rem;
+  font-size: 1.6rem;
+  color: var(--text-muted);
+  margin: 0;
+  padding: 0;
+  width: auto;
+}
+
+.mobileCardFooter .cardFooter span {
+  margin: 0;
+  white-space: nowrap;
+}
+
+.mobileCardActions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.mobileCard .btnAccept {
+  width: fit-content;
+  min-width: auto;
+  height: 3rem;
+  font-size: 1.1rem;
+  padding: 0.45rem 1rem;
+}
+
 
 /* MOBILE (até 480px) */
 @media (max-width: 480px) {
@@ -1314,22 +1343,10 @@ body {
 }
 
 /* ===== ANIMAÇÕES GERAIS E MELHORIAS ===== */
-button {
-  transition: all 0.2s ease;
-}
-
-button:hover {
+.btnPrimary:hover,
+.btnClose:hover,
+.btnAccept:hover {
   transform: translateY(-0.2rem);
-  box-shadow: 0 0.5rem 1.2rem rgba(0, 0, 0, 0.15);
-}
-
-button:active {
-  transform: scale(0.97);
-}
-
-button:focus,
-th:focus {
-  outline: none;
 }
 
 @media (max-width: 768px) {

@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect, useRef } from "react";
 import styles from "../Home/style.module.css";
 import localStyles from "./style.module.css";
 import jsPDF from "jspdf";
-import Modal from "../../../components/Modal/Modal";
+import Modal from "../../../components/Modal/index.jsx";
 import autoTable from "jspdf-autotable";
 import DataTable from "../../../components/ui/DataTable";
 import api from "../../../services/api";
