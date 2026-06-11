@@ -3,10 +3,9 @@ import Button from "../ui/Button";
 import styles from "./style.module.css";
 
 const menuItems = [
-  { href: "#inicio", label: "Início" },
+  { href: "/inicio", label: "Início" },
   { href: "#funcionalidades", label: "Funcionalidades" },
-  { href: "#sobre", label: "Sobre Nós" },
-  
+  { href: "/equipe", label: "Equipe" },
 ];
 
 export default function LandingHeader() {
