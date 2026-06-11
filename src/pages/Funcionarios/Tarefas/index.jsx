@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect, useRef } from "react";
 import { useAuth } from "../../../context/AuthContext";
-import styles from "./style.module.css";
+import styles from "../../Adm/Home/style.module.css";
+import localStyles from "./style.module.css";
 import api from "../../../services/api";
 import Modal from "../../../components/Modal/index.jsx";
 
@@ -329,210 +330,215 @@ export default function Tarefas() {
   // ═════════════════════════════════════════════════════════════════
 
   return (
-    <div className={styles.dashboardContainer}>
-      <div className={styles.dashboard}>
+    <div className={styles.dashboard}>
+      <div className={styles.cardContainer}>
         {/* CABEÇALHO DA PÁGINA */}
-        <div className={styles.pageHeader}>
-          <div className={styles.pageHeaderContent}>
-            <h1 className={styles.title}>Tarefas Disponíveis</h1>
-            <p className={styles.subtitle}>
-              Visualize e aceite as tarefas pendentes para começar a trabalhar.
-              Após aceitar, elas aparecerão em "Minhas Tarefas em Andamento".
-            </p>
-          </div>
+        <h1>Tarefas Disponíveis</h1>
 
-          {/* CARDS DE RESUMO */}
-          <div className={styles.summaryGrid}>
-            <article className={styles.summaryCard}>
-              <span>Disponíveis</span>
-              <strong>{contagem.total}</strong>
-            </article>
-            <article className={styles.summaryCard}>
-              <span>Mostradas</span>
-              <strong>{contagem.filtradas}</strong>
-            </article>
-          </div>
+        <p
+          style={{
+            color: "var(--text-secondary)",
+            marginBottom: "1.5rem",
+          }}
+        >
+          Visualize e aceite tarefas disponíveis para seu setor.
+        </p>
+
+        <div className={styles.resumo}>
+          <div>Disponíveis: {contagem.total}</div>
+          <div>Mostradas: {contagem.filtradas}</div>
         </div>
 
         {/* SEÇÃO PRINCIPAL */}
-        <section className={styles.section}>
-          {/* FILTROS */}
-          <div className={styles.filtrosContainer}>
-            <div className={styles.filtroGroup}>
-              <label className={styles.filtroLabel}> Buscar por título</label>
-              <input
-                type="text"
-                placeholder="Digite o título da tarefa..."
-                value={busca}
-                onChange={(e) => setBusca(e.target.value)}
-              />
-            </div>
+        <div className={styles.filtrosAvancados}>
+          <div>
+            <small>Buscar</small>
 
-            <div className={styles.filtroLinha}>
-              <div className={styles.filtroGroup}>
-                <label className={styles.filtroLabel}> Setor</label>
-                <select
-                  value={filtroSetor}
-                  onChange={(e) => setFiltroSetor(e.target.value)}
+            <input
+              className={styles.busca}
+              type="text"
+              placeholder="Buscar tarefa..."
+              value={busca}
+              onChange={(e) => setBusca(e.target.value)}
+            />
+          </div>
+
+          <div>
+            <small>Setor</small>
+
+            <select
+              value={filtroSetor}
+              onChange={(e) => setFiltroSetor(e.target.value)}
+            >
+              <option value="">Todos</option>
+
+              {setoresUnicos.map((setor) => (
+                <option key={setor} value={setor}>
+                  {setor}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <small>Prioridade</small>
+
+            <select
+              value={filtroPrioridade}
+              onChange={(e) => setFiltroPrioridade(e.target.value)}
+            >
+              <option value="">Todas</option>
+              <option value="Baixa">Baixa</option>
+              <option value="Média">Média</option>
+              <option value="Alta">Alta</option>
+            </select>
+          </div>
+        </div>
+
+        <div className={styles.acoes}>
+          <button
+            className={styles.limparBtn}
+            onClick={limparFiltros}
+          >
+            Limpar filtros
+          </button>
+
+          <span>{tarefasFiltradas.length} registros</span>
+        </div>
+
+        {/* FEEDBACK VISUAL: sucess/error banners */}
+        {(successMessage || errorMessage) && (
+          <div className={styles.alertsWrapper}>
+            {successMessage && (
+              <div
+                className={`${styles.alert} ${styles.alertSuccess}`}
+                role="status"
+              >
+                <div className={styles.alertIcon} aria-hidden>
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M20 6L9 17L4 12"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </div>
+                <div className={styles.alertContent}>{successMessage}</div>
+                <button
+                  className={styles.alertClose}
+                  onClick={() => {
+                    setSuccessMessage("");
+                    if (successTimeoutRef.current)
+                      clearTimeout(successTimeoutRef.current);
+                  }}
+                  aria-label="Fechar mensagem de sucesso"
                 >
-                  <option value="">Todos os setores</option>
-                  {setoresUnicos.map((setor) => (
-                    <option key={setor} value={setor}>
-                      {setor}
-                    </option>
-                  ))}
-                </select>
+                  ✕
+                </button>
               </div>
+            )}
 
-              <div className={styles.filtroGroup}>
-                <label className={styles.filtroLabel}> Prioridade</label>
-                <select
-                  value={filtroPrioridade}
-                  onChange={(e) => setFiltroPrioridade(e.target.value)}
+            {errorMessage && (
+              <div
+                className={`${styles.alert} ${styles.alertError}`}
+                role="alert"
+              >
+                <div className={styles.alertIcon} aria-hidden>
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M12 9v4"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                    <path
+                      d="M12 17h.01"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                    <path
+                      d="M21 12A9 9 0 1 1 3 12a9 9 0 0 1 18 0z"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </div>
+                <div className={styles.alertContent}>{errorMessage}</div>
+                <button
+                  className={styles.alertClose}
+                  onClick={() => {
+                    setErrorMessage("");
+                    if (errorTimeoutRef.current)
+                      clearTimeout(errorTimeoutRef.current);
+                  }}
+                  aria-label="Fechar mensagem de erro"
                 >
-                  <option value="">Todas as prioridades</option>
-                  <option value="Baixa">Baixa</option>
-                  <option value="Média">Média</option>
-                  <option value="Alta">Alta</option>
-                </select>
+                  ✕
+                </button>
               </div>
-            </div>
+            )}
+          </div>
+        )}
 
+        {loading ? (
+          // LOADING
+          <div className={styles.loadingContainer}>
+            <div className={styles.loadingSpinner} />
+            <p style={{ marginTop: "1rem" }}>Carregando tarefas...</p>
+          </div>
+        ) : error ? (
+          // ERRO
+          <div className={styles.emptyState}>
+            <div className={styles.emptyStateIcon}>⚠️</div>
+            <p>{error}</p>
+            <button
+              onClick={fetchTarefas}
+              style={{
+                marginTop: "1rem",
+                padding: "0.8rem 1.6rem",
+                borderRadius: "0.8rem",
+                border: "none",
+                background: "var(--primary)",
+                color: "var(--color-white)",
+                cursor: "pointer",
+                fontWeight: "600",
+                fontSize: "1.35rem",
+              }}
+            >
+              Tentar novamente
+            </button>
+          </div>
+        ) : tarefasFiltradas.length === 0 ? (
+          // VAZIO
+          <div className={styles.emptyState}>
+            <div className={styles.emptyStateIcon}>📭</div>
+            <p>
+              {busca || filtroSetor || filtroPrioridade
+                ? "Nenhuma tarefa encontrada com estes filtros."
+                : "Nenhuma tarefa disponível no momento."}
+            </p>
             {(busca || filtroSetor || filtroPrioridade) && (
               <button
                 onClick={limparFiltros}
-                style={{
-                  marginTop: "auto",
-                  padding: "0.8rem 1.2rem",
-                  borderRadius: "0.8rem",
-                  border: "none",
-                  background: "var(--bg-surface)",
-                  color: "var(--text-primary)",
-                  cursor: "pointer",
-                  fontWeight: "600",
-                  fontSize: "1.35rem",
-                  transition: "all 0.3s ease",
-                }}
-                onMouseEnter={(e) => {
-                  e.target.style.background = "var(--border-default)";
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.background = "var(--bg-surface)";
-                }}
-              >
-                ✕ Limpar filtros
-              </button>
-            )}
-          </div>
-
-          {/* TABELA OU MENSAGENS */}
-
-          {/* FEEDBACK VISUAL: sucess/error banners */}
-          {(successMessage || errorMessage) && (
-            <div className={styles.alertsWrapper}>
-              {successMessage && (
-                <div
-                  className={`${styles.alert} ${styles.alertSuccess}`}
-                  role="status"
-                >
-                  <div className={styles.alertIcon} aria-hidden>
-                    <svg
-                      width="20"
-                      height="20"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M20 6L9 17L4 12"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                  </div>
-                  <div className={styles.alertContent}>{successMessage}</div>
-                  <button
-                    className={styles.alertClose}
-                    onClick={() => {
-                      setSuccessMessage("");
-                      if (successTimeoutRef.current)
-                        clearTimeout(successTimeoutRef.current);
-                    }}
-                    aria-label="Fechar mensagem de sucesso"
-                  >
-                    ✕
-                  </button>
-                </div>
-              )}
-
-              {errorMessage && (
-                <div
-                  className={`${styles.alert} ${styles.alertError}`}
-                  role="alert"
-                >
-                  <div className={styles.alertIcon} aria-hidden>
-                    <svg
-                      width="20"
-                      height="20"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M12 9v4"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                      <path
-                        d="M12 17h.01"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                      <path
-                        d="M21 12A9 9 0 1 1 3 12a9 9 0 0 1 18 0z"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                  </div>
-                  <div className={styles.alertContent}>{errorMessage}</div>
-                  <button
-                    className={styles.alertClose}
-                    onClick={() => {
-                      setErrorMessage("");
-                      if (errorTimeoutRef.current)
-                        clearTimeout(errorTimeoutRef.current);
-                    }}
-                    aria-label="Fechar mensagem de erro"
-                  >
-                    ✕
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
-
-          {loading ? (
-            // LOADING
-            <div className={styles.loadingContainer}>
-              <div className={styles.loadingSpinner} />
-              <p style={{ marginTop: "1rem" }}>Carregando tarefas...</p>
-            </div>
-          ) : error ? (
-            // ERRO
-            <div className={styles.emptyState}>
-              <div className={styles.emptyStateIcon}>⚠️</div>
-              <p>{error}</p>
-              <button
-                onClick={fetchTarefas}
                 style={{
                   marginTop: "1rem",
                   padding: "0.8rem 1.6rem",
@@ -545,141 +551,53 @@ export default function Tarefas() {
                   fontSize: "1.35rem",
                 }}
               >
-                Tentar novamente
+                Limpar filtros
               </button>
-            </div>
-          ) : tarefasFiltradas.length === 0 ? (
-            // VAZIO
-            <div className={styles.emptyState}>
-              <div className={styles.emptyStateIcon}>📭</div>
-              <p>
-                {busca || filtroSetor || filtroPrioridade
-                  ? "Nenhuma tarefa encontrada com estes filtros."
-                  : "Nenhuma tarefa disponível no momento."}
-              </p>
-              {(busca || filtroSetor || filtroPrioridade) && (
-                <button
-                  onClick={limparFiltros}
-                  style={{
-                    marginTop: "1rem",
-                    padding: "0.8rem 1.6rem",
-                    borderRadius: "0.8rem",
-                    border: "none",
-                    background: "var(--primary)",
-                    color: "var(--color-white)",
-                    cursor: "pointer",
-                    fontWeight: "600",
-                    fontSize: "1.35rem",
-                  }}
-                >
-                  Limpar filtros
-                </button>
-              )}
-            </div>
-          ) : (
-            <>
-              {/* DESKTOP: TABELA */}
-              <div className={`${styles.tableWrapper} ${styles.desktopOnly}`}>
-                <table className={styles.table}>
-                  <thead>
-                    <tr>
-                      <th>Título</th>
-                      <th className={styles.textCenter}>Prioridade</th>
-                      <th className={styles.textCenter}>Setor</th>
-                      <th className={styles.textCenter}>Criado por</th>
-                      <th className={styles.textCenter}>Data</th>
-                      <th className={styles.textCenter}>Hora</th>
-                      <th className={styles.textCenter}>Ação</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {tarefasFiltradas.map((tarefa) => (
-                      <tr
-                        key={tarefa.id}
-                        onClick={() => setTarefaSelecionada(tarefa)}
-                        className={`
+            )}
+          </div>
+        ) : (
+          <>
+            {/* DESKTOP: TABELA */}
+            <div className={`${styles.tableWrapper} ${styles.desktopOnly}`}>
+              <table className={styles.table}>
+                <thead>
+                  <tr>
+                    <th>Título</th>
+                    <th className={styles.textCenter}>Prioridade</th>
+                    <th className={styles.textCenter}>Setor</th>
+                    <th className={styles.textCenter}>Criado por</th>
+                    <th className={styles.textCenter}>Data</th>
+                    <th className={styles.textCenter}>Hora</th>
+                    <th className={styles.textCenter}>Ação</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {tarefasFiltradas.map((tarefa) => (
+                    <tr
+                      key={tarefa.id}
+                      onClick={() => setTarefaSelecionada(tarefa)}
+                      className={`
                         ${styles.clickableRow}
                         ${removendoId === tarefa.id ? styles.removingRow : ""}
                       `}
-                      >
-                        <td title={tarefa.titulo}>
-                          <strong>{tarefa.titulo}</strong>
-                        </td>
-                        <td className={styles.textCenter}>
-                          <PrioridadeBadge prioridade={tarefa.prioridade} />
-                        </td>
-                        <td className={styles.textCenter}>{tarefa.setor}</td>
-                        <td className={styles.textCenter}>
-                          {tarefa.criadoPor}
-                        </td>
-                        <td className={styles.textCenter}>
-                          {tarefa.dataCriacao}
-                        </td>
-                        <td className={styles.textCenter}>
-                          {tarefa.horaCriacao}
-                        </td>
-                        <td className={styles.actionCell}>
-                          <button
-                            className={`${styles.btnAccept} ${aceitandoId === tarefa.id ? styles.loading : ""
-                              }`}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              aceitarTarefa(tarefa.id);
-                            }}
-                            disabled={aceitandoId !== null}
-                            title={
-                              aceitandoId === tarefa.id
-                                ? "Processando..."
-                                : "Clique para aceitar esta tarefa"
-                            }
-                          >
-                            {aceitandoId === tarefa.id
-                              ? "✓ Aceitando..."
-                              : "✓ Aceitar"}
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-
-              {/* MOBILE: CARDS */}
-              <div
-                className={`${styles.mobileCardsContainer} ${styles.mobileOnly}`}
-              >
-                {tarefasFiltradas.map((tarefa) => (
-                  <div
-                    key={tarefa.id}
-                    className={`${styles.card} ${styles.mobileCard}`}
-                    onClick={() => setTarefaSelecionada(tarefa)}
-                  >
-                    {/* CABEÇALHO DO CARD */}
-                    <div className={styles.cardHeader}>
-                      <strong>{tarefa.titulo}</strong>
-                      <PrioridadeBadge prioridade={tarefa.prioridade} />
-                    </div>
-
-                    {/* CORPO DO CARD */}
-                    <div className={styles.cardBody}>
-                      <p>
-                        <strong>Setor:</strong> {tarefa.setor}
-                      </p>
-                      <p>
-                        <strong>Criado por:</strong> {tarefa.criadoPor}
-                      </p>
-                      <p>
-                        <strong>Descrição:</strong> {tarefa.descricao}
-                      </p>
-                    </div>
-
-                    <div className={styles.mobileCardFooter}>
-                      <div className={styles.cardFooter}>
-                        <span>{tarefa.dataCriacao}</span>
-                        <span>{tarefa.horaCriacao}</span>
-                      </div>
-
-                      <div className={styles.mobileCardActions}>
+                    >
+                      <td title={tarefa.titulo}>
+                        <strong>{tarefa.titulo}</strong>
+                      </td>
+                      <td className={styles.textCenter}>
+                        <PrioridadeBadge prioridade={tarefa.prioridade} />
+                      </td>
+                      <td className={styles.textCenter}>{tarefa.setor}</td>
+                      <td className={styles.textCenter}>
+                        {tarefa.criadoPor}
+                      </td>
+                      <td className={styles.textCenter}>
+                        {tarefa.dataCriacao}
+                      </td>
+                      <td className={styles.textCenter}>
+                        {tarefa.horaCriacao}
+                      </td>
+                      <td className={styles.textCenter}>
                         <button
                           className={`${styles.btnAccept} ${aceitandoId === tarefa.id ? styles.loading : ""
                             }`}
@@ -698,96 +616,156 @@ export default function Tarefas() {
                             ? "✓ Aceitando..."
                             : "✓ Aceitar"}
                         </button>
-                      </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* MOBILE: CARDS */}
+            <div
+              className={`${styles.mobileCardsContainer} ${styles.showOnMobile}`}
+            >
+              {tarefasFiltradas.map((tarefa) => (
+                <div
+                  key={tarefa.id}
+                  className={`${styles.card} ${styles.mobileCard}`}
+                  onClick={() => setTarefaSelecionada(tarefa)}
+                >
+                  {/* CABEÇALHO DO CARD */}
+                  <div className={styles.cardHeader}>
+                    <strong>{tarefa.titulo}</strong>
+                    <PrioridadeBadge prioridade={tarefa.prioridade} />
+                  </div>
+
+                  {/* CORPO DO CARD */}
+                  <div className={styles.cardBody}>
+                    <p>
+                      <strong>Setor:</strong> {tarefa.setor}
+                    </p>
+                    <p>
+                      <strong>Criado por:</strong> {tarefa.criadoPor}
+                    </p>
+                    <p>
+                      <strong>Descrição:</strong> {tarefa.descricao}
+                    </p>
+                  </div>
+
+                  <div className={styles.mobileCardFooter}>
+                    <div className={styles.cardFooter}>
+                      <span>{tarefa.dataCriacao}</span>
+                      <span>{tarefa.horaCriacao}</span>
+                    </div>
+
+                    <div className={styles.mobileCardActions}>
+                      <button
+                        className={`${styles.btnAccept} ${aceitandoId === tarefa.id ? styles.loading : ""
+                          }`}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          aceitarTarefa(tarefa.id);
+                        }}
+                        disabled={aceitandoId !== null}
+                        title={
+                          aceitandoId === tarefa.id
+                            ? "Processando..."
+                            : "Clique para aceitar esta tarefa"
+                        }
+                      >
+                        {aceitandoId === tarefa.id
+                          ? "✓ Aceitando..."
+                          : "✓ Aceitar"}
+                      </button>
                     </div>
                   </div>
-                ))}
-              </div>
-            </>
-          )}
-        </section>
-      </div>
-
-      {/* MODAL: DETALHES DA TAREFA */}
-      {tarefaSelecionada && (
-        <Modal
-          title={tarefaSelecionada.titulo}
-          onClose={() => setTarefaSelecionada(null)}
-          variant="between"
-          actions={
-            <>
-              <button
-                className={styles.btnClose}
-                onClick={() => setTarefaSelecionada(null)}
-              >
-                Fechar
-              </button>
-
-              <button
-                className={`${styles.btnPrimary} ${aceitandoId === tarefaSelecionada.id
-                    ? styles.loading
-                    : ""
-                  }`}
-                onClick={async () => {
-                  await aceitarTarefa(tarefaSelecionada.id);
-                  setTarefaSelecionada(null);
-                }}
-              >
-                {aceitandoId === tarefaSelecionada.id
-                  ? "Aceitando..."
-                  : "Aceitar"}
-              </button>
-            </>
-          }
-        >
-          <div className={styles.modalGrid}>
-            <div>
-              <strong>Prioridade:</strong>
-
-              <PrioridadeBadge
-                prioridade={tarefaSelecionada.prioridade}
-              />
+                </div>
+              ))}
             </div>
+          </>
+        )}
+      </section>
+    </div >
 
-            <div>
-              <strong>Setor:</strong>
-              <p>{tarefaSelecionada.setor}</p>
-            </div>
+    {/* MODAL: DETALHES DA TAREFA */ }
+  {
+    tarefaSelecionada && (
+      <Modal
+        title={tarefaSelecionada.titulo}
+        onClose={() => setTarefaSelecionada(null)}
+        variant="between"
+        actions={
+          <>
+            <button
+              className={styles.btnClose}
+              onClick={() => setTarefaSelecionada(null)}
+            >
+              Fechar
+            </button>
 
-            <div>
-              <strong>Criado por:</strong>
-              <p>{tarefaSelecionada.criadoPor}</p>
-            </div>
+            <button
+              className={styles.btnPrimary}
+              onClick={async () => {
+                await aceitarTarefa(tarefaSelecionada.id);
+                setTarefaSelecionada(null);
+              }}
+            >
+              {aceitandoId === tarefaSelecionada.id
+                ? "Aceitando..."
+                : "Aceitar"}
+            </button>
+          </>
+        }
+      >
+        <div className={styles.taskCardGrid}>
+          <div className={styles.taskField}>
+            <strong>Prioridade:</strong>
 
-            <div>
-              <strong>Data:</strong>
-              <p>{tarefaSelecionada.dataCriacao}</p>
-            </div>
-
-            <div>
-              <strong>Hora:</strong>
-              <p>{tarefaSelecionada.horaCriacao}</p>
-            </div>
-
-            <div>
-              <strong>Estimativa:</strong>
-              <p>
-                {formatarEstimativa(
-                  tarefaSelecionada.tar_estimativa_minutos
-                )}
-              </p>
-            </div>
+            <PrioridadeBadge
+              prioridade={tarefaSelecionada.prioridade}
+            />
           </div>
 
-          <div className={styles.descricaoArea}>
-            <strong>Descrição:</strong>
-
-            <div className={styles.descricaoBox}>
-              <p>{tarefaSelecionada.descricao}</p>
-            </div>
+          <div className={styles.taskField}>
+            <strong>Setor:</strong>
+            <p>{tarefaSelecionada.setor}</p>
           </div>
-        </Modal>
-      )}
-    </div>
+
+          <div className={styles.taskField}>
+            <strong>Criado por:</strong>
+            <p>{tarefaSelecionada.criadoPor}</p>
+          </div>
+
+          <div className={styles.taskField}>
+            <strong>Data:</strong>
+            <p>{tarefaSelecionada.dataCriacao}</p>
+          </div>
+
+          <div className={styles.taskField}>
+            <strong>Hora:</strong>
+            <p>{tarefaSelecionada.horaCriacao}</p>
+          </div>
+
+          <div className={styles.taskField}>
+            <strong>Estimativa:</strong>
+            <p>
+              {formatarEstimativa(
+                tarefaSelecionada.tar_estimativa_minutos
+              )}
+            </p>
+          </div>
+        </div>
+
+        <div className={styles.descricaoArea}>
+          <strong>Descrição:</strong>
+
+          <div className={styles.descricaoBox}>
+            <p>{tarefaSelecionada.descricao}</p>
+          </div>
+        </div>
+      </Modal>
+    )
+  }
+    </div >
   );
 }
