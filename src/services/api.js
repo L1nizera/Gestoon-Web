@@ -4,6 +4,11 @@ const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || "http://localhost:3333",
 });
 
+// const api = axios.create({
+//   baseURL:
+//     import.meta.env.VITE_API_URL || "https://ftp.apigestoon.kinghost.net",
+// });
+
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem("gestoon:token");
 
