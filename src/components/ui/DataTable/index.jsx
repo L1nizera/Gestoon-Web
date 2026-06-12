@@ -5,6 +5,7 @@ function DataTable({
   data,
   rowKey = "id",
   onRowClick,
+  rowClassName,
   sortKey,
   sortDirection,
   onSort,
@@ -28,9 +29,7 @@ function DataTable({
         mobile === "hidden" ? styles.hideMobile : ""
       }`}
     >
-      <table
-        className={`${styles.tabela} ${variant ? styles[variant] : ""}`}
-      >
+      <table className={`${styles.tabela} ${variant ? styles[variant] : ""}`}>
         <thead>
           <tr>
             {columns.map((column) => (
@@ -62,6 +61,7 @@ function DataTable({
             data.map((row) => (
               <tr
                 key={row[rowKey]}
+                className={rowClassName ? rowClassName(row) : ""}
                 onClick={() => {
                   if (onRowClick) onRowClick(row);
                 }}

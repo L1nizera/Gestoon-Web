@@ -4,7 +4,7 @@
   overflow-x: auto;
   background: var(--bg-card);
   margin-top: 1.5rem;
-  scrollbar-gutter: stable;
+  scrollbar-gutter: auto;
   border-radius: 1.2rem;
   border: 0.1rem solid var(--border-default);
 }

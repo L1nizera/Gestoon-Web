@@ -4,6 +4,7 @@ import styles from "../../Adm/Home/style.module.css";
 import localStyles from "./style.module.css";
 import api from "../../../services/api";
 import Modal from "../../../components/Modal/index.jsx";
+import DataTable from "../../../components/ui/DataTable";
 
 // ═════════════════════════════════════════════════════════════════
 // 📌 MAPEAMENTOS DA API
@@ -15,10 +16,63 @@ const prioridadeApiMap = {
   3: "Alta",
 };
 
+const statusMap = {
+  Pendente: "statusPendente",
+};
+
 const statusClasses = {
   Pendente: styles.statusPendente,
   "Em andamento": styles.statusAndamento,
 };
+
+const columns = [
+  {
+    key: "titulo",
+    label: "Título",
+  },
+
+  {
+    key: "status",
+    label: "Status",
+    align: "center",
+    render: (row) => (
+      <span
+        className={`${styles.badge} ${
+          styles[statusMap[row.status]] || styles.statusPendente
+        }`}
+      >
+        {row.status}
+      </span>
+    ),
+  },
+
+  {
+    key: "prioridade",
+    label: "Prioridade",
+    align: "center",
+    render: (row) => <PrioridadeBadge prioridade={row.prioridade} />,
+  },
+  {
+    key: "setor",
+    label: "Setor",
+    align: "center",
+  },
+  {
+    key: "criadoPor",
+    label: "Criado por",
+    align: "center",
+  },
+  {
+    key: "dataCriacao",
+    label: "Data",
+    align: "center",
+  },
+  {
+    key: "estimativaFormatada",
+    label: "Estimativa",
+    align: "center",
+  },
+];
 
 // ═════════════════════════════════════════════════════════════════
 // 🔧 COMPONENTES MENORES
@@ -162,6 +216,7 @@ export default function Tarefas() {
           return {
             id: tarefa.tar_id,
             titulo: tarefa.tar_titulo || "-",
+            status: "Pendente",
             prioridade:
               prioridadeApiMap[Number(tarefa.tar_prioridade)] || "Média",
             setor: tarefa.set_nome || "Sem setor",
@@ -172,6 +227,9 @@ export default function Tarefas() {
             descricao: tarefa.tar_descricao || "Sem descrição",
             dataCriacao,
             horaCriacao,
+            estimativaFormatada: formatarEstimativa(
+              tarefa.tar_estimativa_minutos,
+            ),
             tar_id: tarefa.tar_id,
             tar_estimativa_minutos: tarefa.tar_estimativa_minutos,
           };
@@ -233,16 +291,13 @@ export default function Tarefas() {
 
       setTimeout(() => {
         setTarefasDisponiveis((prev) => prev.filter((t) => t.id !== tarefaId));
-      }, 300);
+      }, 400);
 
       if (tarefaSelecionada?.id === tarefaId) {
         setTarefaSelecionada(null);
       }
 
       // show visual success
-      setSuccessMessage("Tarefa aceita com sucesso.");
-      if (successTimeoutRef.current) clearTimeout(successTimeoutRef.current);
-      successTimeoutRef.current = setTimeout(() => setSuccessMessage(""), 4000);
       await fetchTarefas(false);
     } catch (err) {
       console.error(
@@ -345,8 +400,7 @@ export default function Tarefas() {
         </p>
 
         <div className={styles.resumo}>
-          <div>Disponíveis: {contagem.total}</div>
-          <div>Mostradas: {contagem.filtradas}</div>
+          <div>Tarefas Pendentes: {contagem.total}</div>
         </div>
 
         {/* SEÇÃO PRINCIPAL */}
@@ -396,14 +450,9 @@ export default function Tarefas() {
         </div>
 
         <div className={styles.acoes}>
-          <button
-            className={styles.limparBtn}
-            onClick={limparFiltros}
-          >
+          <button className={styles.limparBtn} onClick={limparFiltros}>
             Limpar filtros
           </button>
-
-          <span>{tarefasFiltradas.length} registros</span>
         </div>
 
         {/* FEEDBACK VISUAL: sucess/error banners */}
@@ -530,7 +579,6 @@ export default function Tarefas() {
         ) : tarefasFiltradas.length === 0 ? (
           // VAZIO
           <div className={styles.emptyState}>
-            <div className={styles.emptyStateIcon}>📭</div>
             <p>
               {busca || filtroSetor || filtroPrioridade
                 ? "Nenhuma tarefa encontrada com estes filtros."
@@ -558,79 +606,29 @@ export default function Tarefas() {
         ) : (
           <>
             {/* DESKTOP: TABELA */}
-            <div className={`${styles.tableWrapper} ${styles.desktopOnly}`}>
-              <table className={styles.table}>
-                <thead>
-                  <tr>
-                    <th>Título</th>
-                    <th className={styles.textCenter}>Prioridade</th>
-                    <th className={styles.textCenter}>Setor</th>
-                    <th className={styles.textCenter}>Criado por</th>
-                    <th className={styles.textCenter}>Data</th>
-                    <th className={styles.textCenter}>Hora</th>
-                    <th className={styles.textCenter}>Ação</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {tarefasFiltradas.map((tarefa) => (
-                    <tr
-                      key={tarefa.id}
-                      onClick={() => setTarefaSelecionada(tarefa)}
-                      className={`
-                        ${styles.clickableRow}
-                        ${removendoId === tarefa.id ? styles.removingRow : ""}
-                      `}
-                    >
-                      <td title={tarefa.titulo}>
-                        <strong>{tarefa.titulo}</strong>
-                      </td>
-                      <td className={styles.textCenter}>
-                        <PrioridadeBadge prioridade={tarefa.prioridade} />
-                      </td>
-                      <td className={styles.textCenter}>{tarefa.setor}</td>
-                      <td className={styles.textCenter}>
-                        {tarefa.criadoPor}
-                      </td>
-                      <td className={styles.textCenter}>
-                        {tarefa.dataCriacao}
-                      </td>
-                      <td className={styles.textCenter}>
-                        {tarefa.horaCriacao}
-                      </td>
-                      <td className={styles.textCenter}>
-                        <button
-                          className={`${styles.btnAccept} ${aceitandoId === tarefa.id ? styles.loading : ""
-                            }`}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            aceitarTarefa(tarefa.id);
-                          }}
-                          disabled={aceitandoId !== null}
-                          title={
-                            aceitandoId === tarefa.id
-                              ? "Processando..."
-                              : "Clique para aceitar esta tarefa"
-                          }
-                        >
-                          {aceitandoId === tarefa.id
-                            ? "✓ Aceitando..."
-                            : "✓ Aceitar"}
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+            <div className={localStyles.hideOnMobile}>
+              <DataTable
+                columns={columns}
+                data={tarefasFiltradas}
+                rowKey="id"
+                onRowClick={setTarefaSelecionada}
+                rowClassName={(row) =>
+                  removendoId === row.id ? localStyles.removendo : ""
+                }
+                emptyMessage="Nenhuma tarefa encontrada."
+              />
             </div>
 
             {/* MOBILE: CARDS */}
-            <div
-              className={`${styles.mobileCardsContainer} ${styles.showOnMobile}`}
-            >
+            <div className={localStyles.showOnMobile}>
               {tarefasFiltradas.map((tarefa) => (
                 <div
                   key={tarefa.id}
-                  className={`${styles.card} ${styles.mobileCard}`}
+                  className={`
+                  ${styles.card}
+                  ${styles.mobileCard}
+                  ${removendoId === tarefa.id ? localStyles.removendo : ""}
+                `}
                   onClick={() => setTarefaSelecionada(tarefa)}
                 >
                   {/* CABEÇALHO DO CARD */}
@@ -660,8 +658,9 @@ export default function Tarefas() {
 
                     <div className={styles.mobileCardActions}>
                       <button
-                        className={`${styles.btnAccept} ${aceitandoId === tarefa.id ? styles.loading : ""
-                          }`}
+                        className={`${styles.btnAccept} ${
+                          aceitandoId === tarefa.id ? styles.loading : ""
+                        }`}
                         onClick={(e) => {
                           e.stopPropagation();
                           aceitarTarefa(tarefa.id);
@@ -684,88 +683,71 @@ export default function Tarefas() {
             </div>
           </>
         )}
-      </section>
-    </div >
+      </div>
 
-    {/* MODAL: DETALHES DA TAREFA */ }
-  {
-    tarefaSelecionada && (
-      <Modal
-        title={tarefaSelecionada.titulo}
-        onClose={() => setTarefaSelecionada(null)}
-        variant="between"
-        actions={
-          <>
-            <button
-              className={styles.btnClose}
-              onClick={() => setTarefaSelecionada(null)}
-            >
-              Fechar
-            </button>
+      {/* MODAL: DETALHES DA TAREFA */}
+      {tarefaSelecionada && (
+        <Modal
+          title={tarefaSelecionada.titulo}
+          onClose={() => setTarefaSelecionada(null)}
+          variant="between"
+          actions={
+            <>
+              <button
+                className={styles.btnClose}
+                onClick={() => setTarefaSelecionada(null)}
+              >
+                Fechar
+              </button>
 
-            <button
-              className={styles.btnPrimary}
-              onClick={async () => {
-                await aceitarTarefa(tarefaSelecionada.id);
-                setTarefaSelecionada(null);
-              }}
-            >
-              {aceitandoId === tarefaSelecionada.id
-                ? "Aceitando..."
-                : "Aceitar"}
-            </button>
-          </>
-        }
-      >
-        <div className={styles.taskCardGrid}>
-          <div className={styles.taskField}>
-            <strong>Prioridade:</strong>
+              <button
+                className={styles.btnPrimary}
+                onClick={() => aceitarTarefa(tarefaSelecionada.id)}
+              >
+                {aceitandoId === tarefaSelecionada.id ? "Aceitar" : "Aceitar"}
+              </button>
+            </>
+          }
+        >
+          <div className={styles.modalGrid}>
+            <div>
+              <strong>Prioridade:</strong>
 
-            <PrioridadeBadge
-              prioridade={tarefaSelecionada.prioridade}
-            />
+              <PrioridadeBadge prioridade={tarefaSelecionada.prioridade} />
+            </div>
+
+            <div>
+              <strong>Setor:</strong>
+              <p>{tarefaSelecionada.setor}</p>
+            </div>
+
+            <div>
+              <strong>Criado por:</strong>
+              <p>{tarefaSelecionada.criadoPor}</p>
+            </div>
+
+            <div>
+              <strong>Data:</strong>
+              <p>{tarefaSelecionada.dataCriacao}</p>
+            </div>
+
+            <div>
+              <strong>Estimativa:</strong>
+              <p>
+                {formatarEstimativa(tarefaSelecionada.tar_estimativa_minutos)}
+              </p>
+            </div>
           </div>
 
-          <div className={styles.taskField}>
-            <strong>Setor:</strong>
-            <p>{tarefaSelecionada.setor}</p>
-          </div>
+          <div className={styles.descricaoArea}>
+            <strong>Descrição:</strong>
 
-          <div className={styles.taskField}>
-            <strong>Criado por:</strong>
-            <p>{tarefaSelecionada.criadoPor}</p>
+            <div className={styles.descricaoBox}>
+              <p>{tarefaSelecionada.descricao}</p>
+            </div>
           </div>
-
-          <div className={styles.taskField}>
-            <strong>Data:</strong>
-            <p>{tarefaSelecionada.dataCriacao}</p>
-          </div>
-
-          <div className={styles.taskField}>
-            <strong>Hora:</strong>
-            <p>{tarefaSelecionada.horaCriacao}</p>
-          </div>
-
-          <div className={styles.taskField}>
-            <strong>Estimativa:</strong>
-            <p>
-              {formatarEstimativa(
-                tarefaSelecionada.tar_estimativa_minutos
-              )}
-            </p>
-          </div>
-        </div>
-
-        <div className={styles.descricaoArea}>
-          <strong>Descrição:</strong>
-
-          <div className={styles.descricaoBox}>
-            <p>{tarefaSelecionada.descricao}</p>
-          </div>
-        </div>
-      </Modal>
-    )
-  }
-    </div >
+        </Modal>
+      )}
+    </div>
   );
 }

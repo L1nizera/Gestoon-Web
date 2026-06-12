@@ -271,37 +271,6 @@ body {
   }
 }
 
-.tableWrapper {
-  overflow-x: auto;
-  overflow-y: auto;
-  max-height: 70vh;
-  background: var(--bg-card);
-  border-radius: 1.2rem;
-  border: 0.1rem solid var(--border-default);
-  box-shadow: 0 0.4rem 1.2rem rgba(2, 6, 23, 0.05);
-  margin-bottom: 2rem;
-  scrollbar-gutter: stable;
-}
-
-.tableWrapper::-webkit-scrollbar {
-  width: 0.9rem;
-  height: 0.9rem;
-}
-
-.tableWrapper::-webkit-scrollbar-track {
-  background: var(--bg-surface);
-  border-radius: 1rem;
-}
-
-.tableWrapper::-webkit-scrollbar-thumb {
-  background: var(--color-slate-500);
-  border-radius: 1rem;
-}
-
-.tableWrapper::-webkit-scrollbar-thumb:hover {
-  background: var(--color-slate-700);
-}
-
 .desktopOnly {
   display: block;
 }
@@ -555,7 +524,6 @@ body {
   font-weight: 500;
 }
 
-
 .btnPrimary,
 .btnClose {
   padding: 10px 16px;
@@ -646,7 +614,6 @@ body {
   overflow-y: auto;
   animation: modalOpen 0.25s ease;
 }
-
 
 .modalContent::-webkit-scrollbar {
   width: 0.8rem;
@@ -745,7 +712,7 @@ body {
   margin-bottom: 1.4rem;
 }
 
-.modalGrid>div {
+.modalGrid > div {
   display: flex;
   flex-direction: column;
   gap: 0.2rem;
@@ -796,7 +763,6 @@ body {
   flex-shrink: 0;
 }
 
-
 .modalFooter .btnAccept {
   flex: 1;
   margin: 0;
@@ -814,9 +780,8 @@ body {
 
   padding: 0.9rem 1.5rem;
 
-  transition: all .2s ease;
+  transition: all 0.2s ease;
 }
-
 
 @media (max-width: 768px) {
   .modalContent {
@@ -1306,8 +1271,27 @@ body {
   }
 }
 
-.removingRow {
-  animation: removeTask 0.3s ease forwards;
+.removendo {
+  animation: removerLinha 0.25s ease forwards;
+  transform-origin: center;
+  pointer-events: none;
+}
+
+@keyframes removerLinha {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.8;
+    transform: scale(0.98);
+  }
+
+  to {
+    opacity: 0;
+    transform: scale(0.95);
+  }
 }
 
 @keyframes removeTask {
@@ -1339,9 +1323,11 @@ body {
 }
 
 .resumo div {
-  background: linear-gradient(135deg,
-      var(--color-slate-900),
-      var(--color-gray-900));
+  background: linear-gradient(
+    135deg,
+    var(--color-slate-900),
+    var(--color-gray-900)
+  );
 
   color: var(--color-white);
   padding: 1.4rem;
@@ -1352,7 +1338,7 @@ body {
 
 .resumo div:hover {
   transform: translateY(-0.2rem) scale(1.02);
-  box-shadow: 0 1rem 2.5rem rgba(0, 0, 0, .2);
+  box-shadow: 0 1rem 2.5rem rgba(0, 0, 0, 0.2);
 }
 
 .resumo div {
