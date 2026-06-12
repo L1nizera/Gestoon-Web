@@ -72,7 +72,7 @@ body {
   padding: 1.5rem;
   border-radius: 1.2rem;
   border: 0.1rem solid var(--border);
-  transition: all 0.3s ease;
+  transition: transform 0.3s ease;
   margin-bottom: 1rem;
   box-shadow: 0 0.4rem 1.2rem rgba(0, 0, 0, 0.05);
   width: 100%;
@@ -93,7 +93,7 @@ body {
   font-size: 1.4rem;
   background: rgba(255, 255, 255, 0.03);
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.02);
-  transition: all 0.25s ease;
+  transition: transform 0.25s ease;
 }
 
 .filtrosAvancados input:focus,
@@ -364,7 +364,7 @@ select {
   color: var(--color-white);
   padding: 1.4rem;
   border-radius: 1rem;
-  transition: all 0.25s ease;
+  transition: transform 0.25s ease;
   cursor: default;
 }
 
@@ -382,7 +382,7 @@ select {
   border: 0.15rem solid rgba(0, 0, 0, 0.25);
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.02);
   font-size: 1.3rem;
-  transition: all 0.2s ease;
+  transition: transform 0.2s ease;
 }
 
 @media (max-width: 768px) {
@@ -432,7 +432,7 @@ select {
   white-space: nowrap;
   user-select: none;
   position: relative;
-  transition: all 0.2s ease;
+  transition: transform 0.2s ease;
   font-size: 1.8rem;
   cursor: default;
 }
@@ -580,7 +580,7 @@ select {
   margin-bottom: 1.5rem;
   max-width: 100%;
   animation: fadeSlideIn 0.5s ease;
-  transition: all 0.3s ease;
+  transition: transform 0.3s ease;
 }
 
 .graficoVazio {
@@ -619,7 +619,7 @@ select {
 
 .legenda {
   margin-top: 1rem;
-  transition: all 0.2s ease;
+  transition: transform 0.2s ease;
 }
 
 .legenda div {
@@ -706,7 +706,7 @@ select {
 
 /* botões */
 button {
-  transition: all 0.2s ease;
+  transition: transform 0.2s ease;
 }
 
 button:hover {
@@ -902,7 +902,7 @@ th:focus {
 
   font-size: 1.4rem;
 
-  transition: all 0.25s ease;
+  transition: transform 0.25s ease;
 }
 
 .formGroup input:hover,
@@ -1182,26 +1182,6 @@ th:focus {
   animation: cardEnter 0.28s ease both;
 }
 
-.resumo>div:nth-child(1) {
-  animation-delay: 0.03s;
-}
-
-.resumo>div:nth-child(2) {
-  animation-delay: 0.06s;
-}
-
-.resumo>div:nth-child(3) {
-  animation-delay: 0.09s;
-}
-
-.resumo>div:nth-child(4) {
-  animation-delay: 0.12s;
-}
-
-.resumo>div:nth-child(5) {
-  animation-delay: 0.15s;
-}
-
 .topActions,
 .filtrosAvancados,
 .filtros,
@@ -1211,21 +1191,6 @@ th:focus {
   animation: listEnter 0.3s ease both;
 }
 
-.filtrosAvancados {
-  animation-delay: 0.04s;
-}
-
-.filtros {
-  animation-delay: 0.07s;
-}
-
-.acoes {
-  animation-delay: 0.1s;
-}
-
-.grafico {
-  animation-delay: 0.12s;
-}
 
 .tabelaContainer {
   animation: listEnter 0.32s ease both;

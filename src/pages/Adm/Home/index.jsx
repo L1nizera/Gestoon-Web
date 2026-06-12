@@ -10,7 +10,6 @@ import { useToast } from "../../../components/ui/Toast";
 import { useAuth } from "../../../context/AuthContext";
 
 function Home() {
-  const [funcionariosMap, setFuncionariosMap] = useState({});
   const [selectedTask, setSelectedTask] = useState(null);
   const [filtro, setFiltro] = useState("Todos");
   const [busca, setBusca] = useState("");
@@ -23,7 +22,6 @@ function Home() {
   const [tasksState, setTasksState] = useState([]);
   const [editTask, setEditTask] = useState(null);
   const [taskParaExcluir, setTaskParaExcluir] = useState(null);
-  const [menuAtivo, setMenuAtivo] = useState("tarefas");
   const [isMobile, setIsMobile] = useState(
     typeof window !== "undefined" ? window.innerWidth < 768 : false,
   );
@@ -148,9 +146,8 @@ function Home() {
       align: "center",
       render: (row) => (
         <span
-          className={`${styles.badge} ${
-            styles[statusMap[row.status]] || styles.statusPendente
-          }`}
+          className={`${styles.badge} ${styles[statusMap[row.status]] || styles.statusPendente
+            }`}
         >
           {row.status}
         </span>
@@ -233,12 +230,6 @@ function Home() {
     if (Number.isNaN(data.getTime())) return "-";
 
     return data.toLocaleDateString("pt-BR");
-  }
-
-  function formatarCriadoPor(idUsuario) {
-    if (!idUsuario) return "-";
-
-    return `Usuário #${idUsuario}`;
   }
 
   function formatarEstimativa(minutos) {
@@ -325,20 +316,6 @@ function Home() {
     return minutos <= LIMITE_ESTIMATIVA_MINUTOS;
   }
 
-  async function buscarFuncionariosMap() {
-    const response = await api.get("/funcionarios");
-
-    const funcionarios = response.data.dados || response.data;
-
-    const mapa = {};
-
-    funcionarios.forEach((funcionario) => {
-      mapa[funcionario.func_id] = funcionario.func_nome;
-    });
-
-    return mapa;
-  }
-
   function gerarChaveTarefas(lista) {
     return lista
       .map((tarefa) =>
@@ -369,7 +346,6 @@ function Home() {
 
       setError(null);
 
-      const mapaFuncionarios = await buscarFuncionariosMap();
 
       const [tarefasResponse, fotosResponse] = await Promise.all([
         api.get("/tarefas"),
@@ -424,9 +400,7 @@ function Home() {
             setorApiMap[Number(tarefa.tar_setor_id)] ||
             `Setor #${tarefa.tar_setor_id}`,
 
-          criadoPor:
-            mapaFuncionarios[Number(tarefa.tar_criado_por)] ||
-            `Funcionário #${tarefa.tar_criado_por}`,
+          criadoPor: tarefa.func_nome || "-",
 
           estimativaMinutos: tarefa.tar_estimativa_minutos ?? "",
           estimativaFormatada: formatarEstimativa(
@@ -462,9 +436,9 @@ function Home() {
       if (primeiraCargaRef.current) {
         setError(
           err.response?.data?.mensagem ||
-            err.response?.data?.dados ||
-            err.message ||
-            "Não foi possível carregar as tarefas.",
+          err.response?.data?.dados ||
+          err.message ||
+          "Não foi possível carregar as tarefas.",
         );
       }
     } finally {
@@ -477,12 +451,6 @@ function Home() {
 
   useEffect(() => {
     fetchDados();
-
-    const interval = setInterval(() => {
-      fetchDados();
-    }, 15000);
-
-    return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {
@@ -572,31 +540,13 @@ function Home() {
 
       showToast(
         err.response?.data?.dados ||
-          err.response?.data?.mensagem ||
-          "Erro ao excluir tarefa. Verifique os dados informados.",
+        err.response?.data?.mensagem ||
+        "Erro ao excluir tarefa. Verifique os dados informados.",
         "error",
       );
     }
   }
 
-  function abrirEdicao(task) {
-    if (task.status === "Concluída") {
-      showToast(
-        "Tarefa concluída: esta tarefa não pode mais ser editada.",
-        "warning",
-      );
-      return;
-    }
-
-    setSelectedTask(null);
-
-    setEditTask({
-      ...task,
-      estimativaValor: task.estimativaMinutos || "",
-      estimativaUnidade: "minutos",
-      estimativaMinutosBase: Number(task.estimativaMinutos) || 0,
-    });
-  }
 
   async function salvarEdicao() {
     if (!editTask.titulo.trim()) {
@@ -682,8 +632,8 @@ function Home() {
 
       showToast(
         err.response?.data?.dados ||
-          err.response?.data?.mensagem ||
-          "Erro ao editar tarefa. Verifique os dados informados.",
+        err.response?.data?.mensagem ||
+        "Erro ao editar tarefa. Verifique os dados informados.",
         "error",
       );
     }
@@ -783,8 +733,8 @@ function Home() {
     } catch (err) {
       showToast(
         err.response?.data?.mensagem ||
-          err.response?.data?.dados ||
-          "Erro ao criar tarefa. Verifique os dados informados.",
+        err.response?.data?.dados ||
+        "Erro ao criar tarefa. Verifique os dados informados.",
         "error",
       );
     }
@@ -867,6 +817,7 @@ function Home() {
   const setores = [
     "Administrativo",
     "Financeiro",
+    "Operacional",
     "RH",
     "Recepção",
     "Atendimento",
@@ -1281,9 +1232,8 @@ function Home() {
               <div>
                 <strong>Prioridade:</strong>
                 <span
-                  className={`${styles.badge} ${
-                    styles[prioridadeMap[selectedTask.prioridade]]
-                  }`}
+                  className={`${styles.badge} ${styles[prioridadeMap[selectedTask.prioridade]]
+                    }`}
                 >
                   {selectedTask.prioridade}
                 </span>
@@ -1292,10 +1242,9 @@ function Home() {
               <div>
                 <strong>Status:</strong>
                 <span
-                  className={`${styles.badge} ${
-                    styles[statusMap[selectedTask.status]] ||
+                  className={`${styles.badge} ${styles[statusMap[selectedTask.status]] ||
                     styles.statusPendente
-                  }`}
+                    }`}
                 >
                   {selectedTask.status}
                 </span>
@@ -1759,7 +1708,7 @@ function Home() {
                   isMobile
                     ? false
                     : ({ name, percent }) =>
-                        `${name}: ${(percent * 100).toFixed(0)}%`
+                      `${name}: ${(percent * 100).toFixed(0)}%`
                 }
                 labelLine={false}
                 fontSize={isMobile ? 12 : 20}

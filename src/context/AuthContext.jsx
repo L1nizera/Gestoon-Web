@@ -38,6 +38,7 @@ export function AuthProvider({ children }) {
   }
 
   useEffect(() => {
+    console.log("USER:", user);
     if (!user || !token) return;
 
     const verificarSessao = async () => {
@@ -56,7 +57,7 @@ export function AuthProvider({ children }) {
 
     verificarSessao();
 
-    const interval = setInterval(verificarSessao, 5000);
+    const interval = setInterval(verificarSessao, 60000);
 
     return () => clearInterval(interval);
   }, [user, token]);

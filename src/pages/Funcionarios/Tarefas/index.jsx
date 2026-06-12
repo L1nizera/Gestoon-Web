@@ -17,10 +17,6 @@ const prioridadeApiMap = {
 };
 
 const statusMap = {
-  Pendente: "statusPendente",
-};
-
-const statusClasses = {
   Pendente: styles.statusPendente,
   "Em andamento": styles.statusAndamento,
 };
@@ -37,9 +33,8 @@ const columns = [
     align: "center",
     render: (row) => (
       <span
-        className={`${styles.badge} ${
-          styles[statusMap[row.status]] || styles.statusPendente
-        }`}
+        className={`${styles.badge} ${statusMap[row.status] || styles.statusPendente
+          }`}
       >
         {row.status}
       </span>
@@ -198,8 +193,6 @@ export default function Tarefas() {
       const response = await api.get("/tarefas");
       const todosTarefas = response.data.dados || [];
 
-      const setorFuncionario = user?.func_setor_id;
-
       const tarefasFormatadas = todosTarefas
         .filter((t) => {
           const tarefaPendente = Number(t.atr_status ?? 0) === 0;
@@ -290,15 +283,16 @@ export default function Tarefas() {
       setRemovendoId(tarefaId);
 
       setTimeout(() => {
-        setTarefasDisponiveis((prev) => prev.filter((t) => t.id !== tarefaId));
+        setTarefasDisponiveis((prev) =>
+          prev.filter((t) => t.id !== tarefaId)
+        );
+
+        if (tarefaSelecionada?.id === tarefaId) {
+          setTarefaSelecionada(null);
+        }
+
+        setRemovendoId(null);
       }, 400);
-
-      if (tarefaSelecionada?.id === tarefaId) {
-        setTarefaSelecionada(null);
-      }
-
-      // show visual success
-      await fetchTarefas(false);
     } catch (err) {
       console.error(
         "Erro ao aceitar tarefa:",
@@ -330,11 +324,7 @@ export default function Tarefas() {
   // ───── EFEITOS ─────
   useEffect(() => {
     fetchTarefas(true);
-
-    const interval = setInterval(() => {
-      fetchTarefas(false);
-    }, 5000);
-
+    
     return () => clearInterval(interval);
   }, []);
 
@@ -576,33 +566,6 @@ export default function Tarefas() {
               Tentar novamente
             </button>
           </div>
-        ) : tarefasFiltradas.length === 0 ? (
-          // VAZIO
-          <div className={styles.emptyState}>
-            <p>
-              {busca || filtroSetor || filtroPrioridade
-                ? "Nenhuma tarefa encontrada com estes filtros."
-                : "Nenhuma tarefa disponível no momento."}
-            </p>
-            {(busca || filtroSetor || filtroPrioridade) && (
-              <button
-                onClick={limparFiltros}
-                style={{
-                  marginTop: "1rem",
-                  padding: "0.8rem 1.6rem",
-                  borderRadius: "0.8rem",
-                  border: "none",
-                  background: "var(--primary)",
-                  color: "var(--color-white)",
-                  cursor: "pointer",
-                  fontWeight: "600",
-                  fontSize: "1.35rem",
-                }}
-              >
-                Limpar filtros
-              </button>
-            )}
-          </div>
         ) : (
           <>
             {/* DESKTOP: TABELA */}
@@ -615,7 +578,11 @@ export default function Tarefas() {
                 rowClassName={(row) =>
                   removendoId === row.id ? localStyles.removendo : ""
                 }
-                emptyMessage="Nenhuma tarefa encontrada."
+                emptyMessage={
+                  busca || filtroSetor || filtroPrioridade
+                    ? "Nenhuma tarefa encontrada com estes filtros."
+                    : "Nenhuma tarefa disponível no momento."
+                }
               />
             </div>
 
@@ -658,9 +625,8 @@ export default function Tarefas() {
 
                     <div className={styles.mobileCardActions}>
                       <button
-                        className={`${styles.btnAccept} ${
-                          aceitandoId === tarefa.id ? styles.loading : ""
-                        }`}
+                        className={`${styles.btnAccept} ${aceitandoId === tarefa.id ? styles.loading : ""
+                          }`}
                         onClick={(e) => {
                           e.stopPropagation();
                           aceitarTarefa(tarefa.id);
@@ -704,7 +670,7 @@ export default function Tarefas() {
                 className={styles.btnPrimary}
                 onClick={() => aceitarTarefa(tarefaSelecionada.id)}
               >
-                {aceitandoId === tarefaSelecionada.id ? "Aceitar" : "Aceitar"}
+                {aceitandoId === tarefaSelecionada.id ? "Aceitando..." : "Aceitar"}
               </button>
             </>
           }
