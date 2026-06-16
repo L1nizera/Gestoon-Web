@@ -5,6 +5,7 @@ import localStyles from "./style.module.css";
 import api from "../../../services/api";
 import Modal from "../../../components/Modal/index.jsx";
 import DataTable from "../../../components/ui/DataTable";
+import { useToast } from "../../../components/ui/Toast";
 
 // ═════════════════════════════════════════════════════════════════
 // 📌 MAPEAMENTOS DA API
@@ -33,8 +34,9 @@ const columns = [
     align: "center",
     render: (row) => (
       <span
-        className={`${styles.badge} ${statusMap[row.status] || styles.statusPendente
-          }`}
+        className={`${styles.badge} ${
+          statusMap[row.status] || styles.statusPendente
+        }`}
       >
         {row.status}
       </span>
@@ -105,22 +107,16 @@ export default function Tarefas() {
   const [error, setError] = useState(null);
   const [aceitandoId, setAceitandoId] = useState(null);
   const [tarefaSelecionada, setTarefaSelecionada] = useState(null);
-  const [successMessage, setSuccessMessage] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
   const [removendoId, setRemovendoId] = useState(null);
 
   const { user } = useAuth();
+  const { showToast } = useToast();
   const tarefasKeyRef = useRef("");
-
-  const successTimeoutRef = useRef(null);
-  const errorTimeoutRef = useRef(null);
 
   // ───── FILTROS ─────
   const [busca, setBusca] = useState("");
   const [filtroSetor, setFiltroSetor] = useState("");
   const [filtroPrioridade, setFiltroPrioridade] = useState("");
-
-  // ───── FUNÇÕES AUXILIARES ─────
 
   /**
    * Formata data ISO para formato Brasil
@@ -241,12 +237,10 @@ export default function Tarefas() {
       );
       setError("Não foi possível carregar as tarefas. Tente novamente.");
       // show visual error message
-      const msg =
-        err.response?.data?.mensagem ||
-        "Não foi possível carregar as tarefas. Tente novamente.";
-      setErrorMessage(msg);
-      if (errorTimeoutRef.current) clearTimeout(errorTimeoutRef.current);
-      errorTimeoutRef.current = setTimeout(() => setErrorMessage(""), 5000);
+      showToast(
+        "Não foi possível identificar o usuário logado. Faça login novamente.",
+        "error",
+      );
     } finally {
       if (mostrarLoading) {
         setLoading(false);
@@ -265,11 +259,10 @@ export default function Tarefas() {
       user?.id_funcionario;
 
     if (!funcionarioId) {
-      const msg =
-        "Não foi possível identificar o usuário logado. Faça login novamente.";
-      setErrorMessage(msg);
-      if (errorTimeoutRef.current) clearTimeout(errorTimeoutRef.current);
-      errorTimeoutRef.current = setTimeout(() => setErrorMessage(""), 5000);
+      showToast(
+        "Não foi possível identificar o usuário logado. Faça login novamente.",
+        "error",
+      );
       return;
     }
 
@@ -280,32 +273,26 @@ export default function Tarefas() {
         funcionario_id: funcionarioId,
       });
 
+      showToast("Tarefa aceita com sucesso.", "success");
+
       setRemovendoId(tarefaId);
 
       setTimeout(() => {
-        setTarefasDisponiveis((prev) =>
-          prev.filter((t) => t.id !== tarefaId)
-        );
+        setTarefasDisponiveis((prev) => prev.filter((t) => t.id !== tarefaId));
 
         if (tarefaSelecionada?.id === tarefaId) {
           setTarefaSelecionada(null);
         }
 
         setRemovendoId(null);
-      }, 400);
+      },650);  
     } catch (err) {
       console.error(
         "Erro ao aceitar tarefa:",
         err.response?.data || err.message,
       );
 
-      const msg =
-        err.response?.data?.mensagem ||
-        "Erro ao aceitar tarefa. Tente novamente mais tarde.";
-      setErrorMessage(msg);
-      if (errorTimeoutRef.current) clearTimeout(errorTimeoutRef.current);
-      errorTimeoutRef.current = setTimeout(() => setErrorMessage(""), 5000);
-
+      showToast("Erro ao aceitar tarefa. Tente novamente mais tarde.", "error");
       await fetchTarefas(false);
     } finally {
       setAceitandoId(null);
@@ -324,16 +311,6 @@ export default function Tarefas() {
   // ───── EFEITOS ─────
   useEffect(() => {
     fetchTarefas(true);
-    
-    return () => clearInterval(interval);
-  }, []);
-
-  // limpar timeouts de mensagens quando o componente desmonta
-  useEffect(() => {
-    return () => {
-      if (successTimeoutRef.current) clearTimeout(successTimeoutRef.current);
-      if (errorTimeoutRef.current) clearTimeout(errorTimeoutRef.current);
-    };
   }, []);
   // ───── COMPUTADOS ─────
 
@@ -445,210 +422,84 @@ export default function Tarefas() {
           </button>
         </div>
 
-        {/* FEEDBACK VISUAL: sucess/error banners */}
-        {(successMessage || errorMessage) && (
-          <div className={styles.alertsWrapper}>
-            {successMessage && (
-              <div
-                className={`${styles.alert} ${styles.alertSuccess}`}
-                role="status"
-              >
-                <div className={styles.alertIcon} aria-hidden>
-                  <svg
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M20 6L9 17L4 12"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                </div>
-                <div className={styles.alertContent}>{successMessage}</div>
-                <button
-                  className={styles.alertClose}
-                  onClick={() => {
-                    setSuccessMessage("");
-                    if (successTimeoutRef.current)
-                      clearTimeout(successTimeoutRef.current);
-                  }}
-                  aria-label="Fechar mensagem de sucesso"
-                >
-                  ✕
-                </button>
-              </div>
-            )}
+        {/* DESKTOP: TABELA */}
+        <div className={localStyles.hideOnMobile}>
+          <DataTable
+            columns={columns}
+            data={tarefasFiltradas}
+            rowKey="id"
+            onRowClick={setTarefaSelecionada}
+            rowClassName={(row) =>
+              removendoId === row.id ? localStyles.removendo : ""
+            }
+            emptyMessage={
+              busca || filtroSetor || filtroPrioridade
+                ? "Nenhuma tarefa encontrada com estes filtros."
+                : "Nenhuma tarefa disponível no momento."
+            }
+          />
+        </div>
 
-            {errorMessage && (
-              <div
-                className={`${styles.alert} ${styles.alertError}`}
-                role="alert"
-              >
-                <div className={styles.alertIcon} aria-hidden>
-                  <svg
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M12 9v4"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                    <path
-                      d="M12 17h.01"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                    <path
-                      d="M21 12A9 9 0 1 1 3 12a9 9 0 0 1 18 0z"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                </div>
-                <div className={styles.alertContent}>{errorMessage}</div>
-                <button
-                  className={styles.alertClose}
-                  onClick={() => {
-                    setErrorMessage("");
-                    if (errorTimeoutRef.current)
-                      clearTimeout(errorTimeoutRef.current);
-                  }}
-                  aria-label="Fechar mensagem de erro"
-                >
-                  ✕
-                </button>
-              </div>
-            )}
-          </div>
-        )}
-
-        {loading ? (
-          // LOADING
-          <div className={styles.loadingContainer}>
-            <div className={styles.loadingSpinner} />
-            <p style={{ marginTop: "1rem" }}>Carregando tarefas...</p>
-          </div>
-        ) : error ? (
-          // ERRO
-          <div className={styles.emptyState}>
-            <div className={styles.emptyStateIcon}>⚠️</div>
-            <p>{error}</p>
-            <button
-              onClick={fetchTarefas}
-              style={{
-                marginTop: "1rem",
-                padding: "0.8rem 1.6rem",
-                borderRadius: "0.8rem",
-                border: "none",
-                background: "var(--primary)",
-                color: "var(--color-white)",
-                cursor: "pointer",
-                fontWeight: "600",
-                fontSize: "1.35rem",
-              }}
-            >
-              Tentar novamente
-            </button>
-          </div>
-        ) : (
-          <>
-            {/* DESKTOP: TABELA */}
-            <div className={localStyles.hideOnMobile}>
-              <DataTable
-                columns={columns}
-                data={tarefasFiltradas}
-                rowKey="id"
-                onRowClick={setTarefaSelecionada}
-                rowClassName={(row) =>
-                  removendoId === row.id ? localStyles.removendo : ""
-                }
-                emptyMessage={
-                  busca || filtroSetor || filtroPrioridade
-                    ? "Nenhuma tarefa encontrada com estes filtros."
-                    : "Nenhuma tarefa disponível no momento."
-                }
-              />
-            </div>
-
-            {/* MOBILE: CARDS */}
-            <div className={localStyles.showOnMobile}>
-              {tarefasFiltradas.map((tarefa) => (
-                <div
-                  key={tarefa.id}
-                  className={`
+        {/* MOBILE: CARDS */}
+        <div className={localStyles.showOnMobile}>
+          {tarefasFiltradas.map((tarefa) => (
+            <div
+              key={tarefa.id}
+              className={`
                   ${styles.card}
                   ${styles.mobileCard}
                   ${removendoId === tarefa.id ? localStyles.removendo : ""}
                 `}
-                  onClick={() => setTarefaSelecionada(tarefa)}
-                >
-                  {/* CABEÇALHO DO CARD */}
-                  <div className={styles.cardHeader}>
-                    <strong>{tarefa.titulo}</strong>
-                    <PrioridadeBadge prioridade={tarefa.prioridade} />
-                  </div>
+              onClick={() => setTarefaSelecionada(tarefa)}
+            >
+              {/* CABEÇALHO DO CARD */}
+              <div className={styles.cardHeader}>
+                <strong>{tarefa.titulo}</strong>
+                <PrioridadeBadge prioridade={tarefa.prioridade} />
+              </div>
 
-                  {/* CORPO DO CARD */}
-                  <div className={styles.cardBody}>
-                    <p>
-                      <strong>Setor:</strong> {tarefa.setor}
-                    </p>
-                    <p>
-                      <strong>Criado por:</strong> {tarefa.criadoPor}
-                    </p>
-                    <p>
-                      <strong>Descrição:</strong> {tarefa.descricao}
-                    </p>
-                  </div>
+              {/* CORPO DO CARD */}
+              <div className={styles.cardBody}>
+                <p>
+                  <strong>Setor:</strong> {tarefa.setor}
+                </p>
+                <p>
+                  <strong>Criado por:</strong> {tarefa.criadoPor}
+                </p>
+                <p>
+                  <strong>Descrição:</strong> {tarefa.descricao}
+                </p>
+              </div>
 
-                  <div className={styles.mobileCardFooter}>
-                    <div className={styles.cardFooter}>
-                      <span>{tarefa.dataCriacao}</span>
-                      <span>{tarefa.horaCriacao}</span>
-                    </div>
-
-                    <div className={styles.mobileCardActions}>
-                      <button
-                        className={`${styles.btnAccept} ${aceitandoId === tarefa.id ? styles.loading : ""
-                          }`}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          aceitarTarefa(tarefa.id);
-                        }}
-                        disabled={aceitandoId !== null}
-                        title={
-                          aceitandoId === tarefa.id
-                            ? "Processando..."
-                            : "Clique para aceitar esta tarefa"
-                        }
-                      >
-                        {aceitandoId === tarefa.id
-                          ? "✓ Aceitando..."
-                          : "✓ Aceitar"}
-                      </button>
-                    </div>
-                  </div>
+              <div className={styles.mobileCardFooter}>
+                <div className={styles.cardFooter}>
+                  <span>{tarefa.dataCriacao}</span>
+                  <span>{tarefa.horaCriacao}</span>
                 </div>
-              ))}
+
+                <div className={styles.mobileCardActions}>
+                  <button
+                    className={`${styles.btnAccept} ${
+                      aceitandoId === tarefa.id ? styles.loading : ""
+                    }`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      aceitarTarefa(tarefa.id);
+                    }}
+                    disabled={aceitandoId !== null}
+                    title={
+                      aceitandoId === tarefa.id
+                        ? "Processando..."
+                        : "Clique para aceitar esta tarefa"
+                    }
+                  >
+                    {aceitandoId === tarefa.id ? "✓ Aceitando..." : "✓ Aceitar"}
+                  </button>
+                </div>
+              </div>
             </div>
-          </>
-        )}
+          ))}
+        </div>
       </div>
 
       {/* MODAL: DETALHES DA TAREFA */}
@@ -670,7 +521,9 @@ export default function Tarefas() {
                 className={styles.btnPrimary}
                 onClick={() => aceitarTarefa(tarefaSelecionada.id)}
               >
-                {aceitandoId === tarefaSelecionada.id ? "Aceitando..." : "Aceitar"}
+                {aceitandoId === tarefaSelecionada.id
+                  ? "Aceitando..."
+                  : "Aceitar"}
               </button>
             </>
           }

@@ -146,8 +146,9 @@ function Home() {
       align: "center",
       render: (row) => (
         <span
-          className={`${styles.badge} ${styles[statusMap[row.status]] || styles.statusPendente
-            }`}
+          className={`${styles.badge} ${
+            styles[statusMap[row.status]] || styles.statusPendente
+          }`}
         >
           {row.status}
         </span>
@@ -346,7 +347,6 @@ function Home() {
 
       setError(null);
 
-
       const [tarefasResponse, fotosResponse] = await Promise.all([
         api.get("/tarefas"),
         api.get("/tarefaFotos"),
@@ -400,7 +400,10 @@ function Home() {
             setorApiMap[Number(tarefa.tar_setor_id)] ||
             `Setor #${tarefa.tar_setor_id}`,
 
-          criadoPor: tarefa.func_nome || "-",
+          criadoPor:
+            tarefa.usu_nome ||
+            tarefa.responsavel_nome ||
+            `Funcionário #${tarefa.tar_criado_por}`,
 
           estimativaMinutos: tarefa.tar_estimativa_minutos ?? "",
           estimativaFormatada: formatarEstimativa(
@@ -436,9 +439,9 @@ function Home() {
       if (primeiraCargaRef.current) {
         setError(
           err.response?.data?.mensagem ||
-          err.response?.data?.dados ||
-          err.message ||
-          "Não foi possível carregar as tarefas.",
+            err.response?.data?.dados ||
+            err.message ||
+            "Não foi possível carregar as tarefas.",
         );
       }
     } finally {
@@ -540,13 +543,12 @@ function Home() {
 
       showToast(
         err.response?.data?.dados ||
-        err.response?.data?.mensagem ||
-        "Erro ao excluir tarefa. Verifique os dados informados.",
+          err.response?.data?.mensagem ||
+          "Erro ao excluir tarefa. Verifique os dados informados.",
         "error",
       );
     }
   }
-
 
   async function salvarEdicao() {
     if (!editTask.titulo.trim()) {
@@ -632,8 +634,8 @@ function Home() {
 
       showToast(
         err.response?.data?.dados ||
-        err.response?.data?.mensagem ||
-        "Erro ao editar tarefa. Verifique os dados informados.",
+          err.response?.data?.mensagem ||
+          "Erro ao editar tarefa. Verifique os dados informados.",
         "error",
       );
     }
@@ -733,8 +735,8 @@ function Home() {
     } catch (err) {
       showToast(
         err.response?.data?.mensagem ||
-        err.response?.data?.dados ||
-        "Erro ao criar tarefa. Verifique os dados informados.",
+          err.response?.data?.dados ||
+          "Erro ao criar tarefa. Verifique os dados informados.",
         "error",
       );
     }
@@ -1232,8 +1234,9 @@ function Home() {
               <div>
                 <strong>Prioridade:</strong>
                 <span
-                  className={`${styles.badge} ${styles[prioridadeMap[selectedTask.prioridade]]
-                    }`}
+                  className={`${styles.badge} ${
+                    styles[prioridadeMap[selectedTask.prioridade]]
+                  }`}
                 >
                   {selectedTask.prioridade}
                 </span>
@@ -1242,9 +1245,10 @@ function Home() {
               <div>
                 <strong>Status:</strong>
                 <span
-                  className={`${styles.badge} ${styles[statusMap[selectedTask.status]] ||
+                  className={`${styles.badge} ${
+                    styles[statusMap[selectedTask.status]] ||
                     styles.statusPendente
-                    }`}
+                  }`}
                 >
                   {selectedTask.status}
                 </span>
@@ -1708,7 +1712,7 @@ function Home() {
                   isMobile
                     ? false
                     : ({ name, percent }) =>
-                      `${name}: ${(percent * 100).toFixed(0)}%`
+                        `${name}: ${(percent * 100).toFixed(0)}%`
                 }
                 labelLine={false}
                 fontSize={isMobile ? 12 : 20}
