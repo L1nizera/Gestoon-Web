@@ -16,6 +16,7 @@ body {
     opacity: 0;
     transform: translateY(1rem);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -140,6 +141,10 @@ body {
   align-items: center;
   justify-content: center;
   gap: 0.6rem;
+}
+
+.filtrosAvancados>div:first-child {
+  flex: 2;
 }
 
 .badge {
@@ -308,6 +313,7 @@ body {
 }
 
 @media (max-width: 48rem) {
+
   .table th,
   .table td {
     padding: 1rem;

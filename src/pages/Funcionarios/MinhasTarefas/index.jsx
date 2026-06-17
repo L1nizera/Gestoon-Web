@@ -51,9 +51,8 @@ const columns = [
     align: "center",
     render: (row) => (
       <span
-        className={`${styles.badge} ${
-          styles[statusMap[row.status]] || styles.statusPendente
-        }`}
+        className={`${styles.badge} ${styles[statusMap[row.status]] || styles.statusPendente
+          }`}
       >
         {row.status}
       </span>
@@ -65,9 +64,8 @@ const columns = [
     align: "center",
     render: (row) => (
       <span
-        className={`${styles.badge} ${
-          styles[prioridadeMap[row.prioridade]] || styles.prioridadeMedia
-        }`}
+        className={`${styles.badge} ${styles[prioridadeMap[row.prioridade]] || styles.prioridadeMedia
+          }`}
       >
         {row.prioridade}
       </span>
@@ -118,7 +116,6 @@ export default function MinhasTarefas() {
   const [busca, setBusca] = useState("");
   const [statusFiltro, setStatusFiltro] = useState("");
   const [prioridadeFiltro, setPrioridadeFiltro] = useState("");
-  const [setorFiltro, setSetorFiltro] = useState("");
 
   useEffect(() => {
     carregarMinhasTarefas();
@@ -220,9 +217,9 @@ export default function MinhasTarefas() {
 
       showToast(
         error.response?.data?.mensagem ||
-          error.response?.data?.dados ||
-          error.message ||
-          "Erro ao confirmar tarefa.",
+        error.response?.data?.dados ||
+        error.message ||
+        "Erro ao confirmar tarefa.",
         "error",
       );
     }
@@ -275,9 +272,9 @@ export default function MinhasTarefas() {
 
       showToast(
         error.response?.data?.mensagem ||
-          error.response?.data?.dados ||
-          error.message ||
-          "Erro ao cancelar tarefa.",
+        error.response?.data?.dados ||
+        error.message ||
+        "Erro ao cancelar tarefa.",
         "error",
       );
     }
@@ -390,14 +387,6 @@ export default function MinhasTarefas() {
     [taskList],
   );
 
-  const setores = useMemo(
-    () =>
-      Array.from(
-        new Set(taskList.map((task) => task.setor).filter(Boolean)),
-      ).sort(),
-    [taskList],
-  );
-
   const filteredTarefas = useMemo(() => {
     let resultado = [...minhasTarefas];
 
@@ -421,19 +410,13 @@ export default function MinhasTarefas() {
         (task) => task.prioridade === prioridadeFiltro,
       );
     }
-
-    if (setorFiltro) {
-      resultado = resultado.filter((task) => task.setor === setorFiltro);
-    }
-
     return resultado;
-  }, [minhasTarefas, busca, statusFiltro, prioridadeFiltro, setorFiltro]);
+  }, [minhasTarefas, busca, statusFiltro, prioridadeFiltro]);
 
   const limparFiltros = () => {
     setBusca("");
     setStatusFiltro("");
     setPrioridadeFiltro("");
-    setSetorFiltro("");
   };
 
   const counts = useMemo(() => {
@@ -501,21 +484,6 @@ export default function MinhasTarefas() {
               {prioridadeOptions.map((prioridade) => (
                 <option key={prioridade} value={prioridade}>
                   {prioridade}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <small>Setor</small>
-            <select
-              value={setorFiltro}
-              onChange={(e) => setSetorFiltro(e.target.value)}
-            >
-              <option value="">Todos</option>
-              {setores.map((setor) => (
-                <option key={setor} value={setor}>
-                  {setor}
                 </option>
               ))}
             </select>
@@ -653,10 +621,9 @@ export default function MinhasTarefas() {
               <div>
                 <strong>Status:</strong>
                 <span
-                  className={`${styles.badge} ${
-                    styles[statusMap[selectedTask.status]] ||
+                  className={`${styles.badge} ${styles[statusMap[selectedTask.status]] ||
                     styles.statusPendente
-                  }`}
+                    }`}
                 >
                   {selectedTask.status}
                 </span>
@@ -665,10 +632,9 @@ export default function MinhasTarefas() {
               <div>
                 <strong>Prioridade:</strong>
                 <span
-                  className={`${styles.badge} ${
-                    styles[prioridadeMap[selectedTask.prioridade]] ||
+                  className={`${styles.badge} ${styles[prioridadeMap[selectedTask.prioridade]] ||
                     styles.prioridadeMedia
-                  }`}
+                    }`}
                 >
                   {selectedTask.prioridade}
                 </span>

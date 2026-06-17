@@ -476,26 +476,6 @@ export default function Tarefas() {
                   <span>{tarefa.dataCriacao}</span>
                   <span>{tarefa.horaCriacao}</span>
                 </div>
-
-                <div className={styles.mobileCardActions}>
-                  <button
-                    className={`${styles.btnAccept} ${
-                      aceitandoId === tarefa.id ? styles.loading : ""
-                    }`}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      aceitarTarefa(tarefa.id);
-                    }}
-                    disabled={aceitandoId !== null}
-                    title={
-                      aceitandoId === tarefa.id
-                        ? "Processando..."
-                        : "Clique para aceitar esta tarefa"
-                    }
-                  >
-                    {aceitandoId === tarefa.id ? "✓ Aceitando..." : "✓ Aceitar"}
-                  </button>
-                </div>
               </div>
             </div>
           ))}

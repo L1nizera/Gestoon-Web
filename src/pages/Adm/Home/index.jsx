@@ -146,9 +146,8 @@ function Home() {
       align: "center",
       render: (row) => (
         <span
-          className={`${styles.badge} ${
-            styles[statusMap[row.status]] || styles.statusPendente
-          }`}
+          className={`${styles.badge} ${styles[statusMap[row.status]] || styles.statusPendente
+            }`}
         >
           {row.status}
         </span>
@@ -439,9 +438,9 @@ function Home() {
       if (primeiraCargaRef.current) {
         setError(
           err.response?.data?.mensagem ||
-            err.response?.data?.dados ||
-            err.message ||
-            "Não foi possível carregar as tarefas.",
+          err.response?.data?.dados ||
+          err.message ||
+          "Não foi possível carregar as tarefas.",
         );
       }
     } finally {
@@ -543,8 +542,8 @@ function Home() {
 
       showToast(
         err.response?.data?.dados ||
-          err.response?.data?.mensagem ||
-          "Erro ao excluir tarefa. Verifique os dados informados.",
+        err.response?.data?.mensagem ||
+        "Erro ao excluir tarefa. Verifique os dados informados.",
         "error",
       );
     }
@@ -634,8 +633,8 @@ function Home() {
 
       showToast(
         err.response?.data?.dados ||
-          err.response?.data?.mensagem ||
-          "Erro ao editar tarefa. Verifique os dados informados.",
+        err.response?.data?.mensagem ||
+        "Erro ao editar tarefa. Verifique os dados informados.",
         "error",
       );
     }
@@ -735,8 +734,8 @@ function Home() {
     } catch (err) {
       showToast(
         err.response?.data?.mensagem ||
-          err.response?.data?.dados ||
-          "Erro ao criar tarefa. Verifique os dados informados.",
+        err.response?.data?.dados ||
+        "Erro ao criar tarefa. Verifique os dados informados.",
         "error",
       );
     }
@@ -744,19 +743,92 @@ function Home() {
 
   // ===== Exportar PDF =====
   function exportarPDF() {
-    const doc = new jsPDF();
-    const dadosExport = lista; // usa exatamente o que está filtrado
+    const doc = new jsPDF("landscape");
+    const dadosExport = lista;
 
-    // ===== TÍTULO =====
-    doc.setFontSize(18);
-    doc.text("Relatório de Tarefas - Gestoon", 14, 15);
+    const hoje = new Date();
 
-    // ===== DATA =====
-    const hoje = new Date().toLocaleDateString();
-    doc.setFontSize(10);
-    doc.text(`Gerado em: ${hoje}`, 14, 22);
+    const dataFormatada = hoje.toLocaleDateString("pt-BR");
+    const horaFormatada = hoje.toLocaleTimeString("pt-BR");
 
-    // ===== PREPARAR DADOS =====
+    // =========================
+    // CABEÇALHO
+    // =========================
+
+    doc.setFillColor(15, 23, 42);
+    doc.rect(0, 0, 300, 30, "F");
+
+    doc.setTextColor(255);
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(22);
+    doc.text("GESTOON", 14, 15);
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(11);
+    doc.text("Relatório Gerencial de Tarefas", 14, 24);
+
+    doc.setFontSize(9);
+    doc.text(
+      `Emitido em ${dataFormatada} às ${horaFormatada}`,
+      190,
+      20,
+    );
+
+    // =========================
+    // RESUMO
+    // =========================
+
+    doc.setTextColor(40);
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(12);
+    doc.text("Resumo Geral", 14, 48);
+
+    const cards = [
+      {
+        titulo: "Pendentes",
+        valor: pendentes,
+        cor: [255, 243, 205],
+      },
+      {
+        titulo: "Em andamento",
+        valor: andamento,
+        cor: [219, 234, 254],
+      },
+      {
+        titulo: "Concluídas",
+        valor: concluidas,
+        cor: [220, 252, 231],
+      },
+      {
+        titulo: "Canceladas",
+        valor: canceladas,
+        cor: [254, 226, 226],
+      },
+    ];
+
+    let x = 14;
+
+    cards.forEach((card) => {
+      doc.setFillColor(...card.cor);
+
+      doc.roundedRect(x, 54, 62, 24, 2, 2, "F");
+
+      doc.setTextColor(80);
+
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(9);
+      doc.text(card.titulo, x + 4, 63);
+
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(18);
+      doc.text(String(card.valor), x + 4, 73);
+
+      x += 66;
+    });
+
+    // ===== DADOS =====
     const dados = dadosExport.map((t) => [
       t.tarefaId,
       t.titulo,
@@ -765,14 +837,12 @@ function Home() {
       t.setor,
       t.criadoPor,
       t.estimativaFormatada,
-      t.dataCriacao,
-      t.horaCriacao,
-      t.descricao || "-",
+      `${t.dataCriacao} ${t.horaCriacao}`,
     ]);
 
-    // ===== TABELA =====
     autoTable(doc, {
-      startY: 30,
+      startY: 88,
+
       head: [
         [
           "ID",
@@ -782,30 +852,100 @@ function Home() {
           "Setor",
           "Criado por",
           "Estimativa",
-          "Data",
-          "Hora",
-          "Descrição",
+          "Data/Hora",
         ],
       ],
+
       body: dados,
+
+      theme: "grid",
 
       styles: {
         fontSize: 8,
-        lineColor: [200, 200, 200], // cor da linha
-        lineWidth: 0.1, // espessura
+        cellPadding: 4,
+        overflow: "linebreak",
+        valign: "middle",
+        lineColor: [225, 225, 225],
+        lineWidth: 0.1,
       },
 
       headStyles: {
         fillColor: [15, 23, 42],
         textColor: 255,
-        lineWidth: 0.2,
+        fontStyle: "bold",
+        halign: "center",
       },
 
-      theme: "grid",
+      alternateRowStyles: {
+        fillColor: [248, 250, 252],
+      },
+
+      columnStyles: {
+        0: { cellWidth: 18 }, // ID
+        1: { cellWidth: 60 }, // Título
+        2: { cellWidth: 32 }, // Status
+        3: { cellWidth: 26 }, // Prioridade
+        4: { cellWidth: 32 }, // Setor
+        5: { cellWidth: 38 }, // Criado por
+        6: { cellWidth: 24 }, // Estimativa
+        7: { cellWidth: 38 }, // Data/Hora
+      },
+
+      didParseCell(data) {
+        if (data.section !== "body") return;
+
+        const status = data.row.raw[2];
+
+        if (status === "Concluída") {
+          data.cell.styles.fillColor = [220, 252, 231];
+        }
+
+        if (status === "Em andamento") {
+          data.cell.styles.fillColor = [254, 249, 195];
+        }
+
+        if (status === "Pendente") {
+          data.cell.styles.fillColor = [254, 226, 226];
+        }
+
+        if (status === "Cancelada") {
+          data.cell.styles.fillColor = [229, 231, 235];
+        }
+      },
+
+      didDrawPage(data) {
+        const pagina = doc.getNumberOfPages();
+        const altura = doc.internal.pageSize.height;
+
+        doc.setDrawColor(220);
+
+        doc.line(
+          14,
+          altura - 14,
+          282,
+          altura - 14,
+        );
+
+        doc.setFontSize(8);
+        doc.setTextColor(120);
+
+        doc.text(
+          "Gestoon - Sistema de Gerenciamento de Tarefas",
+          14,
+          altura - 7,
+        );
+
+        doc.text(
+          `Página ${pagina}`,
+          265,
+          altura - 7,
+        );
+      }
     });
 
-    // ===== SALVAR =====
-    doc.save("relatorio_tarefas.pdf");
+    doc.save(
+      `relatorio-tarefas-${dataFormatada.replaceAll("/", "-")}.pdf`,
+    );
   }
 
   // ===== MAPS =====
@@ -1234,9 +1374,8 @@ function Home() {
               <div>
                 <strong>Prioridade:</strong>
                 <span
-                  className={`${styles.badge} ${
-                    styles[prioridadeMap[selectedTask.prioridade]]
-                  }`}
+                  className={`${styles.badge} ${styles[prioridadeMap[selectedTask.prioridade]]
+                    }`}
                 >
                   {selectedTask.prioridade}
                 </span>
@@ -1245,10 +1384,9 @@ function Home() {
               <div>
                 <strong>Status:</strong>
                 <span
-                  className={`${styles.badge} ${
-                    styles[statusMap[selectedTask.status]] ||
+                  className={`${styles.badge} ${styles[statusMap[selectedTask.status]] ||
                     styles.statusPendente
-                  }`}
+                    }`}
                 >
                   {selectedTask.status}
                 </span>
@@ -1712,7 +1850,7 @@ function Home() {
                   isMobile
                     ? false
                     : ({ name, percent }) =>
-                        `${name}: ${(percent * 100).toFixed(0)}%`
+                      `${name}: ${(percent * 100).toFixed(0)}%`
                 }
                 labelLine={false}
                 fontSize={isMobile ? 12 : 20}
