@@ -146,8 +146,9 @@ function Home() {
       align: "center",
       render: (row) => (
         <span
-          className={`${styles.badge} ${styles[statusMap[row.status]] || styles.statusPendente
-            }`}
+          className={`${styles.badge} ${
+            styles[statusMap[row.status]] || styles.statusPendente
+          }`}
         >
           {row.status}
         </span>
@@ -438,9 +439,9 @@ function Home() {
       if (primeiraCargaRef.current) {
         setError(
           err.response?.data?.mensagem ||
-          err.response?.data?.dados ||
-          err.message ||
-          "Não foi possível carregar as tarefas.",
+            err.response?.data?.dados ||
+            err.message ||
+            "Não foi possível carregar as tarefas.",
         );
       }
     } finally {
@@ -542,8 +543,8 @@ function Home() {
 
       showToast(
         err.response?.data?.dados ||
-        err.response?.data?.mensagem ||
-        "Erro ao excluir tarefa. Verifique os dados informados.",
+          err.response?.data?.mensagem ||
+          "Erro ao excluir tarefa. Verifique os dados informados.",
         "error",
       );
     }
@@ -633,8 +634,8 @@ function Home() {
 
       showToast(
         err.response?.data?.dados ||
-        err.response?.data?.mensagem ||
-        "Erro ao editar tarefa. Verifique os dados informados.",
+          err.response?.data?.mensagem ||
+          "Erro ao editar tarefa. Verifique os dados informados.",
         "error",
       );
     }
@@ -734,8 +735,8 @@ function Home() {
     } catch (err) {
       showToast(
         err.response?.data?.mensagem ||
-        err.response?.data?.dados ||
-        "Erro ao criar tarefa. Verifique os dados informados.",
+          err.response?.data?.dados ||
+          "Erro ao criar tarefa. Verifique os dados informados.",
         "error",
       );
     }
@@ -766,15 +767,12 @@ function Home() {
 
     doc.setFont("helvetica", "normal");
     doc.setFontSize(11);
+
     doc.text("Relatório Gerencial de Tarefas", 14, 24);
 
-    doc.setFontSize(9);
-    doc.text(
-      `Emitido em ${dataFormatada} às ${horaFormatada}`,
-      190,
-      20,
-    );
-
+    doc.text(`Emitido em ${dataFormatada} às ${horaFormatada}`, 285, 24, {
+      align: "right",
+    });
     // =========================
     // RESUMO
     // =========================
@@ -919,12 +917,7 @@ function Home() {
 
         doc.setDrawColor(220);
 
-        doc.line(
-          14,
-          altura - 14,
-          282,
-          altura - 14,
-        );
+        doc.line(14, altura - 14, 282, altura - 14);
 
         doc.setFontSize(8);
         doc.setTextColor(120);
@@ -935,17 +928,11 @@ function Home() {
           altura - 7,
         );
 
-        doc.text(
-          `Página ${pagina}`,
-          265,
-          altura - 7,
-        );
-      }
+        doc.text(`Página ${pagina}`, 265, altura - 7);
+      },
     });
 
-    doc.save(
-      `relatorio-tarefas-${dataFormatada.replaceAll("/", "-")}.pdf`,
-    );
+    doc.save(`relatorio-tarefas-${dataFormatada.replaceAll("/", "-")}.pdf`);
   }
 
   // ===== MAPS =====
@@ -1374,8 +1361,9 @@ function Home() {
               <div>
                 <strong>Prioridade:</strong>
                 <span
-                  className={`${styles.badge} ${styles[prioridadeMap[selectedTask.prioridade]]
-                    }`}
+                  className={`${styles.badge} ${
+                    styles[prioridadeMap[selectedTask.prioridade]]
+                  }`}
                 >
                   {selectedTask.prioridade}
                 </span>
@@ -1384,9 +1372,10 @@ function Home() {
               <div>
                 <strong>Status:</strong>
                 <span
-                  className={`${styles.badge} ${styles[statusMap[selectedTask.status]] ||
+                  className={`${styles.badge} ${
+                    styles[statusMap[selectedTask.status]] ||
                     styles.statusPendente
-                    }`}
+                  }`}
                 >
                   {selectedTask.status}
                 </span>
@@ -1850,7 +1839,7 @@ function Home() {
                   isMobile
                     ? false
                     : ({ name, percent }) =>
-                      `${name}: ${(percent * 100).toFixed(0)}%`
+                        `${name}: ${(percent * 100).toFixed(0)}%`
                 }
                 labelLine={false}
                 fontSize={isMobile ? 12 : 20}

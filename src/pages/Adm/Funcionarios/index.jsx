@@ -303,8 +303,9 @@ function Funcionarios() {
       align: "center",
       render: (row) => (
         <span
-          className={`${styles.badge} ${row.ativo ? styles.statusConcluida : styles.statusCancelada
-            }`}
+          className={`${styles.badge} ${
+            row.ativo ? styles.statusConcluida : styles.statusCancelada
+          }`}
         >
           {row.ativo ? "Ativo" : "Inativo"}
         </span>
@@ -824,7 +825,81 @@ function Funcionarios() {
   }
 
   function exportarPDF() {
-    const doc = new jsPDF();
+    const doc = new jsPDF("landscape");
+
+    const hoje = new Date();
+
+    const dataFormatada = hoje.toLocaleDateString("pt-BR");
+    const horaFormatada = hoje.toLocaleTimeString("pt-BR");
+
+    doc.setFillColor(15, 23, 42);
+    doc.rect(0, 0, 300, 30, "F");
+
+    doc.setTextColor(255);
+
+    // Título
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(22);
+    doc.text("GESTOON", 14, 15);
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(11);
+
+    doc.text("Relatório de Funcionários", 14, 24);
+
+    doc.text(`Emitido em ${dataFormatada} às ${horaFormatada}`, 285, 24, {
+      align: "right",
+    });
+
+    const ativos = lista.filter((f) => f.ativo).length;
+    const inativos = lista.filter((f) => !f.ativo).length;
+
+    const cards = [
+      {
+        titulo: "Total",
+        valor: lista.length,
+        cor: [219, 234, 254],
+      },
+      {
+        titulo: "Ativos",
+        valor: ativos,
+        cor: [220, 252, 231],
+      },
+      {
+        titulo: "Inativos",
+        valor: inativos,
+        cor: [254, 226, 226],
+      },
+    ];
+
+    // Resumo
+    doc.setTextColor(40);
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(12);
+    doc.text("Resumo Geral", 14, 48);
+
+    let x = 14;
+
+    cards.forEach((card) => {
+      doc.setFillColor(...card.cor);
+
+      doc.roundedRect(x, 54, 84, 24, 2, 2, "F");
+
+      doc.setTextColor(80);
+
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(9);
+
+      doc.text(card.titulo, x + 4, 63);
+
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(18);
+
+      doc.text(String(card.valor), x + 4, 73);
+
+      x += 88;
+    });
 
     const dados = lista.map((func) => [
       func.id,
@@ -833,18 +908,86 @@ function Funcionarios() {
       func.setor,
       func.cargo,
       func.status,
-      func.dataCriacao,
-      func.horaCriacao,
+      `${func.dataCriacao} ${func.horaCriacao}`,
     ]);
 
     autoTable(doc, {
-      head: [
-        ["ID", "Nome", "Email", "Setor", "Cargo", "Status", "Data", "Hora"],
-      ],
+      startY: 88,
+
+      head: [["ID", "Nome", "Email", "Setor", "Cargo", "Status", "Data/Hora"]],
+
       body: dados,
+
+      theme: "grid",
+
+      styles: {
+        fontSize: 8,
+        cellPadding: 4,
+        overflow: "linebreak",
+        valign: "middle",
+        lineColor: [225, 225, 225],
+        lineWidth: 0.1,
+      },
+
+      headStyles: {
+        fillColor: [15, 23, 42],
+        textColor: 255,
+        fontStyle: "bold",
+        halign: "center",
+      },
+
+      alternateRowStyles: {
+        fillColor: [248, 250, 252],
+      },
+
+      columnStyles: {
+        0: { cellWidth: 15 }, // ID
+        1: { cellWidth: 35 }, // Nome
+        2: { cellWidth: 60 }, // Email
+        3: { cellWidth: 30 }, // Setor
+        4: { cellWidth: 55 }, // Cargo
+        5: { cellWidth: 20 }, // Status
+        6: { cellWidth: 45 }, // Data/Hora
+      },
+
+      didParseCell(data) {
+        if (data.section !== "body") return;
+
+        const status = data.row.raw[5];
+
+        if (status === "Ativo") {
+          data.cell.styles.fillColor = [220, 252, 231];
+        }
+
+        if (status === "Inativo") {
+          data.cell.styles.fillColor = [254, 226, 226];
+        }
+      },
+
+      didDrawPage() {
+        const pagina = doc.getNumberOfPages();
+        const altura = doc.internal.pageSize.height;
+
+        doc.setDrawColor(220);
+
+        doc.line(14, altura - 14, 282, altura - 14);
+
+        doc.setFontSize(8);
+        doc.setTextColor(120);
+
+        doc.text(
+          "Gestoon - Sistema de Gerenciamento de Funcionários",
+          14,
+          altura - 7,
+        );
+
+        doc.text(`Página ${pagina}`, 265, altura - 7);
+      },
     });
 
-    doc.save("funcionarios.pdf");
+    doc.save(
+      `relatorio-funcionarios-${dataFormatada.replaceAll("/", "-")}.pdf`,
+    );
   }
 
   return (
@@ -898,8 +1041,14 @@ function Funcionarios() {
             Limpar Filtros
           </button>
 
-          <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: "1rem" }}>
-
+          <div
+            style={{
+              marginLeft: "auto",
+              display: "flex",
+              alignItems: "center",
+              gap: "1rem",
+            }}
+          >
             <button
               className={styles.criarBtn}
               onClick={() => setCreateFuncionarioOpen(true)}
@@ -1055,10 +1204,11 @@ function Funcionarios() {
                 <strong>Status:</strong>
 
                 <span
-                  className={`${styles.badge} ${selected.ativo
-                    ? styles.statusConcluida
-                    : styles.statusCancelada
-                    }`}
+                  className={`${styles.badge} ${
+                    selected.ativo
+                      ? styles.statusConcluida
+                      : styles.statusCancelada
+                  }`}
                 >
                   {selected.ativo ? "Ativo" : "Inativo"}
                 </span>

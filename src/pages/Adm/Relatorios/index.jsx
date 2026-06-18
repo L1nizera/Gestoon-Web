@@ -9,7 +9,6 @@ import styles from "../Home/style.module.css";
 import localStyles from "./style.module.css";
 import DataTable from "../../../components/ui/DataTable";
 
-
 function Relatorios() {
   const [nomeFiltro, setNomeFiltro] = useState("");
   const [cargoFiltro, setCargoFiltro] = useState("");
@@ -196,6 +195,8 @@ function Relatorios() {
   }, []);
 
   function handleSort(key) {
+    alert("NOVA FUNÇÃO");
+
     if (key === "nome") {
       setOrdemNome((prev) => {
         if (prev === null) return "az";
@@ -353,16 +354,112 @@ function Relatorios() {
   }
 
   function handleExport() {
-    const doc = new jsPDF();
+    const doc = new jsPDF("landscape");
 
-    doc.setFontSize(18);
-    doc.text("Relatório de Funcionários - Gestoon", 14, 15);
+    const hoje = new Date();
 
-    doc.setFontSize(10);
-    doc.text(`Gerado em: ${new Date().toLocaleDateString("pt-BR")}`, 14, 22);
+    const dataFormatada = hoje.toLocaleDateString("pt-BR");
+    const horaFormatada = hoje.toLocaleTimeString("pt-BR");
+
+    // =========================
+    // CABEÇALHO
+    // =========================
+
+    doc.setFillColor(15, 23, 42);
+    doc.rect(0, 0, 300, 30, "F");
+
+    doc.setTextColor(255);
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(22);
+    doc.text("GESTOON", 14, 15);
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(11);
+    doc.text("Relatório Gerencial de Funcionários", 14, 24);
+
+    doc.setFontSize(9);
+    doc.text(`Emitido em ${dataFormatada} às ${horaFormatada}`, 285, 24, {
+      align: "right",
+    });
+
+    // =========================
+    // RESUMO
+    // =========================
+
+    const totalFuncionarios = listaFiltrada.length;
+
+    const totalAndamento = listaFiltrada.reduce(
+      (acc, item) => acc + item.emAndamento,
+      0,
+    );
+
+    const totalConcluidas = listaFiltrada.reduce(
+      (acc, item) => acc + item.concluidas,
+      0,
+    );
+
+    const totalCanceladas = listaFiltrada.reduce(
+      (acc, item) => acc + item.canceladas,
+      0,
+    );
+
+    doc.setTextColor(40);
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(12);
+    doc.text("Resumo Geral", 14, 48);
+
+    const cards = [
+      {
+        titulo: "Funcionários",
+        valor: totalFuncionarios,
+        cor: [219, 234, 254],
+      },
+      {
+        titulo: "Em andamento",
+        valor: totalAndamento,
+        cor: [254, 249, 195],
+      },
+      {
+        titulo: "Concluídas",
+        valor: totalConcluidas,
+        cor: [220, 252, 231],
+      },
+      {
+        titulo: "Canceladas",
+        valor: totalCanceladas,
+        cor: [254, 226, 226],
+      },
+    ];
+
+    let x = 14;
+
+    cards.forEach((card) => {
+      doc.setFillColor(...card.cor);
+
+      doc.roundedRect(x, 54, 62, 24, 2, 2, "F");
+
+      doc.setTextColor(80);
+
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(9);
+      doc.text(card.titulo, x + 4, 63);
+
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(18);
+      doc.text(String(card.valor), x + 4, 73);
+
+      x += 66;
+    });
+
+    // =========================
+    // TABELA
+    // =========================
 
     autoTable(doc, {
-      startY: 30,
+      startY: 88,
+
       head: [
         [
           "Nome",
@@ -375,6 +472,7 @@ function Relatorios() {
           "Total",
         ],
       ],
+
       body: listaFiltrada.map((item) => [
         item.nome,
         item.cargo,
@@ -385,20 +483,64 @@ function Relatorios() {
         item.canceladas,
         item.total,
       ]),
+
+      theme: "grid",
+
       styles: {
         fontSize: 8,
-        lineColor: [200, 200, 200],
+        cellPadding: 4,
+        overflow: "linebreak",
+        valign: "middle",
+        lineColor: [225, 225, 225],
         lineWidth: 0.1,
       },
+
       headStyles: {
         fillColor: [15, 23, 42],
         textColor: 255,
-        lineWidth: 0.2,
+        fontStyle: "bold",
+        halign: "center",
       },
-      theme: "grid",
+
+      alternateRowStyles: {
+        fillColor: [248, 250, 252],
+      },
+
+      columnStyles: {
+        0: { cellWidth: 45 },
+        1: { cellWidth: 45 },
+        2: { cellWidth: 35 },
+        3: { cellWidth: 28 },
+        4: { cellWidth: 25, halign: "center" },
+        5: { cellWidth: 25, halign: "center" },
+        6: { cellWidth: 25, halign: "center" },
+        7: { cellWidth: 20, halign: "center" },
+      },
+
+      didDrawPage() {
+        const pagina = doc.getNumberOfPages();
+        const altura = doc.internal.pageSize.height;
+
+        doc.setDrawColor(220);
+
+        doc.line(14, altura - 14, 282, altura - 14);
+
+        doc.setFontSize(8);
+        doc.setTextColor(120);
+
+        doc.text(
+          "Gestoon - Sistema de Gerenciamento de Tarefas",
+          14,
+          altura - 7,
+        );
+
+        doc.text(`Página ${pagina}`, 265, altura - 7);
+      },
     });
 
-    doc.save("relatorio_funcionarios.pdf");
+    doc.save(
+      `relatorio-funcionarios-${dataFormatada.replaceAll("/", "-")}.pdf`,
+    );
   }
 
   const columns = [
