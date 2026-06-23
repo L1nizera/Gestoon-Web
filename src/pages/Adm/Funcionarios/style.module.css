@@ -352,10 +352,18 @@ select {
 .acoes {
   display: flex;
   justify-content: space-between;
-  align-items: center; /* 🔥 alinha melhor vertical */
+  flex-direction: column;
+  align-items: stretch;
+  /* 🔥 alinha melhor vertical */
   gap: 1rem;
   margin-top: 1rem;
 }
+
+
+.criarBtn {
+  width: 100%;
+}
+
 
 /* ===== BOTÕES ===== */
 
@@ -381,8 +389,6 @@ select {
   cursor: pointer;
   font-weight: 500;
   transition: 0.2s;
-  width: 13rem;
-  width: auto;
 }
 
 .btnPrimary {
@@ -418,7 +424,7 @@ select {
 
 /* ===== FORM ===== */
 
-.formGroup {
+.formGroup{
   display: flex;
   flex-direction: column;
   margin-bottom: 1.2rem;
@@ -482,7 +488,7 @@ select {
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   cursor: pointer;
 }
@@ -493,11 +499,11 @@ select {
 
 .cardList {
   display: grid;
-  gap: 1rem;
+  gap: 1.5rem;
   margin-top: 1.5rem;
   max-height: calc(75vh - 180px);
   overflow-y: auto;
-  padding-right: 0.5rem;
+  padding: 0.8rem;
 }
 
 .cardList::-webkit-scrollbar {
@@ -576,5 +582,20 @@ select {
 
   .employeeCard {
     padding: 1.4rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .acoesDireita {
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .criarBtn {
+    width: 100%;
+  }
+
+  .limparBtn {
+    width: 100%;
   }
 }

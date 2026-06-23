@@ -303,9 +303,8 @@ function Funcionarios() {
       align: "center",
       render: (row) => (
         <span
-          className={`${styles.badge} ${
-            row.ativo ? styles.statusConcluida : styles.statusCancelada
-          }`}
+          className={`${styles.badge} ${row.ativo ? styles.statusConcluida : styles.statusCancelada
+            }`}
         >
           {row.ativo ? "Ativo" : "Inativo"}
         </span>
@@ -1041,14 +1040,8 @@ function Funcionarios() {
             Limpar Filtros
           </button>
 
-          <div
-            style={{
-              marginLeft: "auto",
-              display: "flex",
-              alignItems: "center",
-              gap: "1rem",
-            }}
-          >
+          <div>
+
             <button
               className={styles.criarBtn}
               onClick={() => setCreateFuncionarioOpen(true)}
@@ -1204,11 +1197,10 @@ function Funcionarios() {
                 <strong>Status:</strong>
 
                 <span
-                  className={`${styles.badge} ${
-                    selected.ativo
+                  className={`${styles.badge} ${selected.ativo
                       ? styles.statusConcluida
                       : styles.statusCancelada
-                  }`}
+                    }`}
                 >
                   {selected.ativo ? "Ativo" : "Inativo"}
                 </span>
