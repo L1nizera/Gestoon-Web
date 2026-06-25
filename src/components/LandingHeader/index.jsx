@@ -5,7 +5,6 @@ import styles from "./style.module.css";
 const menuItems = [
   { href: "/inicio", label: "Início" },
   { href: "#funcionalidades", label: "Funcionalidades" },
-  { href: "/equipe", label: "Equipe" },
 ];
 
 export default function LandingHeader() {

@@ -1,7 +1,6 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import Login from "./pages/Login";
 import Landing from "./pages/Landing";
-import LandingEquipe from "./pages/LandingEquipe";
 import Home from "./pages/Adm/Home";
 import DashboardLayout from "./layouts";
 import Funcionarios from "./pages/Adm/Funcionarios";
@@ -46,7 +45,6 @@ function AppRoutes() {
         }
       />
 
-      <Route path="/equipe" element={<LandingEquipe />} />
 
       <Route
         element={
