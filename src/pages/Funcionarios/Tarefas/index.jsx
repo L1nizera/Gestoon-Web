@@ -373,7 +373,7 @@ export default function Tarefas() {
         {/* SEÇÃO PRINCIPAL */}
         <div className={styles.filtrosAvancados}>
           <div>
-            <small>Buscar</small>
+            <small>Buscar:</small>
 
             <input
               className={styles.busca}
@@ -385,7 +385,7 @@ export default function Tarefas() {
           </div>
 
           <div>
-            <small>Setor</small>
+            <small>Setor:</small>
 
             <select
               value={filtroSetor}
@@ -402,7 +402,7 @@ export default function Tarefas() {
           </div>
 
           <div>
-            <small>Prioridade</small>
+            <small>Prioridade:</small>
 
             <select
               value={filtroPrioridade}

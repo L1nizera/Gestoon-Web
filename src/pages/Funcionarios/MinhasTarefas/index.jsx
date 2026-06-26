@@ -449,7 +449,7 @@ export default function MinhasTarefas() {
 
         <div className={styles.filtrosAvancados}>
           <div>
-            <small>Buscar</small>
+            <small>Buscar:</small>
             <input
               className={styles.busca}
               type="text"
@@ -460,7 +460,7 @@ export default function MinhasTarefas() {
           </div>
 
           <div>
-            <small>Status</small>
+            <small>Status:</small>
             <select
               value={statusFiltro}
               onChange={(e) => setStatusFiltro(e.target.value)}
@@ -475,7 +475,7 @@ export default function MinhasTarefas() {
           </div>
 
           <div>
-            <small>Prioridade</small>
+            <small>Prioridade:</small>
             <select
               value={prioridadeFiltro}
               onChange={(e) => setPrioridadeFiltro(e.target.value)}

@@ -113,7 +113,6 @@ select {
 .filtrosAvancados>div {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
 }
 
 .filtrosAvancados small {
@@ -790,7 +789,8 @@ th:focus {
 
 @media (max-width: 768px) {
   .cardHeader strong {
-    font-size: 1rem;
+    font-size: 2.4rem;
+    font-weight: bold;
   }
 }
 
@@ -911,6 +911,33 @@ th:focus {
   .cardContainer {
     padding: 1.2rem;
   }
+
+  h1 {
+    font-size: 3.5rem;
+  }
+
+  p {
+    font-size: 1.9rem;
+    margin-left: 2px;
+  }
+  
+  .resumo {
+    font-size: 1.8rem; 
+  }
+
+  .filtrosAvancados select {
+    font-size: 1.5rem;
+  }
+
+  .filtrosAvancados small {
+    font-size: 1.4rem;
+  }
+
+  .filtrosAvancados .busca {
+    font-size: 1.5rem;
+    font-weight: bold;
+  }
+
 }
 
 .acoes span {
