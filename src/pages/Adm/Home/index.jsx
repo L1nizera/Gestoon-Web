@@ -60,6 +60,7 @@ function Home() {
     12: "Padaria",
     13: "Frios",
     14: "Mercearia",
+    15: "Reposição"
   };
 
   const prioridadeToApiMap = {
@@ -83,6 +84,7 @@ function Home() {
     Padaria: 12,
     Frios: 13,
     Mercearia: 14,
+    Reposição: 15
   };
 
   const statusApiMap = {
@@ -958,6 +960,7 @@ function Home() {
     "Frios",
     "Mercearia",
     "Limpeza",
+    "Reposição"
   ];
 
   const prioridadeMap = {

@@ -60,6 +60,7 @@ function Funcionarios() {
     "Frios",
     "Mercearia",
     "Limpeza",
+    "Reposição"
   ];
 
   const cargoApiMap = {
@@ -92,6 +93,7 @@ function Funcionarios() {
     26: "Auxiliar de Frios",
     27: "Repositor de Mercearia",
     28: "Auxiliar de Mercearia",
+
   };
 
   const cargosPorSetor = {
@@ -108,6 +110,7 @@ function Funcionarios() {
     Frios: ["Balconista de Frios", "Auxiliar de Frios"],
     Mercearia: ["Repositor de Mercearia", "Auxiliar de Mercearia"],
     Limpeza: ["Auxiliar de Limpeza"],
+    Reposição: ["Repositor"]
   };
 
   function getCargosPermitidosPorSetor(setorSelecionado) {
@@ -145,6 +148,7 @@ function Funcionarios() {
     12: "Padaria",
     13: "Frios",
     14: "Mercearia",
+    15: "Reposição"
   };
 
   const setorToApiMap = {
@@ -162,6 +166,7 @@ function Funcionarios() {
     Padaria: 12,
     Frios: 13,
     Mercearia: 14,
+    Reposição: 15
   };
 
   const cargoToApiMap = {
@@ -201,6 +206,14 @@ function Funcionarios() {
     inativo: "statusCancelada",
     afastado: "statusAndamento",
   };
+
+  const resumo = useMemo(() => {
+    return {
+      total: funcionarios.length,
+      ativos: funcionarios.filter(f => f.status === "Ativo").length,
+      inativos: funcionarios.filter(f => f.status === "Inativo").length,
+    };
+  }, [funcionarios]);
 
   function parseDateValue(value) {
     if (!value) {
@@ -871,6 +884,8 @@ function Funcionarios() {
       },
     ];
 
+
+
     // Resumo
     doc.setTextColor(40);
 
@@ -994,6 +1009,23 @@ function Funcionarios() {
       <div className={styles.cardContainer}>
         <h1>Funcionários</h1>
 
+        <div className={styles.resumo}>
+          <div>
+            <span>Total: </span>
+            <strong>{resumo.total}</strong>
+          </div>
+
+          <div>
+            <span>Ativos: </span>
+            <strong>{resumo.ativos}</strong>
+          </div>
+
+          <div>
+            <span>Inativos: </span>
+            <strong>{resumo.inativos}</strong>
+          </div>
+        </div>
+
         <div className={styles.topActions}>
           <input
             className={styles.busca}
@@ -1051,7 +1083,9 @@ function Funcionarios() {
           </div>
         </div>
 
-        <span>{lista.length} encontrados</span>
+        <div className={localStyles.resultado}>
+          <span>{lista.length} encontrados</span>
+        </div>
 
         {loading ? (
           <p>Carregando funcionários...</p>
@@ -1098,53 +1132,52 @@ function Funcionarios() {
                         <div>
                           <h2>{funcionario.nome}</h2>
                           <p className={localStyles.cardId}>
-                            ID {funcionario.id}
+                            ID: {funcionario.id}
                           </p>
                         </div>
 
                         <span
-                          className={`${styles.badge} ${funcionario.ativo ? styles.statusConcluida : styles.statusCancelada}`}
+                          className={`${localStyles.badge} ${funcionario.ativo ? styles.statusConcluida : styles.statusCancelada}`}
                         >
                           {funcionario.ativo ? "Ativo" : "Inativo"}
                         </span>
                       </div>
 
                       <div className={styles.cardBody}>
-                        <p className={localStyles.emailLine}>
-                          {funcionario.email}
-                        </p>
 
                         <div className={localStyles.cardGrid}>
                           <div className={localStyles.cardField}>
-                            <span className={localStyles.cardLabel}>Setor</span>
+                            <span className={localStyles.cardLabel}>Setor:</span>
                             <span className={localStyles.cardValue}>
                               {funcionario.setor}
                             </span>
                           </div>
 
                           <div className={localStyles.cardField}>
-                            <span className={localStyles.cardLabel}>Cargo</span>
+                            <span className={localStyles.cardLabel}>Cargo:</span>
                             <span className={localStyles.cardValue}>
                               {funcionario.cargo}
                             </span>
                           </div>
+
                         </div>
 
                         <div className={localStyles.cardGrid}>
                           <div className={localStyles.cardField}>
-                            <span className={localStyles.cardLabel}>Data</span>
+                            <span className={localStyles.cardLabel}>E-mail:</span>
                             <span className={localStyles.cardValue}>
-                              {funcionario.dataCriacao}
+                              {funcionario.email}
                             </span>
                           </div>
 
                           <div className={localStyles.cardField}>
-                            <span className={localStyles.cardLabel}>Hora</span>
+                            <span className={localStyles.cardLabel}>Data:</span>
                             <span className={localStyles.cardValue}>
-                              {funcionario.horaCriacao}
+                              {funcionario.dataCriacao}
                             </span>
                           </div>
                         </div>
+
                       </div>
                     </article>
                   ))}
@@ -1198,8 +1231,8 @@ function Funcionarios() {
 
                 <span
                   className={`${styles.badge} ${selected.ativo
-                      ? styles.statusConcluida
-                      : styles.statusCancelada
+                    ? styles.statusConcluida
+                    : styles.statusCancelada
                     }`}
                 >
                   {selected.ativo ? "Ativo" : "Inativo"}

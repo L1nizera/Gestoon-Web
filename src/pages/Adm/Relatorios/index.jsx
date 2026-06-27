@@ -71,6 +71,7 @@ function Relatorios() {
     12: "Padaria",
     13: "Frios",
     14: "Mercearia",
+    15: "Reposição"
   };
 
   function parseDateValue(value) {
@@ -191,6 +192,7 @@ function Relatorios() {
       "Frios",
       "Mercearia",
       "Limpeza",
+      "Reposição"
     ];
   }, []);
 

@@ -103,11 +103,31 @@ select {
 
 /* ===== BADGES ===== */
 
+
 .badge {
   padding: 0.4rem 1rem;
   border-radius: 99.9rem;
   font-size: 1.2rem;
   font-weight: 600;
+}
+
+
+@media (max-width: 768px) {
+  .badge {
+    padding: 0.4rem 1rem;
+    border-radius: 99.9rem;
+    font-size: 1.8rem;
+    font-weight: 600;
+    display: inline-block;
+    width: fit-content;
+  }
+}
+
+@media (max-width: 768px) {
+  .resultado {
+    font-size: 1.8rem;
+    margin-left: 1.5rem;
+  }
 }
 
 .statusConcluida {
@@ -244,8 +264,8 @@ select {
   /* CLIP no border-radius */
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   table-layout: fixed;
-  overflow:auto;
-  position:relative;
+  overflow: auto;
+  position: relative;
 }
 
 .tabela {
@@ -424,7 +444,7 @@ select {
 
 /* ===== FORM ===== */
 
-.formGroup{
+.formGroup {
   display: flex;
   flex-direction: column;
   margin-bottom: 1.2rem;
@@ -516,34 +536,26 @@ select {
 }
 
 .cardGrid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  display: flex;
   gap: 1rem;
+  justify-content: space-between;
+  margin-bottom: 1rem;
 }
 
 .cardId {
-  font-size: 1.5rem;
+  font-size: 1.8rem;
   color: var(--text-secondary);
   margin-top: 0.35rem;
-}
-
-.emailLine {
-  font-size: 1.45rem;
-  margin-bottom: 1rem;
-  color: var(--text-primary);
-  word-break: break-word;
-  overflow-wrap: break-word;
+  font-weight: bold;
 }
 
 .cardField {
   display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
+  gap: 0.3rem;
 }
 
 .cardLabel {
   font-size: 1.9rem;
-  margin-top: 1rem;
   font-weight: bold;
   color: var(--text-secondary);
 }
@@ -564,6 +576,7 @@ select {
   align-items: center;
   margin-top: 0.5rem;
 }
+
 
 .cardButton {
   padding: 0.75rem 1.25rem;
