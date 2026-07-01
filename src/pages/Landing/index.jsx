@@ -12,7 +12,6 @@ export default function Landing() {
     new URL("../../images/dashboard-gerente.png", import.meta.url).href,
     new URL("../../images/minhas-tarefas.png", import.meta.url).href,
     new URL("../../images/relatorio-funcionarios.png", import.meta.url).href,
-    new URL("../../images/tarefas-disponiveis.png", import.meta.url).href,
     new URL("../../images/tela-funcionarios.png", import.meta.url).href,
   ];
   const [current, setCurrent] = useState(0);

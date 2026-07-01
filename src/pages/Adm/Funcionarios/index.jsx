@@ -671,7 +671,7 @@ function Funcionarios() {
         ativo: true,
         login: "",
         senha: "",
-      });
+      }); 
 
       setCreateFuncionarioOpen(false);
 
